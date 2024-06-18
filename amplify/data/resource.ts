@@ -1,4 +1,5 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { identifyUser } from "aws-amplify/analytics";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -7,11 +8,29 @@ specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
 const schema = a.schema({
-  Todo: a
+  movie: a
     .model({
-      content: a.string(),
+      movieId: a.id(),
+      title: a.string(),
+      description: a.string(),
+      fsk: a.enum(["FSK_0","FSK_12","FSK_16","FSK_18"]),
+      actors: a.hasMany("actorXmovie", "movieId"),
+      //genre
     })
     .authorization((allow) => [allow.owner()]),
+  actor: a
+    .model({
+      actorId: a.id(),
+      name: a.string(),
+      movies: a.hasMany("actorXmovie","actorId"),
+    }).authorization((allow) => [allow.owner()]),
+  actorXmovie: a
+    .model({
+      actorId: a.id().required(),
+      movieId: a.id().required(),
+      actor: a.belongsTo("actor", "actorId"),
+      movie: a.belongsTo("movie", "movieId"),
+    }).authorization((allow) => [allow.owner()]),
 });
 
 export type Schema = ClientSchema<typeof schema>;
