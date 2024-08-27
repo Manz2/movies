@@ -17,4 +17,11 @@ void main() async {
   // SettingsController for changes, then passes it further down to the
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
+
+
+  /* TOdo
+  Credits für einen Schauspierler funktionierren nicht
+  MIT licence von TMDB hinzufügen
+  Credits eines Schauspielers sortieren
+  */
 }

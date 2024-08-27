@@ -5,5 +5,9 @@ class HomeModel{
 
 
   HomeModel({required this.movies});
+
+  void addMovie(Movie movie) {
+    movies.add(movie);
+  }
 }
 

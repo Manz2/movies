@@ -1,27 +1,23 @@
-import 'package:movies/src/home/home_model.dart';
+import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/tmdb_service.dart';
 
-class HomeController {
-  final HomeModel _model;
+class ActorController {
+  final ActorModel _model;
   final TmdbService tmdbService = TmdbService();
+  ActorController({required Actor actor,required movies}) : _model = ActorModel(actor: actor,movies: movies);
 
-  HomeController() : _model = HomeModel(movies: [testMovie]);
+  ActorModel get model => _model;
 
-  HomeModel get model => _model;
 
-  Future<void> loadMovies() async {
+  Future<void> loadMovies(String actorId) async {
     try {
-      Movie movie = await tmdbService.getMovie(268);
-      _model.addMovie(movie);
-      Movie movie2 = await tmdbService.getMovie(98);
-      _model.addMovie(movie2);
+      _model.setMovies(await tmdbService.getCombinedCredits(actorId));
     } on Exception catch (e) {
       print('Fehler beim Laden des Films: $e');
     }
   }
-
   Future<Movie> getMovieWithCredits(String id) async {
     try {
       return await tmdbService.getMovieWithCredits(int.parse(id)); 
@@ -30,4 +26,5 @@ class HomeController {
       print('Fehler beim Laden des Films: $e');
     }
   }
+  
 }

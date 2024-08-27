@@ -3,14 +3,16 @@ import 'package:movies/src/home/movie.dart';
 
 Actor testActor1 = Actor(
   name: "John Doe",
-  yearOfBirth: 1980,
   image: "assets/images/ActorPlaceholder.jpg",
+  roleName: "Badman",
+  id: "2"
 );
 
 Actor testActor2 = Actor(
   name: "Jane Smith",
-  yearOfBirth: 1985,
   image: "assets/images/ActorPlaceholder.jpg",
+  roleName: "joker",
+  id: "1"
 );
 
 // Testfilm erstellen
@@ -22,6 +24,7 @@ Movie testMovie = Movie(
   rating: 4,
   year: 2022,
   duration: 120, // Dauer in Minuten
-  image: "assets/images/moviePlaceholder.png",
+  image: "",
   actors: [testActor1, testActor2],
+  genre: ["Action"]
 );
