@@ -5,14 +5,14 @@ Actor testActor1 = Actor(
   name: "John Doe",
   image: "assets/images/ActorPlaceholder.jpg",
   roleName: "Badman",
-  id: "2"
+  id: 2
 );
 
 Actor testActor2 = Actor(
   name: "Jane Smith",
   image: "assets/images/ActorPlaceholder.jpg",
   roleName: "joker",
-  id: "1"
+  id: 1
 );
 
 // Testfilm erstellen
@@ -26,5 +26,7 @@ Movie testMovie = Movie(
   duration: 120, // Dauer in Minuten
   image: "",
   actors: [testActor1, testActor2],
-  genre: ["Action"]
+  genre: ["Action"],
+  popularity: 10,
+  mediaType: "TV"
 );

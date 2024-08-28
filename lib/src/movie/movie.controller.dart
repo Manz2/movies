@@ -9,7 +9,12 @@ class MovieController {
 final TmdbService tmdbService = TmdbService();
   MovieModel get model => _model;
 
-  Future<List<Movie>> getMovies(String actorId) async {
+  /*
+  * Returns all Movies from a specific actor sorted by Popularity
+  * param: actorId: a string representing the caracter id of the Actor
+  * returns: a list of Movies
+  */
+  Future<List<Movie>> getMovies(int actorId) async {
     try {
       return await tmdbService.getCombinedCredits(actorId);
     } on Exception catch (e) {

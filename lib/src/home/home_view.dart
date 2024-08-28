@@ -15,11 +15,13 @@ class HomeViewState extends State<HomeView> {
   final HomeController _controller = HomeController();
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    // Hier kannst du eine Methode aufrufen, wenn die Seite geladen wird.
-    _controller.loadMovies();
-    setState(() {});
+    _loadMovies();
+  }
+  void _loadMovies() async {
+    await _controller.loadMovies();
+    setState(() {}); // Aktualisiert die UI nach dem Laden der Filme
   }
 
   @override
@@ -63,7 +65,7 @@ class HomeViewState extends State<HomeView> {
                   // background, the navigation stack is restored.
 
                   Navigator.pushNamed(context, MovieView.routeName,
-                      arguments: await _controller.getMovieWithCredits(item.id));
+                      arguments: await _controller.getMovieWithCredits(item.id,item.mediaType));
                 });
           },
         ),

@@ -8,8 +8,8 @@ class TmdbService {
   final String apiKey = tmdbAPIKey;
   final String baseUrl = 'https://api.themoviedb.org/3';
 
-  Future<Movie> getMovie(int id) async {
-    final url = '$baseUrl/movie/$id?api_key=$apiKey&lamguage=de-DE';
+  Future<Movie> getMovie(int id,String mediaType) async {
+    final url = '$baseUrl/$mediaType/$id?api_key=$apiKey&lamguage=de-DE';
 
      final response = await http.get(Uri.parse(url));
 
@@ -20,9 +20,9 @@ class TmdbService {
     }
   }
 
-  Future<Movie> getMovieWithCredits(int id) async {
-    Movie movie = await getMovie(id);
-    final url = '$baseUrl/movie/$id/credits?api_key=$apiKey&lamguage=de-DE';
+  Future<Movie> getMovieWithCredits(int id, String mediaType) async {
+    Movie movie = await getMovie(id,mediaType);
+    final url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&lamguage=de-DE';
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List<Actor> actors =creditsFromTmdb(json.decode(response.body));
@@ -36,13 +36,15 @@ class TmdbService {
  Movie movieFromTmdb(Map<String, dynamic> json) {
   // Extrahieren der Basisinformationen aus dem JSON-Objekt
   String id = json['id'].toString();
-  String title = json['title'] ?? "kein Titel";
+  String title = json['title'] ?? json['original_title'] ?? json['original_name'] ??"kein Titel";
   String description = json['overview'] ?? 'Keine Beschreibung verfügbar';
   String fsk = json['age_rating'] ?? 'Unbekannt'; // Hier könnte eine spezifische Logik für FSK notwendig sein
   int rating = (json['vote_average'] * 10).round(); // Umwandlung des Ratings in Prozent
   int year = json['release_date'] != null && json['release_date'].isNotEmpty ? DateTime.parse(json['release_date']).year : 0;
   int duration = json['runtime'] ?? 0; // Default auf 0, wenn keine Dauer angegeben
   String image = json['poster_path'] != null ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}' : '';
+  double popularity = json['popularity'] ?? 0;
+  String mediaType = json['media_type'] ?? 'movie';
 
   // Extrahieren der Genres
   List<String> genre = json['genres']!= null ? List<String>.from(json['genres'].map((g) => g['name'])) : [];
@@ -59,6 +61,8 @@ class TmdbService {
     image: image,
     actors: [],
     genre: genre,
+    popularity: popularity,
+    mediaType: mediaType
   );
 }
 List<Actor> creditsFromTmdb(Map<String, dynamic> json) {
@@ -69,7 +73,7 @@ List<Actor> creditsFromTmdb(Map<String, dynamic> json) {
         name: actorJson['name'],
         image: actorJson['profile_path'] != null ? 'https://image.tmdb.org/t/p/w500${actorJson['profile_path']}' : '',
         roleName: actorJson['character'] ?? 'Unbekannt',
-        id: actorJson['credit_id'] ?? '1',
+        id: actorJson['id'] ?? 0, //Hier sollte nicht 0 stehen
       );
       actors.add(actor);
     }
@@ -77,8 +81,8 @@ List<Actor> creditsFromTmdb(Map<String, dynamic> json) {
   return actors;
 }
 
-Future<List<Movie>> getCombinedCredits(String id) async {
-   final url = '$baseUrl/person/$id/combined_credits?api_key=$apiKey&lamguage=de-DE';
+Future<List<Movie>> getCombinedCredits(int id) async {
+   final url = '$baseUrl/person/$id/combined_credits?api_key=$apiKey&language=de-DE';
 
      final response = await http.get(Uri.parse(url));
      Map<String, dynamic> moviesJson = json.decode(response.body);

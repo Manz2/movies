@@ -9,12 +9,15 @@ class Movie {
   String image;
   List<Actor> actors;
   List<String> genre;
-  Movie({required this.id, required this.title, required this.description, required this.fsk, required this.rating, required this.year, required this.duration,required this.image, required this.actors,required this.genre});
+  double popularity;
+  String mediaType;
+  Movie({required this.id, required this.title, required this.description, required this.fsk,
+   required this.rating, required this.year, required this.duration,required this.image, required this.actors,required this.genre, required this.popularity,required this.mediaType});
 
 
   @override
   String toString() {
-    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre}';
+    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity}';
   }
 
   // toJson Methode
@@ -30,6 +33,8 @@ class Movie {
       'image': image,
       'actors': actors.map((actor) => actor.toJson()).toList(),
       'genre': genre,
+      'popularity': popularity,
+      'MediaType': mediaType
     };
   }
 
@@ -46,6 +51,8 @@ class Movie {
       image: json['image'],
       actors: (json['actors'] as List).map((actorJson) => Actor.fromJson(actorJson)).toList(),
       genre: List<String>.from(json['genre']),
+      popularity: json['popularity'],
+      mediaType: json['MediaType']
     );
   }
 }
@@ -54,12 +61,12 @@ class Actor {
   String name;
   String image;
   String roleName;
-  String id;
+  int id;
   Actor({required this.name, required this.image, required this.roleName, required this.id});
 
    @override
   String toString() {
-    return 'Actor{name: $name, image: $image, roleName: $roleName}';
+    return 'Actor{name: $name, image: $image, roleName: $roleName, id $id}';
   }
 
   // toJson Methode

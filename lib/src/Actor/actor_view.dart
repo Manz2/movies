@@ -52,7 +52,7 @@ class ActorView extends StatelessWidget {
                         leading: CircleAvatar(
                           foregroundImage: movie.image.isNotEmpty
                         ? NetworkImage(movie.image)
-                        : const AssetImage("assets/images/´moviePlaceholder.png"),
+                        : const AssetImage("assets/images/moviePlaceholder.png"),
                         ),
                         title: Text(movie.title),
                         onTap: () async {
@@ -61,7 +61,7 @@ class ActorView extends StatelessWidget {
                   // background, the navigation stack is restored.
 
                   Navigator.pushNamed(context, MovieView.routeName,
-                      arguments: await controller.getMovieWithCredits(movie.id));
+                      arguments: await controller.getMovieWithCredits(movie.id,movie.mediaType));
                 }
                       ),
                     );

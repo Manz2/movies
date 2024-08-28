@@ -11,16 +11,16 @@ class ActorController {
   ActorModel get model => _model;
 
 
-  Future<void> loadMovies(String actorId) async {
+  Future<void> loadMovies(int actorId) async {
     try {
       _model.setMovies(await tmdbService.getCombinedCredits(actorId));
     } on Exception catch (e) {
       print('Fehler beim Laden des Films: $e');
     }
   }
-  Future<Movie> getMovieWithCredits(String id) async {
+  Future<Movie> getMovieWithCredits(String id,String mediaType) async {
     try {
-      return await tmdbService.getMovieWithCredits(int.parse(id)); 
+      return await tmdbService.getMovieWithCredits(int.parse(id),mediaType); 
     } on Exception catch (e) {
       return testMovie; //Fehlerbehandlung
       print('Fehler beim Laden des Films: $e');

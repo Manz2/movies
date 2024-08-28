@@ -20,8 +20,6 @@ void main() async {
 
 
   /* TOdo
-  Credits für einen Schauspierler funktionierren nicht
   MIT licence von TMDB hinzufügen
-  Credits eines Schauspielers sortieren
   */
 }

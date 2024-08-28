@@ -38,55 +38,63 @@ class MovieView extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                controller.model.movie.title,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(controller.model.movie.description),
-              const SizedBox(height: 8),
-              Text("FSK: ${controller.model.movie.fsk}"),
-              const SizedBox(height: 8),
-              Text("Rating: ${controller.model.movie.rating}"),
-              const SizedBox(height: 8),
-              Text("Year: ${controller.model.movie.year}"),
-              const SizedBox(height: 8),
-              Text("Duration: ${controller.model.movie.duration} minutes"),
-              const SizedBox(height: 16),
-              const Text("Actors:",
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              Container(
-                height: 400, // Höhe des Containers für die Schauspielerliste
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical, // Horizontale Scrollrichtung
-                  itemCount: controller.model.movie.actors.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final actor = controller.model.movie.actors[index];
-                    return Container(
-                      width: 100, // Breite eines ListTiles
-                      child: ListTile(
-                          leading: CircleAvatar(
-                            foregroundImage: actor.image.isNotEmpty
-                                ? NetworkImage(actor.image)
-                                : const AssetImage(
-                                    "assets/images/ActorPlaceholder.jpg"),
-                          ),
-                          title: Text(actor.name),
-                          subtitle: Text("Figur: ${actor.roleName}"),
-                          onTap: () async {
-                            Navigator.pushNamed(
-                              context,
-                              ActorView.routeName,
-                              arguments: ActorViewArguments(
-                                actor: actor, // Dein Actor-Objekt
-                                movies: await controller.getMovies(
-                                    actor.id), // Deine Liste von Movies
-                              ),
-                            );
-                          }),
-                    );
-                  },
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      controller.model.movie.title,
+                      style:
+                          const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(controller.model.movie.description),
+                    const SizedBox(height: 8),
+                    Text("FSK: ${controller.model.movie.fsk}"),
+                    const SizedBox(height: 8),
+                    Text("Rating: ${controller.model.movie.rating}"),
+                    const SizedBox(height: 8),
+                    Text("Year: ${controller.model.movie.year}"),
+                    const SizedBox(height: 8),
+                    Text("Duration: ${controller.model.movie.duration} minutes"),
+                    const SizedBox(height: 16),
+                    const Text("Actors:",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Container(
+                      height: 400, // Höhe des Containers für die Schauspielerliste
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical, // Horizontale Scrollrichtung
+                        itemCount: controller.model.movie.actors.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          final actor = controller.model.movie.actors[index];
+                          return Container(
+                            width: 100, // Breite eines ListTiles
+                            child: ListTile(
+                                leading: CircleAvatar(
+                                  foregroundImage: actor.image.isNotEmpty
+                                      ? NetworkImage(actor.image)
+                                      : const AssetImage(
+                                          "assets/images/ActorPlaceholder.jpg"),
+                                ),
+                                title: Text(actor.name),
+                                subtitle: Text("Figur: ${actor.roleName}"),
+                                onTap: () async {
+                                  Navigator.pushNamed(
+                                    context,
+                                    ActorView.routeName,
+                                    arguments: ActorViewArguments(
+                                      actor: actor, // Dein Actor-Objekt
+                                      movies: await controller.getMovies(
+                                          actor.id), // Deine Liste von Movies
+                                    ),
+                                  );
+                                }),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
