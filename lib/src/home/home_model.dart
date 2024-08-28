@@ -9,5 +9,10 @@ class HomeModel{
   void addMovie(Movie movie) {
     movies.add(movie);
   }
+
+
+  void removeMovie(Movie movie) {
+    movies.remove(movie);
+  }
 }
 

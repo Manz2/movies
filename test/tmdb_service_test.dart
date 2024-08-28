@@ -30,6 +30,7 @@ void main() {
       expect(movie.title, 'Batman');
       // Weitere Tests können hinzugefügt werden, z.B. ob die ID stimmt
       expect(movie.id, '268');
+      expect(movie.fsk, '12');
       expect(movie.actors.length, isNot(0));
     });
 

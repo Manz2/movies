@@ -15,10 +15,11 @@ class HomeViewState extends State<HomeView> {
   final HomeController _controller = HomeController();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _loadMovies();
   }
+
   void _loadMovies() async {
     await _controller.loadMovies();
     setState(() {}); // Aktualisiert die UI nach dem Laden der Filme
@@ -51,24 +52,46 @@ class HomeViewState extends State<HomeView> {
           itemBuilder: (BuildContext context, int index) {
             final item = _controller.model.movies[index];
 
-            return ListTile(
-                title: Text(item.title),
-                leading: CircleAvatar(
-                  // Display the Flutter Logo image asset.
-                  foregroundImage: item.image.isNotEmpty
-                      ? NetworkImage(item.image)
-                      : const AssetImage("assets/images/moviePlaceholder.png"),
-                ),
-                onTap: () async {
-                  // Navigate to the details page. If the user leaves and returns to
-                  // the app after it has been killed while running in the
-                  // background, the navigation stack is restored.
-
-                  Navigator.pushNamed(context, MovieView.routeName,
-                      arguments: await _controller.getMovieWithCredits(item.id,item.mediaType));
-                });
+            return Dismissible(
+              key: Key(item.id),
+              onDismissed: (direction) {
+                _controller.removeMovie(item);
+                setState(() {});
+                String title = item.title;
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text("$title wurde gelöscht"),
+                  action: SnackBarAction(
+                      label: "undo",
+                      onPressed: () async => {
+                            await _controller.addMovieWithId(
+                                context, item.id, item.mediaType),
+                            setState(() {})
+                          }),
+                ));
+              },
+              background: Container(color: Colors.red),
+              child: ListTile(
+                  title: Text(item.title),
+                  leading: CircleAvatar(
+                    // Display the Flutter Logo image asset.
+                    foregroundImage: item.image.isNotEmpty
+                        ? NetworkImage(item.image)
+                        : const AssetImage(
+                            "assets/images/moviePlaceholder.png"),
+                  ),
+                  onTap: () async {
+                    Navigator.pushNamed(context, MovieView.routeName,
+                        arguments: await _controller.getMovieWithCredits(
+                            item.id, item.mediaType));
+                  }),
+            );
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async =>
+            {await _controller.addMovie(context), setState(() {})},
+        child: const Icon(Icons.add),
       ),
     );
   }
