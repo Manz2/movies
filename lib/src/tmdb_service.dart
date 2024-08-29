@@ -223,6 +223,7 @@ class TmdbService {
   Result resultFromTmdb(Map<String, dynamic> json) {
     String id = json['id'].toString();
     String name = json['name'] ??
+				json['title'] ??
         json['original_name'] ??
         json['original_title'] ??
         "kein Name";
