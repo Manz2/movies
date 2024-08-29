@@ -24,7 +24,9 @@ void main() async {
   suche filter hinzufügen actor movie oder tv show 
   adult false bei der suche hinzufügen
   bei seri3en keine duratuion und year sonder von bis und anzahl folgen bzw. staffeln
-  suche und filterauf dem home screen
+  + zu suche ändern, dann filter bei der suche damit man nur die eigenen Filme durchsuchen kann
   eigenes rating
+  Firebasse als db
+  netzwerk auslastung messen ggf. image siz ereduzieren
   */
 }
