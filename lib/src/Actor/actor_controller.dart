@@ -6,10 +6,10 @@ import 'package:movies/src/tmdb_service.dart';
 class ActorController {
   final ActorModel _model;
   final TmdbService tmdbService = TmdbService();
-  ActorController({required Actor actor,required movies}) : _model = ActorModel(actor: actor,movies: movies);
+  ActorController({required Actor actor, required movies})
+      : _model = ActorModel(actor: actor, movies: movies);
 
   ActorModel get model => _model;
-
 
   Future<void> loadMovies(int actorId) async {
     try {
@@ -18,13 +18,14 @@ class ActorController {
       print('Fehler beim Laden des Films: $e');
     }
   }
-  Future<Movie> getMovieWithCredits(String id,String mediaType) async {
+
+  Future<Movie> getMovieWithCredits(Movie movie) async {
     try {
-      return await tmdbService.getMovieWithCredits(int.parse(id),mediaType); 
+      return await tmdbService.getMovieWithCredits(
+          int.parse(movie.id), movie.mediaType);
     } on Exception catch (e) {
-      return testMovie; //Fehlerbehandlung
       print('Fehler beim Laden des Films: $e');
+      return testMovie; //Fehlerbehandlung
     }
   }
-  
 }

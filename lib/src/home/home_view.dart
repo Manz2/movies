@@ -80,9 +80,12 @@ class HomeViewState extends State<HomeView> {
                             "assets/images/moviePlaceholder.png"),
                   ),
                   onTap: () async {
+                    final movieFuture =
+                        await _controller.getMovieWithCredits(item);
+                    if (!context.mounted) return;
                     Navigator.pushNamed(context, MovieView.routeName,
-                        arguments: await _controller.getMovieWithCredits(
-                            item.id, item.mediaType));
+                            arguments: movieFuture)
+                        .then((val) => _loadMovies());
                   }),
             );
           },

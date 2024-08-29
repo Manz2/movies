@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:json_store/json_store.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
@@ -7,30 +8,33 @@ import 'package:movies/src/tmdb_service.dart';
 class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
+  final _jsonStore = JsonStore(dbName: 'movies');
 
   HomeController() : _model = HomeModel(movies: []);
 
   HomeModel get model => _model;
 
   Future<void> loadMovies() async {
-    try {
-      Movie movie = await tmdbService.getMovie(268, 'movie');
-      _model.addMovie(movie);
-      Movie movie2 = await tmdbService.getMovie(98, 'movie');
-      _model.addMovie(movie2);
-      Movie movie3 = await tmdbService.getMovie(13, 'movie');
-      _model.addMovie(movie3);
-    } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
+    //await _jsonStore.clearDataBase();
+    Map<String, dynamic>? storedData = await _jsonStore.getItem('movies');
+
+    if (storedData != null && storedData.containsKey('movies')) {
+      List<dynamic> moviesJson = storedData['movies'];
+
+      // JSON-Liste in Movie-Objekte konvertieren
+      _model.movies = moviesJson.map((json) => Movie.fromJson(json)).toList();
+    } else {
+      _model.movies = [];
     }
   }
 
-  Future<Movie> getMovieWithCredits(String id, String mediaType) async {
+  Future<Movie> getMovieWithCredits(Movie movie) async {
     try {
-      return await tmdbService.getMovieWithCredits(int.parse(id), mediaType);
+      return await tmdbService.getMovieWithCredits(
+          int.parse(movie.id), movie.mediaType);
     } on Exception catch (e) {
-      return testMovie; //Fehlerbehandlung
       print('Fehler beim Laden des Films: $e');
+      return testMovie; //Fehlerbehandlung
     }
   }
 
@@ -69,7 +73,13 @@ class HomeController {
       try {
         Movie movie = await tmdbService.getMovie(int.parse(result), 'movie');
         _model.addMovie(movie);
+        List<Map<String, dynamic>> moviesJson =
+            _model.movies.map((m) => m.toJson()).toList();
+        await _jsonStore.setItem('movies', {'movies': moviesJson},
+            encrypt: false);
       } on Exception catch (e) {
+        print(e.toString());
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("Film mit der id $result existiert nicht"),
@@ -84,6 +94,8 @@ class HomeController {
       Movie movie = await tmdbService.getMovie(int.parse(id), 'movie');
       _model.addMovie(movie);
     } on Exception catch (e) {
+      print(e.toString());
+      if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Film mit der id $id konnte nicht hinzugefügt werden"),
@@ -92,7 +104,10 @@ class HomeController {
     }
   }
 
-  void removeMovie(Movie movie) {
+  Future<void> removeMovie(Movie movie) async {
     _model.removeMovie(movie);
+    List<Map<String, dynamic>> moviesJson =
+        _model.movies.map((m) => m.toJson()).toList();
+    await _jsonStore.setItem('movies', {'movies': moviesJson}, encrypt: false);
   }
 }

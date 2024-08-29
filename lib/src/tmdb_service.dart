@@ -14,7 +14,7 @@ class TmdbService {
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return movieFromTmdb(json.decode(response.body));
+      return movieFromTmdb(json.decode(response.body), mediaType);
     } else {
       throw HttpException("Failed to load movie with id=$id");
     }
@@ -32,28 +32,74 @@ class TmdbService {
       throw HttpException("Failed to load credits for movie with id=$id");
     }
 
+    if (mediaType == 'movie') {
+      movie.fsk = await getMovieFsk(id);
+    } else if (mediaType == 'tv') {
+      movie.fsk = await getTvFsk(id);
+    }
+
+    return movie;
+  }
+
+  Future<String> getMovieFsk(int id) async {
     final url2 =
-        '$baseUrl/$mediaType/$id/release_dates?api_key=$apiKey&language=de-DE';
+        '$baseUrl/movie/$id/release_dates?api_key=$apiKey&language=de-DE';
     final response2 = await http.get(Uri.parse(url2));
     Map<String, dynamic> json2 = json.decode(response2.body);
-    if (response.statusCode == 200) {
+    if (response2.statusCode == 200) {
       String desiredIsoCode = "DE";
       for (var result in json2['results']) {
         if (result['iso_3166_1'] == desiredIsoCode) {
           List<dynamic> releaseDates = result['release_dates'];
           if (releaseDates.isNotEmpty) {
-            movie.fsk = releaseDates[0]['certification'];
+            for (var releaseDate in releaseDates) {
+              String fsk = releaseDate['certification'];
+              if (fsk == '0' ||
+                  fsk == '6' ||
+                  fsk == '12' ||
+                  fsk == '16' ||
+                  fsk == '18') {
+                return releaseDate['certification'];
+              }
+            }
           }
           break; // Abbrechen, da der gewünschte Eintrag gefunden wurde
         }
       }
-    } else {
-      throw HttpException("Failed to load fsk for movie with id=$id");
     }
-    return movie;
+    print("Failed to load fsk for movie with id=$id");
+    return 'Unbekannt';
   }
 
-  Movie movieFromTmdb(Map<String, dynamic> json) {
+  Future<String> getTvFsk(int id) async {
+    final url2 =
+        '$baseUrl/tv/$id/content_ratings?api_key=$apiKey&language=de-DE';
+    final response2 = await http.get(Uri.parse(url2));
+    Map<String, dynamic> json2 = json.decode(response2.body);
+    if (response2.statusCode == 200) {
+      String desiredIsoCode = "DE";
+      for (var result in json2['results']) {
+        if (result['iso_3166_1'] == desiredIsoCode) {
+          if (result.isNotEmpty) {
+            String fsk = result['rating'];
+            if (fsk == '0' ||
+                fsk == '6' ||
+                fsk == '12' ||
+                fsk == '16' ||
+                fsk == '18') {
+              return result['rating'];
+            } else {
+              return 'unbekannt';
+            }
+          }
+        }
+      }
+    }
+    print("Failed to load fsk for movie with id=$id");
+    return 'Unbekannt';
+  }
+
+  Movie movieFromTmdb(Map<String, dynamic> json, String mediaType2) {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
     String title = json['title'] ??
@@ -74,7 +120,7 @@ class TmdbService {
         ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
         : '';
     double popularity = json['popularity'] ?? 0;
-    String mediaType = json['media_type'] ?? 'movie';
+    String mediaType = json['media_type'] ?? mediaType2;
 
     // Extrahieren der Genres
     List<String> genre = json['genres'] != null
@@ -125,7 +171,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var movie in moviesJson['cast']) {
-        movies.add(movieFromTmdb(movie));
+        movies.add(movieFromTmdb(movie, 'unbekannt'));
       }
     } else {
       throw HttpException("Failed to load movie with id=$id");

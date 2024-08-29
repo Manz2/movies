@@ -18,10 +18,10 @@ void main() async {
   // SettingsView.
   runApp(MyApp(settingsController: settingsController));
 
-
   /* TOdo
   MIT licence von TMDB hinzufügen
-  im movieView ein add button um den Film hinzuzufügen
   anbieter netflix etc bei movieView hinzufügen
+  fsk kein bild wenn nicht verfü+gbar
+  nicht testmovie anzeigen sionder route back un ups da ist wohl etwas schiegelaufen
   */
 }

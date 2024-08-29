@@ -11,9 +11,19 @@ class Movie {
   List<String> genre;
   double popularity;
   String mediaType;
-  Movie({required this.id, required this.title, required this.description, required this.fsk,
-   required this.rating, required this.year, required this.duration,required this.image, required this.actors,required this.genre, required this.popularity,required this.mediaType});
-
+  Movie(
+      {required this.id,
+      required this.title,
+      required this.description,
+      required this.fsk,
+      required this.rating,
+      required this.year,
+      required this.duration,
+      required this.image,
+      required this.actors,
+      required this.genre,
+      required this.popularity,
+      required this.mediaType});
 
   @override
   String toString() {
@@ -34,26 +44,27 @@ class Movie {
       'actors': actors.map((actor) => actor.toJson()).toList(),
       'genre': genre,
       'popularity': popularity,
-      'MediaType': mediaType
+      'MediaType': mediaType,
     };
   }
 
   // fromJson Methode
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      fsk: json['fsk'],
-      rating: json['rating'],
-      year: json['year'],
-      duration: json['duration'],
-      image: json['image'],
-      actors: (json['actors'] as List).map((actorJson) => Actor.fromJson(actorJson)).toList(),
-      genre: List<String>.from(json['genre']),
-      popularity: json['popularity'],
-      mediaType: json['MediaType']
-    );
+        id: json['id'],
+        title: json['title'],
+        description: json['description'],
+        fsk: json['fsk'],
+        rating: json['rating'],
+        year: json['year'],
+        duration: json['duration'],
+        image: json['image'],
+        actors: (json['actors'] as List)
+            .map((actorJson) => Actor.fromJson(actorJson))
+            .toList(),
+        genre: List<String>.from(json['genre']),
+        popularity: json['popularity'],
+        mediaType: json['MediaType']);
   }
 }
 
@@ -62,9 +73,13 @@ class Actor {
   String image;
   String roleName;
   int id;
-  Actor({required this.name, required this.image, required this.roleName, required this.id});
+  Actor(
+      {required this.name,
+      required this.image,
+      required this.roleName,
+      required this.id});
 
-   @override
+  @override
   String toString() {
     return 'Actor{name: $name, image: $image, roleName: $roleName, id $id}';
   }
