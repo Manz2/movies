@@ -63,4 +63,12 @@ class SearchPageController {
       return testMovie; //Fehlerbehandlung
     }
   }
+
+  Future<void> getPopular() async {
+    try {
+      _model.results = await tmdbService.getPopular();
+    } on Exception catch (e) {
+      print('Failed to get popular movies $e');
+    }
+  }
 }

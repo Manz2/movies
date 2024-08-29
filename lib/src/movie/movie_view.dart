@@ -147,7 +147,7 @@ class MovieViewState extends State<MovieView> {
                                       "assets/images/ActorPlaceholder.jpg"),
                             ),
                             title: Text(actor.name),
-                            subtitle: Text("Figur: ${actor.roleName}"),
+                            subtitle: Text(actor.roleName),
                             onTap: () async {
                               final movies =
                                   await controller.getMovies(actor.id);

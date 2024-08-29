@@ -12,6 +12,18 @@ class SearchView extends StatefulWidget {
 
 class SearchViewState extends State<SearchView> {
   SearchPageController controller = SearchPageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _getPopular();
+  }
+
+  _getPopular() async {
+    await controller.getPopular();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

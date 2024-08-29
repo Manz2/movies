@@ -32,7 +32,8 @@ class TmdbService {
     }
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      List<Actor> actors = creditsFromTmdb(json.decode(response.body));
+      List<Actor> actors =
+          creditsFromTmdb(json.decode(response.body), mediaType);
       movie.actors = actors;
     } else {
       throw HttpException("Failed to load credits for movie with id=$id");
@@ -149,7 +150,7 @@ class TmdbService {
         mediaType: mediaType);
   }
 
-  List<Actor> creditsFromTmdb(Map<String, dynamic> json) {
+  List<Actor> creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
     List<Actor> actors = [];
     if (json['cast'] != null) {
       for (var actorJson in json['cast']) {
@@ -161,6 +162,22 @@ class TmdbService {
           roleName: actorJson['character'] ?? 'Unbekannt',
           id: actorJson['id'] ?? 0, //Hier sollte nicht 0 stehen
         );
+        if (mediaType == 'tv' && actorJson['roles'] != null) {
+          final buffer = StringBuffer();
+          bool first = true;
+          for (var role in actorJson['roles']) {
+            if (role['character'] != null) {
+              buffer.write(role['character']);
+              if (first) {
+                buffer.write(' ');
+                first = false;
+              } else {
+                buffer.write('/');
+              }
+            }
+          }
+          actor.roleName = buffer.toString().substring(0, buffer.length - 1);
+        }
         actors.add(actor);
       }
     }
@@ -216,5 +233,26 @@ class TmdbService {
     String mediaType = json['media_type'] ?? 'Unbekannt';
 
     return Result(name: name, image: image, type: mediaType, id: id);
+  }
+
+  Future<List<Result>> getPopular() async {
+    final url =
+        '$baseUrl/movie/popular?api_key=$apiKey&language=de-DE&region=Deutschland';
+
+    final response = await http.get(Uri.parse(url));
+    Map<String, dynamic> resultJson = json.decode(response.body);
+    List<Result> results = [];
+
+    if (response.statusCode == 200) {
+      for (var result in resultJson['results']) {
+        Result rs = resultFromTmdb(result);
+        // This is necessary because popular does not have a modia_type field.
+        rs.type = 'movie';
+        results.add(rs);
+      }
+    } else {
+      throw const HttpException("Failed to get popular movies");
+    }
+    return results;
   }
 }
