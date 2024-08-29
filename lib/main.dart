@@ -28,5 +28,6 @@ void main() async {
   eigenes rating
   Firebasse als db
   netzwerk auslastung messen ggf. image siz ereduzieren
+  suchergebnisse sind nicht auf deutsch
   */
 }
