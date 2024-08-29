@@ -1,11 +1,12 @@
 import 'package:json_store/json_store.dart';
+import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 
 class MovieController {
   final MovieModel _model;
-  final _jsonStore = JsonStore(dbName: 'movies');
+  final _db = DbServiceLocal();
 
   MovieController({required Movie movie}) : _model = MovieModel(movie: movie);
   final TmdbService tmdbService = TmdbService();
@@ -26,19 +27,11 @@ class MovieController {
   }
 
   Future<bool> isSaved() async {
-    // Hol die gespeicherten Daten aus dem JsonStore
-    Map<String, dynamic>? storedData = await _jsonStore.getItem('movies');
-
-    // Überprüfen, ob gespeicherte Daten vorhanden sind und ob 'movies' enthalten ist
-    if (storedData != null && storedData.containsKey('movies')) {
-      List<dynamic> moviesJson = storedData['movies'];
-
-      // Überprüfen, ob ein Film mit derselben ID und demselben mediaType existiert
-      for (var movie in moviesJson) {
-        if (movie['id'] == _model.movie.id &&
-            movie['MediaType'] == _model.movie.mediaType) {
-          return true; // Film existiert bereits
-        }
+    // Überprüfen, ob ein Film mit derselben ID und demselben mediaType existiert
+    for (var movie in await _db.getMovies()) {
+      if (movie.id == _model.movie.id &&
+          movie.mediaType == _model.movie.mediaType) {
+        return true; // Film existiert bereits
       }
     }
 
@@ -46,16 +39,8 @@ class MovieController {
   }
 
   addMovie() async {
-    Map<String, dynamic>? storedData = await _jsonStore.getItem('movies');
-    List<dynamic> moviesJson = [];
-
-    if (storedData != null && storedData.containsKey('movies')) {
-      moviesJson = storedData['movies'];
-    }
-    // Neuen Film zur JSON-Liste hinzufügen
-    moviesJson.add(_model.movie.toJson());
-
-    // Aktualisierte Liste im Store speichern
-    await _jsonStore.setItem('movies', {'movies': moviesJson}, encrypt: false);
+    List<Movie> movies = await _db.getMovies();
+    movies.add(_model.movie);
+    await _db.setMovies(movies);
   }
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:json_store/json_store.dart';
+import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
@@ -8,24 +8,14 @@ import 'package:movies/src/tmdb_service.dart';
 class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
-  final _jsonStore = JsonStore(dbName: 'movies');
+  final _db = DbServiceLocal();
 
   HomeController() : _model = HomeModel(movies: []);
 
   HomeModel get model => _model;
 
   Future<void> loadMovies() async {
-    //await _jsonStore.clearDataBase();
-    Map<String, dynamic>? storedData = await _jsonStore.getItem('movies');
-
-    if (storedData != null && storedData.containsKey('movies')) {
-      List<dynamic> moviesJson = storedData['movies'];
-
-      // JSON-Liste in Movie-Objekte konvertieren
-      _model.movies = moviesJson.map((json) => Movie.fromJson(json)).toList();
-    } else {
-      _model.movies = [];
-    }
+    _model.movies = await _db.getMovies();
   }
 
   Future<Movie> getMovieWithCredits(Movie movie) async {
@@ -73,10 +63,7 @@ class HomeController {
       try {
         Movie movie = await tmdbService.getMovie(int.parse(result), 'movie');
         _model.addMovie(movie);
-        List<Map<String, dynamic>> moviesJson =
-            _model.movies.map((m) => m.toJson()).toList();
-        await _jsonStore.setItem('movies', {'movies': moviesJson},
-            encrypt: false);
+        _db.setMovies(_model.movies);
       } on Exception catch (e) {
         print(e.toString());
         if (!context.mounted) return;
@@ -93,6 +80,7 @@ class HomeController {
     try {
       Movie movie = await tmdbService.getMovie(int.parse(id), 'movie');
       _model.addMovie(movie);
+      _db.setMovies(_model.movies);
     } on Exception catch (e) {
       print(e.toString());
       if (!context.mounted) return false;
@@ -106,8 +94,6 @@ class HomeController {
 
   Future<void> removeMovie(Movie movie) async {
     _model.removeMovie(movie);
-    List<Map<String, dynamic>> moviesJson =
-        _model.movies.map((m) => m.toJson()).toList();
-    await _jsonStore.setItem('movies', {'movies': moviesJson}, encrypt: false);
+    _db.setMovies(_model.movies);
   }
 }

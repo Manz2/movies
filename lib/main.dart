@@ -23,8 +23,8 @@ void main() async {
   nicht testmovie anzeigen sionder route back un ups da ist wohl etwas schiegelaufen
   suche filter hinzufügen actor movie oder tv show 
   adult false bei der suche hinzufügen
-  ladeanimation beim suchen
   bei seri3en keine duratuion und year sonder von bis und anzahl folgen bzw. staffeln
   suche und filterauf dem home screen
+  eigenes rating
   */
 }
