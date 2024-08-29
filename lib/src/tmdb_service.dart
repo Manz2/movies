@@ -22,8 +22,13 @@ class TmdbService {
 
   Future<Movie> getMovieWithCredits(int id, String mediaType) async {
     Movie movie = await getMovie(id, mediaType);
-    final url =
-        '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
+    final url;
+    if (mediaType == 'movie') {
+      url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
+    } else {
+      url =
+          '$baseUrl/$mediaType/$id/aggregate_credits?api_key=$apiKey&language=de-DE';
+    }
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List<Actor> actors = creditsFromTmdb(json.decode(response.body));
