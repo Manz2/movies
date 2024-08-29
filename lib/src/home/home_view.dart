@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/home/home_controller.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
 
 class HomeView extends StatefulWidget {
@@ -92,8 +93,12 @@ class HomeViewState extends State<HomeView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async =>
-            {await _controller.addMovie(context), setState(() {})},
+        onPressed: () => {
+          Navigator.pushNamed(
+            context,
+            SearchView.routeName,
+          ).then((val) => _loadMovies())
+        },
         child: const Icon(Icons.add),
       ),
     );

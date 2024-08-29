@@ -19,9 +19,12 @@ void main() async {
   runApp(MyApp(settingsController: settingsController));
 
   /* TOdo
-  MIT licence von TMDB hinzufügen
   anbieter netflix etc bei movieView hinzufügen
-  fsk kein bild wenn nicht verfü+gbar
   nicht testmovie anzeigen sionder route back un ups da ist wohl etwas schiegelaufen
+  suche filter hinzufügen actor movie oder tv show 
+  adult false bei der suche hinzufügen
+  ladeanimation beim suchen
+  bei seri3en keine duratuion und year sonder von bis und anzahl folgen bzw. staffeln
+  suche und filterauf dem home screen
   */
 }

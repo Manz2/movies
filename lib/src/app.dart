@@ -6,6 +6,7 @@ import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/search/search_view.dart';
 import 'sample_feature/sample_item_details_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -77,7 +78,9 @@ class MyApp extends StatelessWidget {
                     return const SampleItemDetailsView();
                   case MovieView.routeName:
                     final args = routeSettings.arguments as Movie;
-                    return MovieView(movie:args);
+                    return MovieView(movie: args);
+                  case SearchView.routeName:
+                    return const SearchView();
                   case ActorView.routeName:
                     final args = routeSettings.arguments as ActorViewArguments;
                     return ActorView(actor: args.actor, movies: args.movies);

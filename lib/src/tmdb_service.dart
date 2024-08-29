@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/search/search_model.dart';
 import 'package:movies/src/secrets.dart';
 
 class TmdbService {
@@ -182,5 +183,38 @@ class TmdbService {
       throw HttpException("Failed to load movie with id=$id");
     }
     return movies;
+  }
+
+  Future<List<Result>> combinedSearch(String search) async {
+    final url =
+        '$baseUrl/search/multi?api_key=$apiKey&language=de-DE&query=$search';
+
+    final response = await http.get(Uri.parse(url));
+    Map<String, dynamic> resultJson = json.decode(response.body);
+    List<Result> results = [];
+
+    if (response.statusCode == 200) {
+      for (var result in resultJson['results']) {
+        results.add(resultFromTmdb(result));
+      }
+    } else {
+      throw HttpException("Failed search with querry=$search");
+    }
+    return results;
+  }
+
+  Result resultFromTmdb(Map<String, dynamic> json) {
+    String id = json['id'].toString();
+    String name = json['name'] ??
+        json['original_name'] ??
+        json['original_title'] ??
+        "kein Name";
+    String image = json['poster_path'] ?? json['profile_path'] ?? '';
+    if (image != '') {
+      image = 'https://image.tmdb.org/t/p/w500$image';
+    }
+    String mediaType = json['media_type'] ?? 'Unbekannt';
+
+    return Result(name: name, image: image, type: mediaType, id: id);
   }
 }
