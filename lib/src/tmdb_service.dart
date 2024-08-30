@@ -9,21 +9,27 @@ class TmdbService {
   final String apiKey = tmdbAPIKey;
   final String baseUrl = 'https://api.themoviedb.org/3';
 
-  Future<Movie> getMovie(int id, String mediaType) async {
+  Future<Movie> getMovie(
+      int id, String mediaType, double privateRating, String firebaseId) async {
     final url = '$baseUrl/$mediaType/$id?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return movieFromTmdb(json.decode(response.body), mediaType);
+      return movieFromTmdb(
+          json.decode(response.body), mediaType, privateRating, firebaseId);
     } else {
       throw HttpException("Failed to load movie with id=$id");
     }
   }
 
-  Future<Movie> getMovieWithCredits(int id, String mediaType) async {
-    Movie movie = await getMovie(id, mediaType);
-    final url;
+  Future<Movie> getMovieWithCredits(movie1) async {
+    int id = int.parse(movie1.id);
+    String mediaType = movie1.mediaType;
+    double privateRating = movie1.privateRating;
+    Movie movie =
+        await getMovie(id, mediaType, privateRating, movie1.firebaseId);
+    String url;
     if (mediaType == 'movie') {
       url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
     } else {
@@ -106,7 +112,8 @@ class TmdbService {
     return 'Unbekannt';
   }
 
-  Movie movieFromTmdb(Map<String, dynamic> json, String mediaType2) {
+  Movie movieFromTmdb(Map<String, dynamic> json, String mediaType2,
+      double privateRating, String firebaseId) {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
     String title = json['title'] ??
@@ -121,13 +128,20 @@ class TmdbService {
     int year = json['release_date'] != null && json['release_date'].isNotEmpty
         ? DateTime.parse(json['release_date']).year
         : 0;
-    int duration =
-        json['runtime'] ?? 0; // Default auf 0, wenn keine Dauer angegeben
+    int duration = json['runtime'] ??
+        json["number_of_seasons"] ??
+        0; // Default auf 0, wenn keine Dauer angegeben
     String image = json['poster_path'] != null
         ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
         : '';
     double popularity = json['popularity'] ?? 0;
     String mediaType = json['media_type'] ?? mediaType2;
+
+    if (year == 0 &&
+        json['first_air_date'] != null &&
+        json['first_air_date'].isNotEmpty) {
+      year = DateTime.parse(json['first_air_date']).year;
+    }
 
     // Extrahieren der Genres
     List<String> genre = json['genres'] != null
@@ -147,7 +161,9 @@ class TmdbService {
         actors: [],
         genre: genre,
         popularity: popularity,
-        mediaType: mediaType);
+        mediaType: mediaType,
+        privateRating: privateRating,
+        firebaseId: firebaseId);
   }
 
   List<Actor> creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
@@ -194,7 +210,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var movie in moviesJson['cast']) {
-        movies.add(movieFromTmdb(movie, 'unbekannt'));
+        movies.add(movieFromTmdb(movie, 'unbekannt', 0, ''));
       }
     } else {
       throw HttpException("Failed to load movie with id=$id");
@@ -223,7 +239,7 @@ class TmdbService {
   Result resultFromTmdb(Map<String, dynamic> json) {
     String id = json['id'].toString();
     String name = json['name'] ??
-				json['title'] ??
+        json['title'] ??
         json['original_name'] ??
         json['original_title'] ??
         "kein Name";

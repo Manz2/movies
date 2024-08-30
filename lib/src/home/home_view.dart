@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/home/home_controller.dart';
+import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
@@ -55,17 +56,17 @@ class HomeViewState extends State<HomeView> {
 
             return Dismissible(
               key: Key(item.id),
-              onDismissed: (direction) {
-                _controller.removeMovie(item);
+              onDismissed: (direction) async {
+                Movie movie = await _controller.removeMovie(item);
                 setState(() {});
                 String title = item.title;
+                if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text("$title wurde gelöscht"),
                   action: SnackBarAction(
                       label: "undo",
                       onPressed: () async => {
-                            await _controller.addMovieWithId(
-                                context, item.id, item.mediaType),
+                            await _controller.addMovieWithId(context, movie),
                             setState(() {})
                           }),
                 ));

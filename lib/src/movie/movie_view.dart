@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
@@ -18,6 +19,10 @@ class MovieView extends StatefulWidget {
 class MovieViewState extends State<MovieView> {
   late final MovieController controller;
   bool _isFabVisible = false;
+
+  set rating(double rating) {
+    controller.setRating(rating);
+  }
 
   @override
   void initState() {
@@ -123,14 +128,39 @@ class MovieViewState extends State<MovieView> {
                     const SizedBox(height: 8),
                     Text("FSK: ${controller.model.movie.fsk}"),
                     const SizedBox(height: 8),
-                    Text("Rating: ${controller.model.movie.rating}"),
-                    const SizedBox(height: 8),
-                    Text("Year: ${controller.model.movie.year}"),
-                    const SizedBox(height: 8),
                     Text(
-                        "Duration: ${controller.model.movie.duration} minutes"),
+                        "Öffentliches Rating: ${controller.model.movie.rating}"),
+                    const SizedBox(height: 8),
+                    Text("Jahr: ${controller.model.movie.year}"),
+                    const SizedBox(height: 8),
+                    Text("Genre: ${controller.model.movie.genre.join(', ')}"),
+                    const SizedBox(height: 8),
+                    controller.model.movie.mediaType == 'movie'
+                        ? Text(
+                            "Dauer: ${controller.model.movie.duration} Minuten")
+                        : Text(
+                            "Dauer: ${controller.model.movie.duration} Staffeln"),
+                    const SizedBox(height: 8),
+                    !_isFabVisible
+                        ? const Text("Privates Rating: ")
+                        : const SizedBox(height: 0),
+                    const SizedBox(height: 8),
+                    !_isFabVisible
+                        ? StarRating(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            size: 40.0,
+                            rating: controller.model.movie.privateRating,
+                            color: Colors.orange,
+                            borderColor: Colors.grey,
+                            allowHalfRating: true,
+                            starCount: 5,
+                            onRatingChanged: (rating) => setState(() {
+                              this.rating = rating;
+                            }),
+                          )
+                        : const SizedBox(height: 0),
                     const SizedBox(height: 16),
-                    const Text("Actors:",
+                    const Text("Schauspieler:",
                         style: TextStyle(fontWeight: FontWeight.bold)),
                     SizedBox(
                       height: 400,

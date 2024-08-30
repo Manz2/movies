@@ -4,6 +4,7 @@
 // writing unit tests, visit
 // https://flutter.dev/to/unit-testing
 import 'package:flutter_test/flutter_test.dart';
+import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/tmdb_service.dart';
 
 void main() {
@@ -11,7 +12,7 @@ void main() {
     test('should get the Batman Movie', () async {
       // ID 268 wird als Beispiel für den Film "Batman" verwendet.
       final tmdbService = TmdbService();
-      final movie = await tmdbService.getMovie(268, 'movie');
+      final movie = await tmdbService.getMovie(268, 'movie', 0, '');
       // Überprüfe, ob der Titel des Films "Batman" ist
       expect(movie.title, 'Batman');
       // Weitere Tests können hinzugefügt werden, z.B. ob die ID stimmt
@@ -22,7 +23,7 @@ void main() {
     test('should get the Batman Movie with credits', () async {
       // ID 268 wird als Beispiel für den Film "Batman" verwendet.
       final tmdbService = TmdbService();
-      final movie = await tmdbService.getMovieWithCredits(268, 'movie');
+      final movie = await tmdbService.getMovieWithCredits(testMovie);
       // Überprüfe, ob der Titel des Films "Batman" ist
       expect(movie.title, 'Batman');
       // Weitere Tests können hinzugefügt werden, z.B. ob die ID stimmt

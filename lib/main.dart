@@ -23,11 +23,8 @@ void main() async {
   nicht testmovie anzeigen sionder route back un ups da ist wohl etwas schiegelaufen
   suche filter hinzufügen actor movie oder tv show 
   adult false bei der suche hinzufügen
-  bei seri3en keine duratuion und year sonder von bis und anzahl folgen bzw. staffeln
   + zu suche ändern, dann filter bei der suche damit man nur die eigenen Filme durchsuchen kann
-  eigenes rating
   Firebasse als db
   netzwerk auslastung messen ggf. image siz ereduzieren
-  suchergebnisse sind nicht auf deutsch
   */
 }

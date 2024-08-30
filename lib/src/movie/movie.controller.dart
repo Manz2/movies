@@ -1,4 +1,3 @@
-import 'package:json_store/json_store.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
@@ -27,20 +26,15 @@ class MovieController {
   }
 
   Future<bool> isSaved() async {
-    // Überprüfen, ob ein Film mit derselben ID und demselben mediaType existiert
-    for (var movie in await _db.getMovies()) {
-      if (movie.id == _model.movie.id &&
-          movie.mediaType == _model.movie.mediaType) {
-        return true; // Film existiert bereits
-      }
-    }
-
-    return false; // Kein Film mit derselben ID und demselben mediaType gefunden
+    return _db.movieExists(_model.movie.id, _model.movie.mediaType);
   }
 
   addMovie() async {
-    List<Movie> movies = await _db.getMovies();
-    movies.add(_model.movie);
-    await _db.setMovies(movies);
+    await _db.addMovie(_model.movie);
+  }
+
+  Future<void> setRating(double rating) async {
+    _model.movie.privateRating = rating;
+    await _db.setMovie(_model.movie);
   }
 }

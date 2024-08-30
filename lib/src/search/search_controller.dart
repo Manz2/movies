@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
+import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
@@ -10,6 +11,7 @@ import 'package:movies/src/tmdb_service.dart';
 class SearchPageController {
   final SearchModel _model;
   final TmdbService tmdbService = TmdbService();
+  final DbServiceLocal _db = DbServiceLocal();
   SearchPageController() : _model = SearchModel(results: []);
 
   SearchModel get model => _model;
@@ -57,10 +59,11 @@ class SearchPageController {
 
   Future<Movie> _getMovie(String id, String mediaType) async {
     try {
-      return await tmdbService.getMovieWithCredits(int.parse(id), mediaType);
+      return await tmdbService
+          .getMovieWithCredits(await _db.getMovie(id, mediaType));
     } on Exception catch (e) {
       print('Fehler beim Laden des Films: $e');
-      return testMovie; //Fehlerbehandlung
+      return testMovie; // Fehlerbehandlung
     }
   }
 

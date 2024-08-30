@@ -11,6 +11,8 @@ class Movie {
   List<String> genre;
   double popularity;
   String mediaType;
+  double privateRating;
+  String firebaseId;
   Movie(
       {required this.id,
       required this.title,
@@ -23,11 +25,13 @@ class Movie {
       required this.actors,
       required this.genre,
       required this.popularity,
-      required this.mediaType});
+      required this.mediaType,
+      required this.privateRating,
+      required this.firebaseId});
 
   @override
   String toString() {
-    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity}';
+    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId}';
   }
 
   // toJson Methode
@@ -45,26 +49,31 @@ class Movie {
       'genre': genre,
       'popularity': popularity,
       'MediaType': mediaType,
+      'privateRating': privateRating,
+      'firebaseId': firebaseId
     };
   }
 
   // fromJson Methode
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-        id: json['id'],
-        title: json['title'],
-        description: json['description'],
-        fsk: json['fsk'],
-        rating: json['rating'],
-        year: json['year'],
-        duration: json['duration'],
-        image: json['image'],
-        actors: (json['actors'] as List)
-            .map((actorJson) => Actor.fromJson(actorJson))
-            .toList(),
-        genre: List<String>.from(json['genre']),
-        popularity: json['popularity'],
-        mediaType: json['MediaType']);
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      fsk: json['fsk'],
+      rating: json['rating'],
+      year: json['year'],
+      duration: json['duration'],
+      image: json['image'],
+      actors: (json['actors'] as List)
+          .map((actorJson) => Actor.fromJson(actorJson))
+          .toList(),
+      genre: List<String>.from(json['genre']),
+      popularity: json['popularity'],
+      mediaType: json['MediaType'],
+      privateRating: json['privateRating'] ?? 0,
+      firebaseId: json['firebaseId'] ?? '',
+    );
   }
 }
 

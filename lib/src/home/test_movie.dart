@@ -15,7 +15,7 @@ Actor testActor2 = Actor(
 
 // Testfilm erstellen
 Movie testMovie = Movie(
-    id: "1",
+    id: "268",
     title: "Test Movie",
     description: "This is a test movie description.",
     fsk: "12",
@@ -26,4 +26,6 @@ Movie testMovie = Movie(
     actors: [testActor1, testActor2],
     genre: ["Action"],
     popularity: 10,
-    mediaType: "TV");
+    mediaType: "TV",
+    privateRating: 5,
+    firebaseId: '');
