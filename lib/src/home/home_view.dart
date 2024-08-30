@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/Filter/filter_model.dart';
+import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/home/home_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
@@ -27,6 +29,11 @@ class HomeViewState extends State<HomeView> {
     setState(() {}); // Aktualisiert die UI nach dem Laden der Filme
   }
 
+  void _applyFilter(Filter filter) {
+    _controller.model.filter = filter;
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,19 +43,21 @@ class HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
               Navigator.restorablePushNamed(context, SettingsView.routeName);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.filter_alt),
+            onPressed: () {
+              Navigator.pushNamed(context, FilterView.routeName,
+                      arguments: _controller.model.filter)
+                  .then((filter) => _applyFilter(filter as Filter));
             },
           ),
         ],
       ),
       body: Center(
         child: ListView.builder(
-          // Providing a restorationId allows the ListView to restore the
-          // scroll position when a user leaves and returns to the app after it
-          // has been killed while running in the background.
           restorationId: 'sampleItemListView',
           itemCount: _controller.model.movies.length,
           itemBuilder: (BuildContext context, int index) {

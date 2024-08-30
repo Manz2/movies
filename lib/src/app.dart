@@ -3,6 +3,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
+import 'package:movies/src/Filter/filter_model.dart';
+import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
@@ -84,6 +86,9 @@ class MyApp extends StatelessWidget {
                   case ActorView.routeName:
                     final args = routeSettings.arguments as ActorViewArguments;
                     return ActorView(actor: args.actor, movies: args.movies);
+                  case FilterView.routeName:
+                    final args = routeSettings.arguments as Filter;
+                    return FilterView(filter: args);
                   case HomeView.routeName:
                   default:
                     return const HomeView();

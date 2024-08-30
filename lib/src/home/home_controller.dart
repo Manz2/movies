@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
@@ -10,7 +11,17 @@ class HomeController {
   final TmdbService tmdbService = TmdbService();
   final _db = DbServiceLocal();
 
-  HomeController() : _model = HomeModel(movies: []);
+  HomeController()
+      : _model = HomeModel(
+            movies: [],
+            filter: Filter(
+                movie: 3,
+                fsk: [],
+                durationFrom: 0,
+                durationTo: 400,
+                rating: 0,
+                yearFrom: 0,
+                yearTo: 6000));
 
   HomeModel get model => _model;
 
