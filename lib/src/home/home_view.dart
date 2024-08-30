@@ -31,7 +31,7 @@ class HomeViewState extends State<HomeView> {
 
   void _applyFilter(Filter filter) {
     _controller.model.filter = filter;
-    setState(() {});
+    _loadMovies();
   }
 
   @override
@@ -59,9 +59,9 @@ class HomeViewState extends State<HomeView> {
       body: Center(
         child: ListView.builder(
           restorationId: 'sampleItemListView',
-          itemCount: _controller.model.movies.length,
+          itemCount: _controller.model.filteredMovies.length,
           itemBuilder: (BuildContext context, int index) {
-            final item = _controller.model.movies[index];
+            final item = _controller.model.filteredMovies[index];
 
             return Dismissible(
               key: Key(item.id),

@@ -15,15 +15,15 @@ class FilterView extends StatefulWidget {
 
 class FilterViewState extends State<FilterView> {
   late final FilterController controller;
-  bool movieIsSelected = false;
-  bool tvIsSelected = false;
+  bool movieIsSelected = true;
+  bool tvIsSelected = true;
   bool fsk0 = false;
   bool fsk6 = false;
   bool fsk12 = false;
   bool fsk16 = false;
   bool fsk18 = false;
   RangeValues _durationrange = const RangeValues(60, 120);
-  double rating = 1;
+  double rating = 0;
   int yearFrom = 0;
   int yearTo = 6000;
 
@@ -35,11 +35,11 @@ class FilterViewState extends State<FilterView> {
           controller.model.filter.movie == 3;
       tvIsSelected = controller.model.filter.movie == 2 ||
           controller.model.filter.movie == 3;
-      fsk0 = controller.model.filter.fsk.contains('FSK0');
-      fsk6 = controller.model.filter.fsk.contains('FSK6');
-      fsk12 = controller.model.filter.fsk.contains('FSK12');
-      fsk16 = controller.model.filter.fsk.contains('FSK16');
-      fsk18 = controller.model.filter.fsk.contains('FSK18');
+      fsk0 = controller.model.filter.fsk.contains('0');
+      fsk6 = controller.model.filter.fsk.contains('6');
+      fsk12 = controller.model.filter.fsk.contains('12');
+      fsk16 = controller.model.filter.fsk.contains('16');
+      fsk18 = controller.model.filter.fsk.contains('18');
       _durationrange = RangeValues(
           controller.model.filter.durationFrom.toDouble(),
           controller.model.filter.durationTo.toDouble());
@@ -52,15 +52,29 @@ class FilterViewState extends State<FilterView> {
 
   _toggleMovieButton() {
     controller.setMovie();
+    if (movieIsSelected == true) {
+      _durationrange = const RangeValues(30, 180);
+      controller.setDuration(const RangeValues(30, 180));
+    }
     setState(() {
-      movieIsSelected = !movieIsSelected; // Wechseln des Zustands
+      movieIsSelected = !movieIsSelected;
+      if (!movieIsSelected && !tvIsSelected) {
+        movieIsSelected = true;
+        tvIsSelected = true;
+      } // Wechseln des Zustands
     });
   }
 
   _toggleTvButton() {
     controller.setTv();
+    controller.setDuration(const RangeValues(30, 180));
     setState(() {
-      tvIsSelected = !tvIsSelected; // Wechseln des Zustands
+      _durationrange = const RangeValues(30, 180);
+      tvIsSelected = !tvIsSelected;
+      if (!movieIsSelected && !tvIsSelected) {
+        movieIsSelected = true;
+        tvIsSelected = true;
+      } // Wechseln des Zustands
     });
   }
 
@@ -117,15 +131,15 @@ class FilterViewState extends State<FilterView> {
               onPressed: () {
                 controller.resetFilter();
                 setState(() {
-                  movieIsSelected = false;
-                  tvIsSelected = false;
+                  movieIsSelected = true;
+                  tvIsSelected = true;
                   fsk0 = false;
                   fsk6 = false;
                   fsk12 = false;
                   fsk16 = false;
                   fsk18 = false;
-                  _durationrange = const RangeValues(60, 120);
-                  rating = 1;
+                  _durationrange = const RangeValues(30, 180);
+                  rating = 0;
                   yearFrom = 0;
                   yearTo = 6000; // Wechseln des Zustands
                 });
@@ -249,21 +263,29 @@ class FilterViewState extends State<FilterView> {
                 padding: EdgeInsets.only(top: 16),
                 child: Text("Dauer"),
               ),
-              RangeSlider(
-                values: _durationrange,
-                max: 180,
-                min: 30,
-                labels: RangeLabels(
-                  _durationrange.start.round().toString(),
-                  _durationrange.end.round().toString(),
+              Padding(
+                padding: const EdgeInsets.only(right: 25, left: 25),
+                child: RangeSlider(
+                  values: _durationrange,
+                  max: 180,
+                  min: 30,
+                  labels: RangeLabels(
+                    _durationrange.start.round().toString(),
+                    _durationrange.end.round().toString(),
+                  ),
+                  onChanged: (RangeValues values) {
+                    controller.setDuration(values);
+                    if (values.start != 30 || values.end != 180) {
+                      controller.model.filter.movie = 1;
+                    }
+                    setState(() {
+                      tvIsSelected = false;
+                      movieIsSelected = true;
+                      _durationrange = values;
+                    });
+                  },
+                  divisions: 30,
                 ),
-                onChanged: (RangeValues values) {
-                  controller.setDuration(values);
-                  setState(() {
-                    _durationrange = values;
-                  });
-                },
-                divisions: 30,
               ),
               const Padding(
                 padding: EdgeInsets.only(top: 16, bottom: 8),
@@ -278,6 +300,7 @@ class FilterViewState extends State<FilterView> {
                 allowHalfRating: true,
                 starCount: 5,
                 onRatingChanged: (rating) => setState(() {
+                  controller.setRating(rating);
                   this.rating = rating;
                 }),
               ),
@@ -292,6 +315,8 @@ class FilterViewState extends State<FilterView> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 25, right: 25),
                       child: TextField(
+                        controller: TextEditingController(
+                            text: yearFrom != 0 ? yearFrom.toString() : ''),
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(hintText: "von"),
                         onChanged: (text) => controller.setYearFrom(text),
@@ -302,6 +327,8 @@ class FilterViewState extends State<FilterView> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 25, right: 25),
                       child: TextField(
+                        controller: TextEditingController(
+                            text: yearTo != 6000 ? yearTo.toString() : ''),
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(hintText: "bis"),
                         onChanged: (text) => controller.setYearTo(text),

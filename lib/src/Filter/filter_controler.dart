@@ -1,4 +1,4 @@
-import 'package:flutter/src/material/slider_theme.dart';
+import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 
 class FilterController {
@@ -40,33 +40,33 @@ class FilterController {
   }
 
   void setFsk0() {
-    _model.filter.fsk.contains("FSK0")
-        ? _model.filter.fsk.remove("FSK0")
-        : _model.filter.fsk.add("FSK0");
+    _model.filter.fsk.contains("0")
+        ? _model.filter.fsk.remove("0")
+        : _model.filter.fsk.add("0");
   }
 
   void setFsk6() {
-    _model.filter.fsk.contains("FSK6")
-        ? _model.filter.fsk.remove("FSK6")
-        : _model.filter.fsk.add("FSK6");
+    _model.filter.fsk.contains("6")
+        ? _model.filter.fsk.remove("6")
+        : _model.filter.fsk.add("6");
   }
 
   void setFsk12() {
-    _model.filter.fsk.contains("FSK12")
-        ? _model.filter.fsk.remove("FSK12")
-        : _model.filter.fsk.add("FSK12");
+    _model.filter.fsk.contains("12")
+        ? _model.filter.fsk.remove("12")
+        : _model.filter.fsk.add("12");
   }
 
   void setFsk16() {
-    _model.filter.fsk.contains("FSK16")
-        ? _model.filter.fsk.remove("FSK16")
-        : _model.filter.fsk.add("FSK16");
+    _model.filter.fsk.contains("16")
+        ? _model.filter.fsk.remove("16")
+        : _model.filter.fsk.add("16");
   }
 
   void setFsk18() {
-    _model.filter.fsk.contains("FSK18")
-        ? _model.filter.fsk.remove("FSK18")
-        : _model.filter.fsk.add("FSK18");
+    _model.filter.fsk.contains("18")
+        ? _model.filter.fsk.remove("18")
+        : _model.filter.fsk.add("18");
   }
 
   void setDuration(RangeValues values) {
@@ -77,19 +77,31 @@ class FilterController {
   }
 
   setYearFrom(String text) {
-    _model.filter.yearFrom = int.parse(text);
+    if (text.isNotEmpty) {
+      _model.filter.yearFrom = int.parse(text);
+    } else {
+      _model.filter.yearFrom = 0;
+    }
   }
 
   setYearTo(String text) {
-    _model.filter.yearTo = int.parse(text);
+    if (text.isNotEmpty) {
+      _model.filter.yearTo = int.parse(text);
+    } else {
+      _model.filter.yearFrom = 6000;
+    }
+  }
+
+  setRating(rating) {
+    _model.filter.rating = rating;
   }
 
   void resetFilter() {
     model.filter = Filter(
         movie: 3,
         fsk: [],
-        durationFrom: 60,
-        durationTo: 120,
+        durationFrom: 30,
+        durationTo: 180,
         rating: 0,
         yearFrom: 0,
         yearTo: 6000);

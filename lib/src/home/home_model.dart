@@ -3,9 +3,13 @@ import 'package:movies/src/home/movie.dart';
 
 class HomeModel {
   List<Movie> movies;
+  List<Movie> filteredMovies;
   Filter filter;
 
-  HomeModel({required this.movies, required this.filter});
+  HomeModel(
+      {required this.movies,
+      required this.filter,
+      required this.filteredMovies});
 
   void addMovie(Movie movie) {
     movies.add(movie);

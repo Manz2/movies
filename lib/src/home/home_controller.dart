@@ -14,11 +14,12 @@ class HomeController {
   HomeController()
       : _model = HomeModel(
             movies: [],
+            filteredMovies: [],
             filter: Filter(
                 movie: 3,
                 fsk: [],
-                durationFrom: 60,
-                durationTo: 120,
+                durationFrom: 30,
+                durationTo: 180,
                 rating: 0,
                 yearFrom: 0,
                 yearTo: 6000));
@@ -26,7 +27,7 @@ class HomeController {
   HomeModel get model => _model;
 
   Future<void> loadMovies() async {
-    _model.movies = await _db.getMovies();
+    await _getFilteredMovies();
   }
 
   Future<Movie> getMovieWithCredits(Movie movie) async {
@@ -59,5 +60,62 @@ class HomeController {
     _model.removeMovie(movie);
     _db.removeMovie(movie);
     return movie2;
+  }
+
+  // Die Methode zur Filterung der Filme
+  Future<void> _getFilteredMovies() async {
+    // Hole die Liste aller Filme
+    _model.movies = await _db.getMovies();
+
+    // Initialisiere die Liste der gefilterten Filme
+    List<Movie> filteredMovies = [];
+
+    // Hole das Filterobjekt
+    Filter filter = _model.filter;
+
+    // Filtere die Filme basierend auf den Filterkriterien
+    for (var movie in _model.movies) {
+      bool matchesFilter = true;
+
+      // Filtere nach Filmtitel
+      if (filter.movie == 1 && movie.mediaType != 'movie') {
+        matchesFilter = false;
+      } else if (filter.movie == 2 && movie.mediaType != 'tv') {
+        matchesFilter = false;
+      } else if (filter.movie == 3 &&
+          !(movie.mediaType == 'movie' || movie.mediaType == 'tv')) {
+        matchesFilter = false;
+      }
+
+      // Filtere nach FSK
+      if (filter.fsk.isNotEmpty && !filter.fsk.contains(movie.fsk)) {
+        matchesFilter = false;
+      }
+
+      // Filtere nach Dauer
+      if ((filter.durationFrom > 30 && movie.duration < filter.durationFrom) ||
+          (filter.durationTo < 180 && movie.duration > filter.durationTo)) {
+        matchesFilter = false;
+      }
+
+      // Filtere nach Bewertung
+      if (movie.privateRating < filter.rating && filter.rating != 0) {
+        matchesFilter = false;
+      }
+
+      // Filtere nach Jahr
+      if (movie.year < filter.yearFrom || movie.year > filter.yearTo) {
+        matchesFilter = false;
+      }
+
+      // Füge den Film zur gefilterten Liste hinzu, wenn er alle Kriterien erfüllt
+      if (matchesFilter) {
+        filteredMovies.add(movie);
+      }
+    }
+
+    // Setze die gefilterten Filme in das Modell
+    print(filteredMovies.length);
+    _model.filteredMovies = filteredMovies;
   }
 }
