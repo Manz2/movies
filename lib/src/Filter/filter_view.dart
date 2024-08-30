@@ -30,6 +30,23 @@ class FilterViewState extends State<FilterView> {
   @override
   void initState() {
     controller = FilterController(filter: widget.filter);
+    setState(() {
+      movieIsSelected = controller.model.filter.movie == 1 ||
+          controller.model.filter.movie == 3;
+      tvIsSelected = controller.model.filter.movie == 2 ||
+          controller.model.filter.movie == 3;
+      fsk0 = controller.model.filter.fsk.contains('FSK0');
+      fsk6 = controller.model.filter.fsk.contains('FSK6');
+      fsk12 = controller.model.filter.fsk.contains('FSK12');
+      fsk16 = controller.model.filter.fsk.contains('FSK16');
+      fsk18 = controller.model.filter.fsk.contains('FSK18');
+      _durationrange = RangeValues(
+          controller.model.filter.durationFrom.toDouble(),
+          controller.model.filter.durationTo.toDouble());
+      rating = controller.model.filter.rating;
+      yearFrom = controller.model.filter.yearFrom;
+      yearTo = controller.model.filter.yearTo;
+    });
     super.initState();
   }
 
@@ -96,7 +113,7 @@ class FilterViewState extends State<FilterView> {
           title: const Text('Filter'),
           actions: [
             IconButton(
-              icon: const Icon(Icons.settings),
+              icon: const Icon(Icons.replay_sharp),
               onPressed: () {
                 controller.resetFilter();
                 setState(() {

@@ -17,8 +17,8 @@ class HomeController {
             filter: Filter(
                 movie: 3,
                 fsk: [],
-                durationFrom: 0,
-                durationTo: 400,
+                durationFrom: 60,
+                durationTo: 120,
                 rating: 0,
                 yearFrom: 0,
                 yearTo: 6000));
