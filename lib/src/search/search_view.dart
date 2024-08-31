@@ -57,16 +57,20 @@ class SearchViewState extends State<SearchView> {
         itemCount: controller.model.results.length,
         itemBuilder: (BuildContext context, int index) {
           final result = controller.model.results[index];
-          return ListTile(
-            leading: CircleAvatar(
-              foregroundImage: result.image.isNotEmpty
-                  ? NetworkImage(result.image)
-                  : const AssetImage("assets/images/ActorPlaceholder.jpg"),
+          return Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 35,
+                foregroundImage: result.image.isNotEmpty
+                    ? NetworkImage(result.image)
+                    : const AssetImage("assets/images/ActorPlaceholder.jpg"),
+              ),
+              title: Text(result.name),
+              onTap: () {
+                controller.getResult(context, result);
+              },
             ),
-            title: Text(result.name),
-            onTap: () {
-              controller.getResult(context, result);
-            },
           );
         },
       ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
+import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
@@ -11,7 +12,7 @@ import 'package:movies/src/tmdb_service.dart';
 class SearchPageController {
   final SearchModel _model;
   final TmdbService tmdbService = TmdbService();
-  final DbServiceLocal _db = DbServiceLocal();
+  final DbServiceFirebase _db = DbServiceFirebase();
   SearchPageController() : _model = SearchModel(results: []);
 
   SearchModel get model => _model;

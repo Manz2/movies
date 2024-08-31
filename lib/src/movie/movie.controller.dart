@@ -1,3 +1,4 @@
+import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
@@ -5,7 +6,7 @@ import 'package:movies/src/tmdb_service.dart';
 
 class MovieController {
   final MovieModel _model;
-  final _db = DbServiceLocal();
+  final _db = DbServiceFirebase();
 
   MovieController({required Movie movie}) : _model = MovieModel(movie: movie);
   final TmdbService tmdbService = TmdbService();
@@ -29,7 +30,7 @@ class MovieController {
     return _db.movieExists(_model.movie.id, _model.movie.mediaType);
   }
 
-  addMovie() async {
+  Future<void> addMovie() async {
     await _db.addMovie(_model.movie);
   }
 

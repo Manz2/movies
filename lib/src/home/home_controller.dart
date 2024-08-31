@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
+import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
@@ -9,12 +10,11 @@ import 'package:movies/src/tmdb_service.dart';
 class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
-  final _db = DbServiceLocal();
+  final _db = DbServiceFirebase();
 
   HomeController()
       : _model = HomeModel(
             movies: [],
-            filteredMovies: [],
             filter: Filter(
                 movie: 3,
                 fsk: [],
@@ -58,7 +58,7 @@ class HomeController {
   Future<Movie> removeMovie(Movie movie) async {
     Movie movie2 = await _db.getMovie(movie.id, movie.mediaType);
     _model.removeMovie(movie);
-    _db.removeMovie(movie);
+    await _db.removeMovie(movie);
     return movie2;
   }
 
@@ -116,6 +116,6 @@ class HomeController {
 
     // Setze die gefilterten Filme in das Modell
     print(filteredMovies.length);
-    _model.filteredMovies = filteredMovies;
+    _model.movies = filteredMovies;
   }
 }

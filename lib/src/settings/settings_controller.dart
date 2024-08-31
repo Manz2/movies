@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/db_service_firebase.dart';
+import 'package:movies/src/db_service_local.dart';
 
 import 'settings_service.dart';
 
@@ -47,4 +49,14 @@ class SettingsController with ChangeNotifier {
     // SettingService.
     await _settingsService.updateThemeMode(newThemeMode);
   }
+
+  Future<void> loadMoviesFromLocal() async {
+    DbServiceLocal db = DbServiceLocal();
+    DbServiceFirebase dbFirebase = DbServiceFirebase();
+    final movies = await db.getMovies();
+    for (var movie in movies) {
+      dbFirebase.addMovie(movie);
+    }
+  }
+
 }

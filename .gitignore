@@ -34,6 +34,8 @@ migrate_working_dir/
 # Symbolication related
 app.*.symbols
 
+/linux/flutter
+
 # Obfuscation related
 app.*.map.json
 
@@ -42,3 +44,9 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 lib/src/secrets.dart
+linux/flutter/generated_plugin_registrant.cc
+
+/linux/flutter
+firebase.json
+lib/firebase_options.dart
+android/app/google-services.json

@@ -59,45 +59,58 @@ class HomeViewState extends State<HomeView> {
       body: Center(
         child: ListView.builder(
           restorationId: 'sampleItemListView',
-          itemCount: _controller.model.filteredMovies.length,
+          itemCount: _controller.model.movies.length,
           itemBuilder: (BuildContext context, int index) {
-            final item = _controller.model.filteredMovies[index];
+            final item = _controller.model.movies[index];
 
-            return Dismissible(
-              key: Key(item.id),
-              onDismissed: (direction) async {
-                Movie movie = await _controller.removeMovie(item);
-                setState(() {});
-                String title = item.title;
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("$title wurde gelöscht"),
-                  action: SnackBarAction(
-                      label: "undo",
-                      onPressed: () async => {
-                            await _controller.addMovieWithId(context, movie),
-                            setState(() {})
-                          }),
-                ));
-              },
-              background: Container(color: Colors.red),
-              child: ListTile(
-                  title: Text(item.title),
-                  leading: CircleAvatar(
-                    // Display the Flutter Logo image asset.
-                    foregroundImage: item.image.isNotEmpty
-                        ? NetworkImage(item.image)
-                        : const AssetImage(
-                            "assets/images/moviePlaceholder.png"),
-                  ),
-                  onTap: () async {
-                    final movieFuture =
-                        await _controller.getMovieWithCredits(item);
-                    if (!context.mounted) return;
-                    Navigator.pushNamed(context, MovieView.routeName,
-                            arguments: movieFuture)
-                        .then((val) => _loadMovies());
-                  }),
+            return Padding(
+              padding: const EdgeInsets.only(top: 8, bottom: 8),
+              child: Dismissible(
+                key: Key(item.id),
+                onDismissed: (direction) async {
+                  showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext dialogContext) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      });
+                  Movie movie = await _controller.removeMovie(item);
+                  if (!context.mounted) return;
+                  Navigator.of(context, rootNavigator: true).pop();
+                  setState(() {});
+                  String title = item.title;
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text("$title wurde gelöscht"),
+                    action: SnackBarAction(
+                        label: "undo",
+                        onPressed: () async => {
+                              await _controller.addMovieWithId(context, movie),
+                              setState(() {})
+                            }),
+                  ));
+                },
+                background: Container(color: Colors.red),
+                child: ListTile(
+                    title: Text(item.title),
+                    leading: CircleAvatar(
+                      radius: 35,
+                      foregroundImage: item.image.isNotEmpty
+                          ? NetworkImage(item.image)
+                          : const AssetImage(
+                              "assets/images/moviePlaceholder.png"),
+                    ),
+                    onTap: () async {
+                      final movieFuture =
+                          await _controller.getMovieWithCredits(item);
+                      if (!context.mounted) return;
+                      Navigator.pushNamed(context, MovieView.routeName,
+                              arguments: movieFuture)
+                          .then((val) => _loadMovies());
+                    }),
+              ),
             );
           },
         ),

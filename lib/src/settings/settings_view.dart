@@ -67,7 +67,10 @@ class SettingsView extends StatelessWidget {
             padding: EdgeInsets.all(16.0),
             child: Text(
                 "This product uses the TMDB API but is not endorsed or certified by TMDB."),
-          )
+          ),
+          ElevatedButton(
+              onPressed: controller.loadMoviesFromLocal,
+              child: const Text("Load Movies from Local")),
         ],
       ),
     );

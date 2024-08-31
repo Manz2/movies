@@ -71,7 +71,7 @@ class Movie {
       genre: List<String>.from(json['genre']),
       popularity: json['popularity'],
       mediaType: json['MediaType'],
-      privateRating: json['privateRating'] ?? 0,
+      privateRating: json['privateRating'].toDouble() ?? 0,
       firebaseId: json['firebaseId'] ?? '',
     );
   }
