@@ -6,15 +6,16 @@ import 'package:movies/src/home/movie.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
-  final databaseRef =
-      FirebaseDatabase.instance.ref().child("movies/"); // Database reference
+  final databaseRef = FirebaseDatabase.instance
+      .ref()
+      .child("moviesTest/"); // Database reference
   Logger logger = Logger();
   @override
   Future<void> addMovie(Movie movie) async {
     final newPostKey = databaseRef.child('posts').push().key;
-    databaseRef.child(newPostKey!).update(movie.toJson());
+    await databaseRef.child(newPostKey!).update(movie.toJson());
     logger.d("created recipe with id:$newPostKey");
-    databaseRef.child(newPostKey).update({"firebaseId": newPostKey});
+    await databaseRef.child(newPostKey).update({"firebaseId": newPostKey});
   }
 
   @override

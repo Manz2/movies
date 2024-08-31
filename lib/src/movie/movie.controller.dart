@@ -32,6 +32,10 @@ class MovieController {
 
   Future<void> addMovie() async {
     await _db.addMovie(_model.movie);
+    _model.movie = await _db.getMovie(
+        _model.movie.id,
+        _model.movie
+            .mediaType); //nötig weil firebase id fehlt bei rating auchtung performance
   }
 
   Future<void> setRating(double rating) async {
