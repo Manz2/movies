@@ -8,7 +8,7 @@ import 'package:firebase_database/firebase_database.dart';
 class DbServiceFirebase implements DbServiceInterface {
   final databaseRef = FirebaseDatabase.instance
       .ref()
-      .child("moviesTest/"); // Database reference
+      .child("movies/"); // Database reference
   Logger logger = Logger();
   @override
   Future<void> addMovie(Movie movie) async {
