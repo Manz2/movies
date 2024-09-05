@@ -4,6 +4,7 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MovieView extends StatefulWidget {
   final Movie movie;
@@ -19,6 +20,7 @@ class MovieView extends StatefulWidget {
 class MovieViewState extends State<MovieView> {
   late final MovieController controller;
   bool _isFabVisible = false;
+  double _fontSize = 16.0;
 
   set rating(double rating) {
     controller.setRating(rating);
@@ -29,6 +31,7 @@ class MovieViewState extends State<MovieView> {
     super.initState();
     controller = MovieController(movie: widget.movie);
     _istSaved();
+    _loadFontSize();
   }
 
   _istSaved() async {
@@ -39,6 +42,13 @@ class MovieViewState extends State<MovieView> {
   void _toggleFabVisibility() {
     setState(() {
       _isFabVisible = !_isFabVisible;
+    });
+  }
+
+  Future<void> _loadFontSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
     });
   }
 
@@ -96,8 +106,8 @@ class MovieViewState extends State<MovieView> {
                         Flexible(
                           child: Text(
                             controller.model.movie.title,
-                            style: const TextStyle(
-                              fontSize: 24,
+                            style: TextStyle(
+                              fontSize: _fontSize + 8,
                               fontWeight: FontWeight.bold,
                             ),
                             overflow: TextOverflow
@@ -124,25 +134,33 @@ class MovieViewState extends State<MovieView> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(controller.model.movie.description),
+                    Text(controller.model.movie.description,
+                        style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
-                    Text("FSK: ${controller.model.movie.fsk}"),
+                    Text("FSK: ${controller.model.movie.fsk}",
+                        style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
                     Text(
-                        "Öffentliches Rating: ${controller.model.movie.rating}"),
+                        "Öffentliches Rating: ${controller.model.movie.rating}",
+                        style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
-                    Text("Jahr: ${controller.model.movie.year}"),
+                    Text("Jahr: ${controller.model.movie.year}",
+                        style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
-                    Text("Genre: ${controller.model.movie.genre.join(', ')}"),
+                    Text("Genre: ${controller.model.movie.genre.join(', ')}",
+                        style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
                     controller.model.movie.mediaType == 'movie'
                         ? Text(
-                            "Dauer: ${controller.model.movie.duration} Minuten")
+                            "Dauer: ${controller.model.movie.duration} Minuten",
+                            style: TextStyle(fontSize: _fontSize))
                         : Text(
-                            "Dauer: ${controller.model.movie.duration} Staffeln"),
+                            "Dauer: ${controller.model.movie.duration} Staffeln",
+                            style: TextStyle(fontSize: _fontSize)),
                     const SizedBox(height: 8),
                     !_isFabVisible
-                        ? const Text("Privates Rating: ")
+                        ? Text("Privates Rating: ",
+                            style: TextStyle(fontSize: _fontSize))
                         : const SizedBox(height: 0),
                     const SizedBox(height: 8),
                     !_isFabVisible
@@ -160,8 +178,9 @@ class MovieViewState extends State<MovieView> {
                           )
                         : const SizedBox(height: 0),
                     const SizedBox(height: 16),
-                    const Text("Schauspieler:",
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text("Schauspieler:",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: _fontSize)),
                     SizedBox(
                       height: 400,
                       child: ListView.builder(
@@ -176,8 +195,10 @@ class MovieViewState extends State<MovieView> {
                                   : const AssetImage(
                                       "assets/images/ActorPlaceholder.jpg"),
                             ),
-                            title: Text(actor.name),
-                            subtitle: Text(actor.roleName),
+                            title: Text(actor.name,
+                                style: TextStyle(fontSize: _fontSize)),
+                            subtitle: Text(actor.roleName,
+                                style: TextStyle(fontSize: _fontSize - 4)),
                             onTap: () async {
                               final movies =
                                   await controller.getMovies(actor.id);
@@ -186,7 +207,7 @@ class MovieViewState extends State<MovieView> {
                                 context,
                                 ActorView.routeName,
                                 arguments: ActorViewArguments(
-                                    actor: actor, movies: movies),
+                                    actor: actor, movies: movies,fontSize: _fontSize),
                               );
                             },
                           );

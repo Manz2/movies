@@ -18,7 +18,7 @@ class SearchPageController {
 
   SearchModel get model => _model;
 
-  Future<void> getResult(BuildContext context, Result result) async {
+  Future<void> getResult(BuildContext context, Result result, double fontSize) async {
     if (result.type == 'person') {
       final movies = await _getMovies(int.parse(result.id));
       if (!context.mounted) return;
@@ -31,7 +31,7 @@ class SearchPageController {
                 image: result.image,
                 roleName: "roleName",
                 id: int.parse(result.id)),
-            movies: movies),
+            movies: movies, fontSize: fontSize),
       );
     } else if (result.type == 'movie' || result.type == 'tv') {
       try {

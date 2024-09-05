@@ -13,6 +13,7 @@ class ActorModel {
 class ActorViewArguments {
   final Actor actor;
   final List<Movie> movies;
+  final double fontSize;
 
-  ActorViewArguments({required this.actor, required this.movies});
+  ActorViewArguments({required this.actor, required this.movies, required this.fontSize});
 }

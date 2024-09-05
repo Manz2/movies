@@ -85,7 +85,7 @@ class MyApp extends StatelessWidget {
                     return const SearchView();
                   case ActorView.routeName:
                     final args = routeSettings.arguments as ActorViewArguments;
-                    return ActorView(actor: args.actor, movies: args.movies);
+                    return ActorView(actor: args.actor, movies: args.movies,fontSize: args.fontSize,);
                   case FilterView.routeName:
                     final args = routeSettings.arguments as Filter;
                     return FilterView(filter: args);

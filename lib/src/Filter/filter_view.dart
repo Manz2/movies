@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/Filter/filter_controler.dart';
 import 'package:movies/src/Filter/filter_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FilterView extends StatefulWidget {
   static const routeName = '/filter';
@@ -26,6 +27,14 @@ class FilterViewState extends State<FilterView> {
   double rating = 0;
   int yearFrom = 0;
   int yearTo = 6000;
+  double _fontSize = 16.0;
+
+  Future<void> _loadFontSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
+    });
+  }
 
   @override
   void initState() {
@@ -47,6 +56,7 @@ class FilterViewState extends State<FilterView> {
       yearFrom = controller.model.filter.yearFrom;
       yearTo = controller.model.filter.yearTo;
     });
+    _loadFontSize();
     super.initState();
   }
 
@@ -164,7 +174,8 @@ class FilterViewState extends State<FilterView> {
                             )
                           : null,
                       onPressed: _toggleMovieButton,
-                      child: const Text('Filme')),
+                      child:
+                          Text('Filme', style: TextStyle(fontSize: _fontSize))),
                   ElevatedButton(
                       style: tvIsSelected
                           ? ButtonStyle(
@@ -175,12 +186,13 @@ class FilterViewState extends State<FilterView> {
                             )
                           : null,
                       onPressed: _toggleTvButton,
-                      child: const Text('Serien'))
+                      child: Text('Serien',
+                          style: TextStyle(fontSize: _fontSize))),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text("FSK"),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text("FSK", style: TextStyle(fontSize: _fontSize)),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -259,9 +271,9 @@ class FilterViewState extends State<FilterView> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16),
-                child: Text("Dauer"),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Text("Dauer", style: TextStyle(fontSize: _fontSize)),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 25, left: 25),
@@ -287,9 +299,9 @@ class FilterViewState extends State<FilterView> {
                   divisions: 30,
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16, bottom: 8),
-                child: Text("Bewertung"),
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: Text("Bewertung", style: TextStyle(fontSize: _fontSize)),
               ),
               StarRating(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -304,9 +316,9 @@ class FilterViewState extends State<FilterView> {
                   this.rating = rating;
                 }),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16, bottom: 8),
-                child: Text("Jahr"),
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: Text("Jahr", style: TextStyle(fontSize: _fontSize)),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -345,7 +357,8 @@ class FilterViewState extends State<FilterView> {
                       style: ElevatedButton.styleFrom(),
                       onPressed: () =>
                           Navigator.of(context).pop(controller.model.filter),
-                      child: const Text('Anwenden')),
+                      child: Text('Anwenden',
+                          style: TextStyle(fontSize: _fontSize))),
                 ),
               )
             ],

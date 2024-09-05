@@ -7,15 +7,15 @@ import 'settings_controller.dart';
 class SettingsView extends StatefulWidget {
   final SettingsController controller;
 
-  SettingsView({super.key, required this.controller});
+  const SettingsView({super.key, required this.controller});
 
   static const routeName = '/settings';
 
   @override
-  _SettingsViewState createState() => _SettingsViewState();
+  SettingsViewState createState() => SettingsViewState();
 }
 
-class _SettingsViewState extends State<SettingsView> {
+class SettingsViewState extends State<SettingsView> {
   double _fontSize = 16.0; // Standardwert
 
   @override
@@ -166,8 +166,8 @@ class _SettingsViewState extends State<SettingsView> {
                 style: TextStyle(fontSize: _fontSize),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
               child: Image(image: AssetImage('assets/images/tmdb.png')),
             ),
             Padding(

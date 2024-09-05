@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/search/search_controller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchView extends StatefulWidget {
   static const routeName = '/search';
@@ -12,11 +13,20 @@ class SearchView extends StatefulWidget {
 
 class SearchViewState extends State<SearchView> {
   SearchPageController controller = SearchPageController();
+  double _fontSize = 16.0;
 
   @override
   void initState() {
     super.initState();
     _getPopular();
+    _loadFontSize();
+  }
+
+  Future<void> _loadFontSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
+    });
   }
 
   _getPopular() async {
@@ -34,6 +44,8 @@ class SearchViewState extends State<SearchView> {
             onPressed: () {},
           ),
           hintText: "suche",
+          hintStyle: WidgetStateProperty.all<TextStyle>(
+              TextStyle(fontSize: _fontSize)),
           constraints: BoxConstraints(
               maxWidth: (MediaQuery.of(context).size.width) - 140),
           onSubmitted: (text) async {
@@ -66,10 +78,11 @@ class SearchViewState extends State<SearchView> {
                     ? NetworkImage(result.image)
                     : const AssetImage("assets/images/ActorPlaceholder.jpg"),
               ),
-              title: Text(result.name),
+              title:
+                  Text(result.name, style: TextStyle(fontSize: _fontSize + 2)),
               onTap: () {
                 try {
-                  controller.getResult(context, result);
+                  controller.getResult(context, result, _fontSize);
                 } on Exception catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(

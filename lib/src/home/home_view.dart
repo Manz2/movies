@@ -6,6 +6,7 @@ import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -17,11 +18,13 @@ class HomeView extends StatefulWidget {
 
 class HomeViewState extends State<HomeView> {
   final HomeController _controller = HomeController();
+  double _fontSize = 16.0;
 
   @override
   void initState() {
     super.initState();
     _syncMovies();
+    _loadFontSize();
   }
 
   void _syncMovies() async {
@@ -31,12 +34,20 @@ class HomeViewState extends State<HomeView> {
 
   void _loadMovies() async {
     await _controller.loadMovies();
+    _loadFontSize();
     setState(() {}); // Aktualisiert die UI nach dem Laden der Filme
   }
 
   void _applyFilter(Filter filter) {
     _controller.model.filter = filter;
     _loadMovies();
+  }
+
+  Future<void> _loadFontSize() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
+    });
   }
 
   @override
@@ -104,7 +115,8 @@ class HomeViewState extends State<HomeView> {
                   },
                   background: Container(color: Colors.red),
                   child: ListTile(
-                      title: Text(item.title),
+                      title: Text(item.title,
+                          style: TextStyle(fontSize: _fontSize + 2)),
                       leading: CircleAvatar(
                         radius: 35,
                         foregroundImage: item.image.isNotEmpty

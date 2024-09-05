@@ -6,11 +6,16 @@ import 'package:movies/src/movie/movie_view.dart';
 class ActorView extends StatelessWidget {
   final Actor actor;
   final List<Movie> movies;
+  final double fontSize;
   late final ActorController controller;
 
   static const routeName = '/actor_details';
 
-  ActorView({super.key, required this.actor, required this.movies}) {
+  ActorView(
+      {super.key,
+      required this.actor,
+      required this.movies,
+      required this.fontSize}) {
     controller = ActorController(actor: actor, movies: movies);
   }
 
@@ -60,7 +65,8 @@ class ActorView extends StatelessWidget {
                             : const AssetImage(
                                 "assets/images/moviePlaceholder.png"),
                       ),
-                      title: Text(movie.title),
+                      title: Text(movie.title,
+                          style: TextStyle(fontSize: fontSize + 2)),
                       onTap: () async {
                         final movieWithCredits =
                             await controller.getMovieWithCredits(movie);
