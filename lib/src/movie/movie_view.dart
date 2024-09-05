@@ -68,6 +68,107 @@ class MovieViewState extends State<MovieView> {
         title: Text(controller.model.movie.title),
         actions: [
           IconButton(
+            icon: const Icon(Icons.remove_red_eye_rounded),
+            onPressed: () async {
+              await controller.getWatchlists();
+              if (!context.mounted) return;
+              await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('Zur Watchlist hinzufügen?',
+                          style: TextStyle(fontSize: _fontSize)),
+                      content: Container(
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              for (final watchlist
+                                  in controller.model.watchlists)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await controller.addMovieToWatchlist(
+                                          watchlist, context);
+                                    },
+                                    child: Container(
+                                      width: 400,
+                                      height: 40,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).focusColor,
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Center(
+                                          child: Text(
+                                        watchlist.name,
+                                        style: TextStyle(fontSize: _fontSize),
+                                      )),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          child: Text('Abbrechen',
+                              style: TextStyle(fontSize: _fontSize)),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        TextButton(
+                          child: Text('Neue Liste',
+                              style: TextStyle(fontSize: _fontSize)),
+                          onPressed: () async {
+                            TextEditingController textController =
+                                TextEditingController();
+                            await showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('Neue Watchlist erstellen?',
+                                        style: TextStyle(fontSize: _fontSize)),
+                                    content: TextField(
+                                      controller: textController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'Name der Watchlist',
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('Abbrechen',
+                                            style:
+                                                TextStyle(fontSize: _fontSize)),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('Erstellen',
+                                            style:
+                                                TextStyle(fontSize: _fontSize)),
+                                        onPressed: () async {
+                                          await controller.addWatchlist(
+                                              textController.text);
+                                          if (!context.mounted) return;
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
               Navigator.popUntil(context, (route) => route.isFirst);
@@ -207,7 +308,9 @@ class MovieViewState extends State<MovieView> {
                                 context,
                                 ActorView.routeName,
                                 arguments: ActorViewArguments(
-                                    actor: actor, movies: movies,fontSize: _fontSize),
+                                    actor: actor,
+                                    movies: movies,
+                                    fontSize: _fontSize),
                               );
                             },
                           );

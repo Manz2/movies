@@ -1,4 +1,5 @@
 import 'package:json_store/json_store.dart';
+import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
 
@@ -80,7 +81,36 @@ class DbServiceLocal implements DbServiceInterface {
 
   @override
   Future<List<Movie>> syncMovies() {
-    // TODO: implement syncMovies
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Watchlist> addMovieToWatchlist(Watchlist watchlist, Movie movie) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Watchlist> addWatchlist(String name) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Watchlist> getWatchlistMovies(String id) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Watchlist>> getWatchlists() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> removeMovieFromWatchlist(Watchlist watchlist, Entry entry) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> removeWatchlist(String id) {
     throw UnimplementedError();
   }
 }

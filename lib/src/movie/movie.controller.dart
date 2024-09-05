@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
@@ -40,5 +43,28 @@ class MovieController {
   Future<void> setRating(double rating) async {
     _model.movie.privateRating = rating;
     await _db.setMovie(_model.movie);
+  }
+
+  Future<void> getWatchlists() async {
+    _model.watchlists = await _db.getWatchlists();
+  }
+
+  Future<void> addMovieToWatchlist(
+      Watchlist watchlist, BuildContext context) async {
+    if (watchlist.entries.any((element) =>
+        element.id == _model.movie.id &&
+        element.type == _model.movie.mediaType)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Der Film ist bereits in der Watchlist enthalten"),
+        ),
+      );
+      return;
+    }
+    await _db.addMovieToWatchlist(watchlist, _model.movie);
+  }
+
+  Future<void> addWatchlist(String name) async {
+    _model.watchlists.add(await _db.addWatchlist(name));
   }
 }

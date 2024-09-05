@@ -1,3 +1,4 @@
+import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/db_service_local.dart';
@@ -40,7 +41,7 @@ class DbCombinator implements DbServiceInterface {
   Future<void> setMovies(List<Movie> movies) async {
     throw UnimplementedError();
   }
-  
+
   @override
   Future<List<Movie>> syncMovies() async {
     List<Movie> movies = await _dbServiceFirebase.getMovies();
@@ -48,5 +49,35 @@ class DbCombinator implements DbServiceInterface {
     return movies;
   }
 
-  
+  @override
+  Future<Watchlist> addMovieToWatchlist(
+      Watchlist watchlist, Movie movie) async {
+    return await _dbServiceFirebase.addMovieToWatchlist(watchlist, movie);
+  }
+
+  @override
+  Future<Watchlist> addWatchlist(String name) async {
+    return await _dbServiceFirebase.addWatchlist(name);
+  }
+
+  @override
+  Future<Watchlist> getWatchlistMovies(String id) async {
+    return await _dbServiceFirebase.getWatchlistMovies(id);
+  }
+
+  @override
+  Future<List<Watchlist>> getWatchlists() async {
+    return await _dbServiceFirebase.getWatchlists();
+  }
+
+  @override
+  Future<void> removeMovieFromWatchlist(
+      Watchlist watchlist, Entry entry) async {
+    await _dbServiceFirebase.removeMovieFromWatchlist(watchlist, entry);
+  }
+
+  @override
+  Future<void> removeWatchlist(String id) async {
+    await _dbServiceFirebase.removeWatchlist(id);
+  }
 }

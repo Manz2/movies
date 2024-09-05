@@ -57,6 +57,10 @@ class HomeViewState extends State<HomeView> {
         title: const Text('Movies'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.remove_red_eye_rounded),
+            onPressed: () {},
+          ),
+          IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
               Navigator.pushNamed(context, SettingsView.routeName)
