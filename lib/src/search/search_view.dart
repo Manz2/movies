@@ -68,7 +68,16 @@ class SearchViewState extends State<SearchView> {
               ),
               title: Text(result.name),
               onTap: () {
-                controller.getResult(context, result);
+                try {
+                  controller.getResult(context, result);
+                } on Exception catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Fehler beim aufrufen der Seite"),
+                    ),
+                  );
+                  print('Fehler beim aufrufen der Seite: $e');
+                }
               },
             ),
           );

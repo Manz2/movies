@@ -7,29 +7,33 @@ class DbServiceLocal implements DbServiceInterface {
 
   @override
   Future<List<Movie>> getMovies() async {
-    //await _jsonStore.clearDataBase();
-    Map<String, dynamic>? storedData = await _jsonStore.getItem('movies');
-
-    if (storedData != null && storedData.containsKey('movies')) {
-      List<dynamic> moviesJson = storedData['movies'];
-
-      // JSON-Liste in Movie-Objekte konvertieren
-      return moviesJson.map((json) => Movie.fromJson(json)).toList();
-    } else {
-      print("unable to get Movies from db");
-      return [];
+    List<Movie> movies = [];
+    try {
+      List<Map<String, dynamic>>? allItems =
+          await _jsonStore.getListLike('movie_%');
+      if (allItems == null) {
+        print("no movies found locally");
+        return movies;
+      }
+      for (var item in allItems) {
+        movies.add(Movie.fromJson(item));
+      }
+    } on Exception catch (e) {
+      print(e.toString());
     }
+    return movies;
   }
 
   @override
   Future<void> setMovies(List<Movie> movies) async {
     try {
-      List<Map<String, dynamic>> moviesJson =
-          movies.map((m) => m.toJson()).toList();
-      await _jsonStore.setItem('movies', {'movies': moviesJson},
-          encrypt: false);
+      await _jsonStore.deleteLike('movie_%');
+      for (var movie in movies) {
+        _jsonStore.setItem('movie_${movie.firebaseId}', movie.toJson(),
+            encrypt: false);
+      }
     } on Exception catch (e) {
-      print(e.toString());
+      throw Exception('Error setting movies: $e');
     }
   }
 
@@ -57,44 +61,26 @@ class DbServiceLocal implements DbServiceInterface {
   }
 
   @override
-  Future<void> addMovie(movie) async {
-    List<Movie> movies = await getMovies();
-    movies.add(movie);
-    await setMovies(movies);
+  Future<Movie> addMovie(movie) async {
+    _jsonStore.setItem('movie_${movie.firebaseId}', movie.toJson(),
+        encrypt: false);
+    return movie;
   }
 
   @override
   Future<void> removeMovie(Movie movie) async {
-    List<Movie> movies = await getMovies();
-    movies
-        .removeWhere((m) => m.id == movie.id && m.mediaType == movie.mediaType);
-    await setMovies(movies);
+    _jsonStore.deleteItem('movie_${movie.firebaseId}');
   }
 
   @override
   Future<void> setMovie(Movie movie2) async {
-    List<Movie> movies = await getMovies();
-
-    // Den Index des Films finden, der ersetzt werden soll
-    int index = movies.indexWhere(
-      (movie) => movie.id == movie2.id && movie.mediaType == movie2.mediaType,
-    );
-
-    if (index == -1) {
-      throw Exception('Movie not found');
-    }
-
-    // Den Film ersetzen
-    movies[index] = movie2;
-
-    // Falls notwendig, speichere die geänderte Liste zurück
-    await setMovies(movies);
+    _jsonStore.setItem('movie_${movie2.firebaseId}', movie2.toJson(),
+        encrypt: false);
   }
 
   @override
-  Future<bool> movieExists(String id, String mediaType) async {
-    List<Movie> movies = await getMovies();
-    return movies
-        .any((movie) => movie.id == id && movie.mediaType == mediaType);
+  Future<List<Movie>> syncMovies() {
+    // TODO: implement syncMovies
+    throw UnimplementedError();
   }
 }

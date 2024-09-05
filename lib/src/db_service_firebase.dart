@@ -6,16 +6,23 @@ import 'package:movies/src/home/movie.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
-  final databaseRef = FirebaseDatabase.instance
-      .ref()
-      .child("movies/"); // Database reference
+  final databaseRef =
+      FirebaseDatabase.instance.ref().child("movies/"); // Database reference
   Logger logger = Logger();
   @override
-  Future<void> addMovie(Movie movie) async {
-    final newPostKey = databaseRef.child('posts').push().key;
-    await databaseRef.child(newPostKey!).update(movie.toJson());
-    logger.d("created recipe with id:$newPostKey");
-    await databaseRef.child(newPostKey).update({"firebaseId": newPostKey});
+  Future<Movie> addMovie(Movie movie) async {
+    try {
+      final newPostKey = databaseRef.child('posts').push().key;
+      await databaseRef.child(newPostKey!).update(movie.toJson());
+      logger.d("created recipe with id:$newPostKey");
+      await databaseRef.child(newPostKey).update({"firebaseId": newPostKey});
+      Movie movie2 = await databaseRef.child(newPostKey).get().then((value) {
+        return Movie.fromJson(jsonDecode(jsonEncode(value.value)));
+      });
+      return movie2;
+    } on Exception catch (e) {
+      throw Exception("Error creating movie: $e");
+    }
   }
 
   @override
@@ -60,25 +67,24 @@ class DbServiceFirebase implements DbServiceInterface {
   }
 
   @override
-  Future<bool> movieExists(String id, String mediaType) {
-    return getMovies().then((movies) {
-      for (Movie movie in movies) {
-        if (movie.id == id && movie.mediaType == mediaType) {
-          return true;
-        }
-      }
-      return false;
-    });
-  }
-
-  @override
   Future<void> removeMovie(Movie movie) async {
-    await databaseRef.child(movie.firebaseId).remove();
+    try {
+      await databaseRef.child(movie.firebaseId).remove();
+    } on Exception catch (e) {
+      throw Exception("Error removing movie: $e");
+    }
   }
 
   @override
   Future<void> setMovie(Movie movie2) async {
-    await databaseRef.child(movie2.firebaseId).update(movie2.toJson());
+    if (databaseRef.child(movie2.firebaseId).key == null) {
+      throw Exception("Movie does not exist in database");
+    }
+    try {
+      await databaseRef.child(movie2.firebaseId).update(movie2.toJson());
+    } on Exception catch (e) {
+      throw Exception("Error updating movie: $e");
+    }
   }
 
   @override
@@ -86,5 +92,11 @@ class DbServiceFirebase implements DbServiceInterface {
     for (Movie movie in movies) {
       await setMovie(movie);
     }
+  }
+
+  @override
+  Future<List<Movie>> syncMovies() {
+    // TODO: implement syncMovies
+    throw UnimplementedError();
   }
 }

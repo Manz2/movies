@@ -1,6 +1,5 @@
 import 'package:movies/src/Actor/actor_model.dart';
-import 'package:movies/src/db_service_firebase.dart';
-import 'package:movies/src/db_service_local.dart';
+import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/tmdb_service.dart';
@@ -8,7 +7,7 @@ import 'package:movies/src/tmdb_service.dart';
 class ActorController {
   final ActorModel _model;
   final TmdbService tmdbService = TmdbService();
-  final DbServiceFirebase _db = DbServiceFirebase();
+  final DbCombinator _db = DbCombinator();
   ActorController({required Actor actor, required movies})
       : _model = ActorModel(actor: actor, movies: movies);
 
@@ -22,17 +21,15 @@ class ActorController {
     }
   }
 
-  Future<Movie> getMovieWithCredits(Movie movie) async {
+  Future<Movie> getMovieWithCredits(Movie movie2) async {
     try {
-      movie = await _db.getMovie(movie.id, movie.mediaType);
-    } catch (e) {
-      print('Film noch nicht gespeichert');
-    }
-    try {
-      return await tmdbService.getMovieWithCredits(movie);
+      Movie movie = await _db.getMovie(movie2.id, movie2.mediaType);
+      if (movie.firebaseId == '') {
+        movie = await tmdbService.getMovieWithCredits(movie);
+      }
+      return movie;
     } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
-      return testMovie; //Fehlerbehandlung
+      throw Exception('Fehler beim Laden des Films: $e');
     }
   }
 }

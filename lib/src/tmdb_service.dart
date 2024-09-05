@@ -16,7 +16,7 @@ class TmdbService {
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return movieFromTmdb(
+      return _movieFromTmdb(
           json.decode(response.body), mediaType, privateRating, firebaseId);
     } else {
       throw HttpException("Failed to load movie with id=$id");
@@ -39,22 +39,22 @@ class TmdbService {
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       List<Actor> actors =
-          creditsFromTmdb(json.decode(response.body), mediaType);
+          _creditsFromTmdb(json.decode(response.body), mediaType);
       movie.actors = actors;
     } else {
       throw HttpException("Failed to load credits for movie with id=$id");
     }
 
     if (mediaType == 'movie') {
-      movie.fsk = await getMovieFsk(id);
+      movie.fsk = await _getMovieFsk(id);
     } else if (mediaType == 'tv') {
-      movie.fsk = await getTvFsk(id);
+      movie.fsk = await _getTvFsk(id);
     }
 
     return movie;
   }
 
-  Future<String> getMovieFsk(int id) async {
+  Future<String> _getMovieFsk(int id) async {
     final url2 =
         '$baseUrl/movie/$id/release_dates?api_key=$apiKey&language=de-DE';
     final response2 = await http.get(Uri.parse(url2));
@@ -84,7 +84,7 @@ class TmdbService {
     return 'Unbekannt';
   }
 
-  Future<String> getTvFsk(int id) async {
+  Future<String> _getTvFsk(int id) async {
     final url2 =
         '$baseUrl/tv/$id/content_ratings?api_key=$apiKey&language=de-DE';
     final response2 = await http.get(Uri.parse(url2));
@@ -112,7 +112,7 @@ class TmdbService {
     return 'Unbekannt';
   }
 
-  Movie movieFromTmdb(Map<String, dynamic> json, String mediaType2,
+  Movie _movieFromTmdb(Map<String, dynamic> json, String mediaType2,
       double privateRating, String firebaseId) {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
@@ -166,7 +166,7 @@ class TmdbService {
         firebaseId: firebaseId);
   }
 
-  List<Actor> creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
+  List<Actor> _creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
     List<Actor> actors = [];
     if (json['cast'] != null) {
       for (var actorJson in json['cast']) {
@@ -210,7 +210,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var movie in moviesJson['cast']) {
-        movies.add(movieFromTmdb(movie, 'unbekannt', 0, ''));
+        movies.add(_movieFromTmdb(movie, 'unbekannt', 0, ''));
       }
     } else {
       throw HttpException("Failed to load movie with id=$id");
@@ -228,7 +228,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var result in resultJson['results']) {
-        results.add(resultFromTmdb(result));
+        results.add(_resultFromTmdb(result));
       }
     } else {
       throw HttpException("Failed search with querry=$search");
@@ -236,7 +236,7 @@ class TmdbService {
     return results;
   }
 
-  Result resultFromTmdb(Map<String, dynamic> json) {
+  Result _resultFromTmdb(Map<String, dynamic> json) {
     String id = json['id'].toString();
     String name = json['name'] ??
         json['title'] ??
@@ -262,7 +262,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var result in resultJson['results']) {
-        Result rs = resultFromTmdb(result);
+        Result rs = _resultFromTmdb(result);
         // This is necessary because popular does not have a modia_type field.
         rs.type = 'movie';
         results.add(rs);

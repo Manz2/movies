@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
-import 'package:movies/src/db_service_firebase.dart';
-import 'package:movies/src/db_service_local.dart';
+import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
@@ -10,7 +9,7 @@ import 'package:movies/src/tmdb_service.dart';
 class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
-  final _db = DbServiceFirebase();
+  final _db = DbCombinator();
 
   HomeController()
       : _model = HomeModel(
@@ -30,16 +29,7 @@ class HomeController {
     await _getFilteredMovies();
   }
 
-  Future<Movie> getMovieWithCredits(Movie movie) async {
-    try {
-      return await tmdbService.getMovieWithCredits(movie);
-    } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
-      return testMovie; //Fehlerbehandlung
-    }
-  }
-
-  addMovieWithId(BuildContext context, Movie movie) async {
+  addMovie(BuildContext context, Movie movie) async {
     try {
       _model.addMovie(movie);
       _db.addMovie(movie);
@@ -55,11 +45,13 @@ class HomeController {
     }
   }
 
-  Future<Movie> removeMovie(Movie movie) async {
-    Movie movie2 = await _db.getMovie(movie.id, movie.mediaType);
-    _model.removeMovie(movie);
-    await _db.removeMovie(movie);
-    return movie2;
+  Future<void> removeMovie(Movie movie) async {
+    try {
+      await _db.removeMovie(movie);
+      _model.removeMovie(movie);
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   // Die Methode zur Filterung der Filme
@@ -117,5 +109,9 @@ class HomeController {
     // Setze die gefilterten Filme in das Modell
     print(filteredMovies.length);
     _model.movies = filteredMovies;
+  }
+
+  Future<void> syncMovies() async {
+    _model.movies = await _db.syncMovies();
   }
 }

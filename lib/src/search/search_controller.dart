@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
+import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
@@ -12,7 +13,7 @@ import 'package:movies/src/tmdb_service.dart';
 class SearchPageController {
   final SearchModel _model;
   final TmdbService tmdbService = TmdbService();
-  final DbServiceFirebase _db = DbServiceFirebase();
+  final DbCombinator _db = DbCombinator();
   SearchPageController() : _model = SearchModel(results: []);
 
   SearchModel get model => _model;
@@ -33,9 +34,13 @@ class SearchPageController {
             movies: movies),
       );
     } else if (result.type == 'movie' || result.type == 'tv') {
-      Movie movie = await _getMovie(result.id, result.type);
-      if (!context.mounted) return;
-      Navigator.pushNamed(context, MovieView.routeName, arguments: movie);
+      try {
+        Movie movie = await _getMovie(result.id, result.type);
+        if (!context.mounted) return;
+        Navigator.pushNamed(context, MovieView.routeName, arguments: movie);
+      } on Exception catch (e) {
+        throw Exception('Fehler beim Laden des Films: $e');
+      }
     } else {
       print('Unbekannter media_type: ${result.type}');
     }
@@ -60,11 +65,13 @@ class SearchPageController {
 
   Future<Movie> _getMovie(String id, String mediaType) async {
     try {
-      return await tmdbService
-          .getMovieWithCredits(await _db.getMovie(id, mediaType));
+      Movie movie = await _db.getMovie(id, mediaType);
+      if (movie.firebaseId == '') {
+        movie = await tmdbService.getMovieWithCredits(movie);
+      }
+      return movie;
     } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
-      return testMovie; // Fehlerbehandlung
+      throw Exception('Fehler beim Laden des Films: $e');
     }
   }
 

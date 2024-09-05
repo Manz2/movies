@@ -1,6 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:json_store/json_store.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_local.dart';
+import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/tmdb_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_service.dart';
 
@@ -50,13 +55,33 @@ class SettingsController with ChangeNotifier {
     await _settingsService.updateThemeMode(newThemeMode);
   }
 
-  Future<void> loadMoviesFromLocal() async {
-    DbServiceLocal db = DbServiceLocal();
-    DbServiceFirebase dbFirebase = DbServiceFirebase();
-    final movies = await db.getMovies();
-    for (var movie in movies) {
-      dbFirebase.addMovie(movie);
+  Future<void> syncMovies() async {
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    TmdbService tmdbService = TmdbService();
+    List<Movie> movies = await dbServiceFirebase.getMovies();
+    for (Movie movie in movies) {
+      try {
+        Movie movie2 = await tmdbService.getMovieWithCredits(movie);
+        await dbServiceFirebase.setMovie(movie2);
+      } on Exception catch (e) {
+        print('Fehler beim Laden des Films: $e');
+      }
     }
   }
 
+  Future<void> clearDataBase() async {
+    final jsonStore = JsonStore(dbName: 'movies');
+    jsonStore.clearDataBase();
+  }
+
+  //TODO Passive and active sync
+  //TODO Sync only when on wifi
+
+  //TDO datensparmodus
+  //TODO Schriftgröße
+
+  Future<void> saveFontSize(double fontSize) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('font_size', fontSize);
+  }
 }

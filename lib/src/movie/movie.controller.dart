@@ -1,12 +1,11 @@
-import 'package:movies/src/db_service_firebase.dart';
-import 'package:movies/src/db_service_local.dart';
+import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 
 class MovieController {
   final MovieModel _model;
-  final _db = DbServiceFirebase();
+  final _db = DbCombinator();
 
   MovieController({required Movie movie}) : _model = MovieModel(movie: movie);
   final TmdbService tmdbService = TmdbService();
@@ -27,15 +26,15 @@ class MovieController {
   }
 
   Future<bool> isSaved() async {
-    return _db.movieExists(_model.movie.id, _model.movie.mediaType);
+    return _model.movie.firebaseId != '';
   }
 
   Future<void> addMovie() async {
-    await _db.addMovie(_model.movie);
-    _model.movie = await _db.getMovie(
-        _model.movie.id,
-        _model.movie
-            .mediaType); //nötig weil firebase id fehlt bei rating auchtung performance
+    try {
+      _model.movie = await _db.addMovie(_model.movie);
+    } catch (e) {
+      print('Fehler beim Hinzufügen des Films: $e');
+    }
   }
 
   Future<void> setRating(double rating) async {
