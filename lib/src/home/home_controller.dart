@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
+import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/tmdb_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeController {
   final HomeModel _model;
@@ -113,5 +115,26 @@ class HomeController {
 
   Future<void> syncMovies() async {
     _model.movies = await _db.syncMovies();
+  }
+
+  Future<Watchlist> getCurrentWatchlist() async {
+    final prefs = await SharedPreferences.getInstance();
+    String id = prefs.getString('current_watchlist') ?? '';
+    if (id == '') {
+      return _db.getWatchlists().then((value) {
+        if (value.isNotEmpty) {
+          prefs.setString('current_watchlist', value.first.id);
+          return value.first;
+        } else {
+          return Watchlist(id: '', name: 'Watchlist', entries: []);
+        }
+      });
+    } else {
+      try {
+        return await _db.getWatchlistMovies(id);
+      } finally {
+        print('should not happen');
+      }
+    }
   }
 }

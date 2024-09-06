@@ -146,11 +146,7 @@ class DbServiceFirebase implements DbServiceInterface {
 
   @override
   Future<Watchlist> getWatchlistMovies(String id) async {
-    return await databaseRefWatchlist
-        .child(id)
-        .child('entries')
-        .get()
-        .then((value) {
+    return await databaseRefWatchlist.child(id).get().then((value) {
       return Watchlist.fromJson(jsonDecode(jsonEncode(value.value)));
     });
   }
@@ -191,6 +187,23 @@ class DbServiceFirebase implements DbServiceInterface {
       await databaseRefWatchlist.child(id).remove();
     } on Exception catch (e) {
       throw Exception("Error removing entry: $e");
+    }
+  }
+
+  @override
+  Future<Watchlist> setWatchlist(Watchlist watchlist2) async {
+    try {
+      String? newPostKey = databaseRefWatchlist.child('posts').push().key;
+      Watchlist watchlist =
+          Watchlist(entries: [], name: watchlist2.name, id: newPostKey!);
+      await databaseRefWatchlist.child(newPostKey).update(watchlist.toJson());
+      logger.d("created Watchlist with id:$newPostKey");
+      for (Entry entry in watchlist2.entries) {
+        addMovieToWatchlist(watchlist, await getMovie(entry.id, entry.type));
+      }
+      return watchlist;
+    } catch (e) {
+      throw Exception("Error creating Watchlist: $e");
     }
   }
 }

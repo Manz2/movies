@@ -113,4 +113,9 @@ class DbServiceLocal implements DbServiceInterface {
   Future<void> removeWatchlist(String id) {
     throw UnimplementedError();
   }
+  
+  @override
+  Future<Watchlist> setWatchlist(Watchlist watchlist) {
+    throw UnimplementedError();
+  }
 }

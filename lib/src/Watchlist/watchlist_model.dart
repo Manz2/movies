@@ -1,6 +1,7 @@
 class WatchlistModel {
-  List<Watchlist> watchlists;
-  WatchlistModel({required this.watchlists});
+  List<Watchlist> watchlists = [];
+  Watchlist currentWatchlist;
+  WatchlistModel({required this.currentWatchlist});
 }
 
 class Watchlist {
@@ -20,10 +21,12 @@ class Watchlist {
   factory Watchlist.fromJson(Map<String, dynamic> json) {
     return Watchlist(
       name: json['name'],
-      entries: (json['entries'] as Map<String, dynamic>)
-          .values
-          .map((element) => Entry.fromJson(element))
-          .toList(),
+      entries: (json['entries'] != null)
+          ? (json['entries'] as Map<String, dynamic>)
+              .values
+              .map((element) => Entry.fromJson(element))
+              .toList()
+          : [],
       id: json['id'],
     );
   }

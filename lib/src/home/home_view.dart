@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Filter/filter_view.dart';
+import 'package:movies/src/Watchlist/watchlist_model.dart';
+import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_view.dart';
@@ -58,7 +60,13 @@ class HomeViewState extends State<HomeView> {
         actions: [
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
-            onPressed: () {},
+            onPressed: () async {
+              if (!context.mounted) return;
+              Watchlist watchlist = await _controller.getCurrentWatchlist();
+              Navigator.pushNamed(context, WatchlistView.routeName,
+                      arguments: watchlist)
+                  .then((val) => _loadMovies());
+            },
           ),
           IconButton(
             icon: const Icon(Icons.settings),

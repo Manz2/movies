@@ -15,4 +15,5 @@ abstract class DbServiceInterface {
   Future<Watchlist> addMovieToWatchlist(Watchlist watchlist, Movie movie);
   Future<void> removeMovieFromWatchlist(Watchlist watchlist, Entry entry);
   Future<Watchlist> getWatchlistMovies(String id);
+  Future<Watchlist> setWatchlist(Watchlist watchlist);
 }

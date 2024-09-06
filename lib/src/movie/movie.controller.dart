@@ -55,13 +55,21 @@ class MovieController {
         element.id == _model.movie.id &&
         element.type == _model.movie.mediaType)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Der Film ist bereits in der Watchlist enthalten"),
+        SnackBar(
+          content: Text(
+              "${_model.movie.title} ist bereits in ${watchlist.name} enthalten"),
         ),
       );
       return;
     }
     await _db.addMovieToWatchlist(watchlist, _model.movie);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            "${_model.movie.title} wurde zu ${watchlist.name} hinzugefügt"),
+      ),
+    );
   }
 
   Future<void> addWatchlist(String name) async {

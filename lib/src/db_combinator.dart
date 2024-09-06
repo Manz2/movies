@@ -80,4 +80,9 @@ class DbCombinator implements DbServiceInterface {
   Future<void> removeWatchlist(String id) async {
     await _dbServiceFirebase.removeWatchlist(id);
   }
+  
+  @override
+  Future<Watchlist> setWatchlist(Watchlist watchlist) async{
+    return await _dbServiceFirebase.setWatchlist(watchlist);
+  }
 }
