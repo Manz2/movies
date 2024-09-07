@@ -4,5 +4,27 @@ import 'package:movies/src/home/movie.dart';
 class MovieModel {
   Movie movie;
   List<Watchlist> watchlists = [];
-  MovieModel({required this.movie});
+  Providers providers;
+  List<String> trailers;
+  MovieModel({required this.movie, required this.providers, required this.trailers});
+}
+
+class Provider {
+  String icon;
+  String type;
+  String id;
+  Provider({required this.icon, required this.type, required this.id});
+}
+
+class Providers {
+  List<Provider> providers = [];
+  String link;
+  Providers({required this.providers, required this.link});
+}
+
+class MovieViewArguments {
+  Movie movie;
+  Providers providers;
+  List<String> trailers;
+  MovieViewArguments({required this.movie, required this.providers, required this.trailers});
 }

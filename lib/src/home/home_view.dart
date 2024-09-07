@@ -5,6 +5,7 @@ import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_controller.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
@@ -137,9 +138,11 @@ class HomeViewState extends State<HomeView> {
                                 "assets/images/moviePlaceholder.png"),
                       ),
                       onTap: () async {
+                        Providers providers = await _controller.getProviders(item);
+                        List<String> trailers = await _controller.getTrailers(item);
                         if (!context.mounted) return;
                         Navigator.pushNamed(context, MovieView.routeName,
-                                arguments: item)
+                                arguments: MovieViewArguments(movie: item, providers: providers, trailers: trailers))
                             .then((val) => _loadMovies());
                       }),
                 ),

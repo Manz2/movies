@@ -39,5 +39,22 @@ void main() {
       // Überprüfe, ob der Titel des Films "Batman" ist
       expect(movies.length, isNot(0));
     });
+
+    test('should return providers', () async {
+      // ID 268 wird als Beispiel für den Film "Batman" verwendet.
+      final tmdbService = TmdbService();
+      final providers = await tmdbService.getProviders('13', 'movie');
+      print(providers);
+      // Überprüfe, ob der Titel des Films "Batman" ist
+      expect(providers.providers.length, isNot(0));
+    });
+
+    test('should return trailers', () async {
+      // ID 268 wird als Beispiel für den Film "Batman" verwendet.
+      final tmdbService = TmdbService();
+      final trailer = await tmdbService.getTrailers('13', 'movie');
+      // Überprüfe, ob der Titel des Films "Batman" ist
+      expect(trailer.length, isNot(0));
+    });
   });
 }

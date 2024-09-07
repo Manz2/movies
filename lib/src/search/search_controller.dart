@@ -3,6 +3,7 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_model.dart';
 import 'package:movies/src/tmdb_service.dart';
@@ -15,7 +16,8 @@ class SearchPageController {
 
   SearchModel get model => _model;
 
-  Future<void> getResult(BuildContext context, Result result, double fontSize) async {
+  Future<void> getResult(
+      BuildContext context, Result result, double fontSize) async {
     if (result.type == 'person') {
       final movies = await _getMovies(int.parse(result.id));
       if (!context.mounted) return;
@@ -28,13 +30,18 @@ class SearchPageController {
                 image: result.image,
                 roleName: "roleName",
                 id: int.parse(result.id)),
-            movies: movies, fontSize: fontSize),
+            movies: movies,
+            fontSize: fontSize),
       );
     } else if (result.type == 'movie' || result.type == 'tv') {
       try {
         Movie movie = await _getMovie(result.id, result.type);
+        Providers providers = await _getProviders(movie);
+        List<String> trailers = await _getTrailers(movie);
         if (!context.mounted) return;
-        Navigator.pushNamed(context, MovieView.routeName, arguments: movie);
+        Navigator.pushNamed(context, MovieView.routeName,
+            arguments: MovieViewArguments(
+                movie: movie, providers: providers, trailers: trailers));
       } on Exception catch (e) {
         throw Exception('Fehler beim Laden des Films: $e');
       }
@@ -77,6 +84,23 @@ class SearchPageController {
       _model.results = await tmdbService.getPopular();
     } on Exception catch (e) {
       print('Failed to get popular movies $e');
+    }
+  }
+
+  Future<Providers> _getProviders(Movie item) async {
+    try {
+      return await tmdbService.getProviders(item.id.toString(), item.mediaType);
+    } on Exception catch (e) {
+      return Providers(providers: [], link: '');
+    }
+  }
+
+  Future<List<String>> _getTrailers(Movie movie) async {
+    try {
+      return await tmdbService.getTrailers(
+          movie.id.toString(), movie.mediaType);
+    } on Exception catch (e) {
+      return [];
     }
   }
 }

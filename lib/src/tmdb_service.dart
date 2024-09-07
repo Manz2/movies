@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/search/search_model.dart';
 import 'package:movies/src/secrets.dart';
 
@@ -271,5 +272,96 @@ class TmdbService {
       throw const HttpException("Failed to get popular movies");
     }
     return results;
+  }
+
+  Future<Providers> getProviders(String id, String mediaType) async {
+    final url =
+        '$baseUrl/$mediaType/$id/watch/providers?api_key=$apiKey&language=de-DE';
+
+    final response = await http.get(Uri.parse(url));
+    Map<String, dynamic> resultJson = json.decode(response.body);
+    List<Provider> providers = [];
+    String link = '';
+
+    if (response.statusCode == 200) {
+      if (resultJson['results'] != null &&
+          resultJson['results']['DE'] != null) {
+        if (resultJson['results']['DE']['flatrate'] != null) {
+          for (var provider in resultJson['results']['DE']['flatrate']) {
+            providers.add(Provider(
+                icon: provider['logo_path'] != null
+                    ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                    : '',
+                id: provider['provider_id'].toString(),
+                type: 'flatrate'));
+          }
+        }
+        if (resultJson['results']['DE']['rent'] != null) {
+          for (var provider in resultJson['results']['DE']['rent']) {
+            providers.any((p) => p.id == provider['provider_id'].toString()) ==
+                    false
+                ? providers.add(Provider(
+                    icon: provider['logo_path'] != null
+                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                        : '',
+                    id: provider['provider_id'].toString(),
+                    type: 'rent'))
+                : null;
+          }
+        }
+        if (resultJson['results']['DE']['buy'] != null) {
+          for (var provider in resultJson['results']['DE']['buy']) {
+            providers.any((p) => p.id == provider['provider_id'].toString()) ==
+                    false
+                ? providers.add(Provider(
+                    icon: provider['logo_path'] != null
+                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                        : '',
+                    id: provider['provider_id'].toString(),
+                    type: 'buy'))
+                : null;
+          }
+        }
+        link = resultJson['results']['DE']['link'];
+      }
+    } else {
+      throw HttpException("Failed to get providers for id=$id");
+    }
+    return Providers(providers: providers, link: link);
+  }
+
+  Future<List<String>> getTrailers(String id, String mediaType) async {
+    final url = '$baseUrl/$mediaType/$id/videos?api_key=$apiKey&language=de-DE';
+
+    final response = await http.get(Uri.parse(url));
+    Map<String, dynamic> resultJson = json.decode(response.body);
+    List<String> trailers = [];
+
+    if (response.statusCode == 200) {
+      if (resultJson['results'] != null) {
+        for (var trailer in resultJson['results']) {
+          if (trailer['site'] == 'YouTube') {
+            trailers.add(trailer['key']);
+          }
+        }
+      } else {
+        final url2 =
+            '$baseUrl/$mediaType/$id/videos?api_key=$apiKey&language=en-US';
+        final response2 = await http.get(Uri.parse(url2));
+        Map<String, dynamic> resultJson2 = json.decode(response2.body);
+        if (response2.statusCode == 200) {
+          if (resultJson2['results'] != null) {
+            for (var trailer in resultJson2['results']) {
+              if (trailer['site'] == 'YouTube') {
+                trailers.add(trailer['key']);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      throw HttpException("Failed to get trailers for id=$id");
+    }
+    return trailers;
   }
 }

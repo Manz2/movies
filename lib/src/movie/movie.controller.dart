@@ -10,7 +10,7 @@ class MovieController {
   final MovieModel _model;
   final _db = DbCombinator();
 
-  MovieController({required Movie movie}) : _model = MovieModel(movie: movie);
+  MovieController({required Movie movie, required Providers providers, required List<String> trailers}) : _model = MovieModel(movie: movie, providers: providers, trailers: trailers);
   final TmdbService tmdbService = TmdbService();
   MovieModel get model => _model;
 
