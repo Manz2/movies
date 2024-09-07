@@ -32,8 +32,6 @@ class MovieViewState extends State<MovieView> {
   late final YoutubePlayerController _trailerController;
   bool _isFabVisible = false;
   double _fontSize = 16.0;
-  double _volume = 100;
-  bool _muted = false;
   bool _isPlayerReady = false;
   late PlayerState _playerState;
   late YoutubeMetaData _videoMetaData;
@@ -95,6 +93,21 @@ class MovieViewState extends State<MovieView> {
       )..addListener(listener);
       _videoMetaData = const YoutubeMetaData();
       _playerState = PlayerState.unknown;
+    } else {
+      _trailerController = YoutubePlayerController(
+        initialVideoId: 'no_trailer',
+        flags: const YoutubePlayerFlags(
+          mute: false,
+          autoPlay: false,
+          disableDragSeek: false,
+          loop: false,
+          isLive: false,
+          enableCaption: false,
+          showLiveFullscreenButton: true,
+        ),
+      )..addListener(listener);
+      _videoMetaData = const YoutubeMetaData();
+      _playerState = PlayerState.unknown;
     }
   }
 
@@ -120,6 +133,7 @@ class MovieViewState extends State<MovieView> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return YoutubePlayerBuilder(
         onExitFullScreen: () {
@@ -128,8 +142,7 @@ class MovieViewState extends State<MovieView> {
         },
         onEnterFullScreen: () {
           // The player forces landscapeLeft after entering fullscreen. This overrides the behaviour.
-          SystemChrome.setPreferredOrientations(
-              [DeviceOrientation.landscapeLeft]);
+          SystemChrome.setPreferredOrientations(DeviceOrientation.values);
         },
         player: YoutubePlayer(
           controller: _trailerController,
@@ -306,10 +319,14 @@ class MovieViewState extends State<MovieView> {
                               ),
                             ),
                             const SizedBox(height: 8),
-                            Text("Trailer:",
-                                style: TextStyle(fontSize: _fontSize)),
+                            controller.model.trailers.isNotEmpty
+                                ? Text("Trailer:",
+                                    style: TextStyle(fontSize: _fontSize))
+                                : const Text(""),
                             const SizedBox(height: 8),
-                            player,
+                            controller.model.trailers.isNotEmpty
+                                ? player
+                                : const Text(""),
                             const SizedBox(height: 16),
                             Text("Schauspieler:",
                                 style: TextStyle(
