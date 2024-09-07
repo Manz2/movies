@@ -88,7 +88,7 @@ class MovieViewState extends State<MovieView> {
           loop: false,
           isLive: false,
           enableCaption: false,
-          showLiveFullscreenButton: true,
+          showLiveFullscreenButton: false,
         ),
       )..addListener(listener);
       _videoMetaData = const YoutubeMetaData();
@@ -103,7 +103,7 @@ class MovieViewState extends State<MovieView> {
           loop: false,
           isLive: false,
           enableCaption: false,
-          showLiveFullscreenButton: true,
+          showLiveFullscreenButton: false,
         ),
       )..addListener(listener);
       _videoMetaData = const YoutubeMetaData();
@@ -139,19 +139,28 @@ class MovieViewState extends State<MovieView> {
         onExitFullScreen: () {
           // The player forces portraitUp after exiting fullscreen. This overrides the behaviour.
           SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+          _trailerController.pause();
         },
         onEnterFullScreen: () {
-          // The player forces landscapeLeft after entering fullscreen. This overrides the behaviour.
-          SystemChrome.setPreferredOrientations(DeviceOrientation.values);
+          if (_trailerController.value.isPlaying) {
+            _trailerController.play();
+          }
         },
         player: YoutubePlayer(
           controller: _trailerController,
-          showVideoProgressIndicator: true,
-          progressIndicatorColor: Colors.blueAccent,
           onReady: () {
             _isPlayerReady = true;
           },
           onEnded: (data) {},
+          bottomActions: [
+            ProgressBar(
+                isExpanded: true,
+                colors: const ProgressBarColors(
+                    playedColor: Colors.blue,
+                    handleColor: Colors.blue,
+                    bufferedColor: Colors.white))
+          ],
+          topActions: const [],
         ),
         builder: (context, player) => Scaffold(
               floatingActionButton: _isFabVisible
