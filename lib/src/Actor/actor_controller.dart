@@ -2,6 +2,7 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/home/test_movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 
 class ActorController {
@@ -30,6 +31,22 @@ class ActorController {
       return movie;
     } on Exception catch (e) {
       throw Exception('Fehler beim Laden des Films: $e');
+    }
+  }
+
+    Future<Providers> getProviders(Movie item) async {
+    try {
+      return await tmdbService.getProviders(item.id.toString(), item.mediaType);
+    } on Exception catch (e) {
+      return Providers(providers: [], link: '');
+    }
+  }
+
+  Future<List<String>> getTrailers(Movie item) async{
+    try {
+      return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
+    } on Exception catch (e) {
+      return [];
     }
   }
 }

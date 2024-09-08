@@ -73,6 +73,11 @@ class DbServiceFirebase implements DbServiceInterface {
   Future<void> removeMovie(Movie movie) async {
     try {
       await databaseRef.child(movie.firebaseId).remove();
+      final newPostKey = databaseRef.child('posts').push().key;
+      await databaseRef
+          .child('deleted')
+          .child(newPostKey!)
+          .update(movie.toJson());
     } on Exception catch (e) {
       throw Exception("Error removing movie: $e");
     }

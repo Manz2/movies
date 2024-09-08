@@ -43,6 +43,8 @@ class WatchlistViewState extends State<WatchlistView> {
       appBar: AppBar(
         title: Text(controller.model.currentWatchlist.name),
         actions: [
+          Text(controller.model.currentWatchlist.entries.length.toString(),
+              style: TextStyle(fontSize: _fontSize)),
           IconButton(
               onPressed: () async {
                 await controller.getWatchlists();
@@ -180,7 +182,8 @@ class WatchlistViewState extends State<WatchlistView> {
   }
 
   _loadMovies() async {
-    await controller.getMoviesForCurrentWatchlist(controller.model.currentWatchlist);
+    await controller
+        .getMoviesForCurrentWatchlist(controller.model.currentWatchlist);
     setState(() {});
   }
 }

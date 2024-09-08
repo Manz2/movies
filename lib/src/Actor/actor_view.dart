@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Actor/actor_controller.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 
 class ActorView extends StatelessWidget {
@@ -74,7 +75,10 @@ class ActorView extends StatelessWidget {
                         Navigator.pushNamed(
                           context,
                           MovieView.routeName,
-                          arguments: movieWithCredits,
+                          arguments: MovieViewArguments(
+                              movie: movieWithCredits,
+                              providers: await controller.getProviders(movie),
+                              trailers: await controller.getTrailers(movie)),
                         );
                       },
                     );

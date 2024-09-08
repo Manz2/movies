@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
@@ -137,14 +136,10 @@ class MovieViewState extends State<MovieView> {
   Widget build(BuildContext context) {
     return YoutubePlayerBuilder(
         onExitFullScreen: () {
-          // The player forces portraitUp after exiting fullscreen. This overrides the behaviour.
-          SystemChrome.setPreferredOrientations(DeviceOrientation.values);
           _trailerController.pause();
         },
         onEnterFullScreen: () {
-          if (_trailerController.value.isPlaying) {
-            _trailerController.play();
-          }
+          _trailerController.play();
         },
         player: YoutubePlayer(
           controller: _trailerController,

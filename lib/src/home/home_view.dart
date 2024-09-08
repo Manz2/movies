@@ -59,6 +59,8 @@ class HomeViewState extends State<HomeView> {
       appBar: AppBar(
         title: const Text('Movies'),
         actions: [
+          Text(_controller.model.movies.length.toString(),
+              style: TextStyle(fontSize: _fontSize)),
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
             onPressed: () async {
@@ -138,11 +140,16 @@ class HomeViewState extends State<HomeView> {
                                 "assets/images/moviePlaceholder.png"),
                       ),
                       onTap: () async {
-                        Providers providers = await _controller.getProviders(item);
-                        List<String> trailers = await _controller.getTrailers(item);
+                        Providers providers =
+                            await _controller.getProviders(item);
+                        List<String> trailers =
+                            await _controller.getTrailers(item);
                         if (!context.mounted) return;
                         Navigator.pushNamed(context, MovieView.routeName,
-                                arguments: MovieViewArguments(movie: item, providers: providers, trailers: trailers))
+                                arguments: MovieViewArguments(
+                                    movie: item,
+                                    providers: providers,
+                                    trailers: trailers))
                             .then((val) => _loadMovies());
                       }),
                 ),
