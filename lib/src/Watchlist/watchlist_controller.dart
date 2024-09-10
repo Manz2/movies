@@ -1,12 +1,14 @@
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WatchlistController {
   final WatchlistModel _model;
   final DbCombinator _db = DbCombinator();
+  TmdbService tmdbService = TmdbService();
   WatchlistController({required Watchlist currentWatchlist})
       : _model = WatchlistModel(currentWatchlist: currentWatchlist);
   WatchlistModel get model => _model;
@@ -97,6 +99,21 @@ class WatchlistController {
       return movie;
     } on Exception catch (e) {
       throw Exception('Fehler beim Laden des Films: $e');
+    }
+  }
+  Future<Providers> getProviders(Entry item) async {
+    try {
+      return await tmdbService.getProviders(item.id.toString(), item.type);
+    } on Exception catch (e) {
+      return Providers(providers: [], link: '');
+    }
+  }
+
+  Future<List<String>> getTrailers(Entry item) async{
+    try {
+      return await tmdbService.getTrailers(item.id.toString(), item.type);
+    } on Exception catch (e) {
+      return [];
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/Watchlist/watchlist_controller.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
+import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -169,7 +170,12 @@ class WatchlistViewState extends State<WatchlistView> {
                       onTap: () async {
                         if (!context.mounted) return;
                         Navigator.pushNamed(context, MovieView.routeName,
-                                arguments: await controller.getMovie(item))
+                                arguments: MovieViewArguments(
+                                    movie: await controller.getMovie(item),
+                                    providers:
+                                        await controller.getProviders(item),
+                                    trailers:
+                                        await controller.getTrailers(item)))
                             .then((val) => _loadMovies());
                       }),
                 ),
