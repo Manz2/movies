@@ -96,6 +96,14 @@ class FilterController {
     _model.filter.rating = rating;
   }
 
+  setSortBy(String value) {
+    _model.filter.sortBy = value;
+  }
+
+  setAccending() {
+    _model.filter.accending = !_model.filter.accending;
+  }
+
   void resetFilter() {
     model.filter = Filter(
         movie: 3,
@@ -104,6 +112,8 @@ class FilterController {
         durationTo: 180,
         rating: 0,
         yearFrom: 0,
-        yearTo: 6000);
+        yearTo: 6000,
+        sortBy: '',
+        accending: false);
   }
 }

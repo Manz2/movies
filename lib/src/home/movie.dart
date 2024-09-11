@@ -13,6 +13,7 @@ class Movie {
   String mediaType;
   double privateRating;
   String firebaseId;
+  DateTime addedAt;
   Movie(
       {required this.id,
       required this.title,
@@ -27,11 +28,12 @@ class Movie {
       required this.popularity,
       required this.mediaType,
       required this.privateRating,
-      required this.firebaseId});
+      required this.firebaseId,
+      required this.addedAt});
 
   @override
   String toString() {
-    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId}';
+    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt}';
   }
 
   // toJson Methode
@@ -50,7 +52,8 @@ class Movie {
       'popularity': popularity,
       'MediaType': mediaType,
       'privateRating': privateRating,
-      'firebaseId': firebaseId
+      'firebaseId': firebaseId,
+      'addedAt': addedAt.toIso8601String(),
     };
   }
 
@@ -73,6 +76,7 @@ class Movie {
       mediaType: json['MediaType'],
       privateRating: json['privateRating'].toDouble() ?? 0,
       firebaseId: json['firebaseId'] ?? '',
+      addedAt: json['addedAt'] != null ?DateTime.parse(json['addedAt']) : DateTime.now(),
     );
   }
 }

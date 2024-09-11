@@ -11,6 +11,8 @@ class Filter {
   double rating;
   int yearFrom;
   int yearTo;
+  String sortBy;
+  bool accending;
 
   Filter({
     required this.movie,
@@ -20,5 +22,7 @@ class Filter {
     required this.rating,
     required this.yearFrom,
     required this.yearTo,
+    required this.sortBy,
+    required this.accending,
   });
 }

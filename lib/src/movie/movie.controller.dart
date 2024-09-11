@@ -10,11 +10,15 @@ class MovieController {
   final MovieModel _model;
   final _db = DbCombinator();
 
-  MovieController({required Movie movie, required Providers providers, required List<String> trailers}) : _model = MovieModel(movie: movie, providers: providers, trailers: trailers);
+  MovieController(
+      {required Movie movie,
+      required Providers providers,
+      required List<String> trailers})
+      : _model =
+            MovieModel(movie: movie, providers: providers, trailers: trailers);
   final TmdbService tmdbService = TmdbService();
   MovieModel get model => _model;
   Logger logger = Logger();
-
 
   Future<List<Movie>> getMovies(int actorId) async {
     try {
@@ -71,5 +75,12 @@ class MovieController {
 
   Future<void> addWatchlist(String name) async {
     _model.watchlists.add(await _db.addWatchlist(name));
+  }
+
+  String getDuration() {
+    int durationInMinutes = _model.movie.duration;
+    int hours = durationInMinutes ~/ 60; // Ganze Stunden
+    int minutes = durationInMinutes % 60;
+    return "$hours Std. $minutes Min."; // Verbleibende Minuten
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:movies/src/home/movie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_controller.dart';
@@ -109,34 +110,62 @@ class SettingsViewState extends State<SettingsView> {
               child: ElevatedButton(
                 onPressed: () async {
                   await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text('Filme Synchronisieren',
-                              style: TextStyle(fontSize: _fontSize)),
-                          content: Text(
-                            "Sind Sie sicher, dass Sie alle Filme mit der TMDB synchronisieren möchten? Ein hoher Datenverbrauch kann entstehen.",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          actions: [
-                            TextButton(
-                              child: Text('Abbrechen',
-                                  style: TextStyle(fontSize: _fontSize)),
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
+                    context: context,
+                    builder: (context) {
+                      String passwordInput = '';
+                      String correctPassword = '1234'; // Festgelegtes Passwort
+
+                      return AlertDialog(
+                        title: Text('Filme Synchronisieren',
+                            style: TextStyle(fontSize: _fontSize)),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Sind Sie sicher, dass Sie alle Filme mit der TMDB synchronisieren möchten? Ein hoher Datenverbrauch kann entstehen.",
+                              style: TextStyle(fontSize: _fontSize),
                             ),
-                            TextButton(
-                              child: Text('Sync',
-                                  style: TextStyle(fontSize: _fontSize)),
-                              onPressed: () {
-                                Navigator.pop(context);
-                                widget.controller.syncMovies();
+                            const SizedBox(height: 20),
+                            TextField(
+                              obscureText: true, // Passworteingabe verbergen
+                              decoration: const InputDecoration(
+                                labelText: 'Passwort eingeben',
+                              ),
+                              onChanged: (value) {
+                                passwordInput = value;
                               },
                             ),
                           ],
-                        );
-                      });
+                        ),
+                        actions: [
+                          TextButton(
+                            child: Text('Abbrechen',
+                                style: TextStyle(fontSize: _fontSize)),
+                            onPressed: () {
+                              Navigator.pop(context); // Dialog schließen
+                            },
+                          ),
+                          TextButton(
+                            child: Text('Sync',
+                                style: TextStyle(fontSize: _fontSize)),
+                            onPressed: () {
+                              if (passwordInput == correctPassword) {
+                                Navigator.pop(context); // Dialog schließen
+                                widget.controller
+                                    .syncMovies(); // Filme synchronisieren
+                              } else {
+                                // Zeige eine Warnung an, dass das Passwort falsch ist
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Falsches Passwort')),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 },
                 child:
                     Text('Sync Movies', style: TextStyle(fontSize: _fontSize)),
@@ -156,6 +185,24 @@ class SettingsViewState extends State<SettingsView> {
                   widget.controller.clearDataBase();
                 },
                 child: Text('Lokale DB Löschen',
+                    style: TextStyle(fontSize: _fontSize)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  List<Movie> deleted =
+                      await widget.controller.removeDublicates();
+                  String names = deleted.map((e) => e.title).join(', ');
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Folgende Filme wurden gelöscht: $names"),
+                    ),
+                  );
+                },
+                child: Text('Duplikate löschen',
                     style: TextStyle(fontSize: _fontSize)),
               ),
             ),

@@ -8,9 +8,10 @@ import 'package:firebase_database/firebase_database.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
   final databaseRef =
-      FirebaseDatabase.instance.ref().child("movies/"); // Database reference
+      FirebaseDatabase.instance.ref().child("movies"); // Database reference
   final databaseRefWatchlist =
       FirebaseDatabase.instance.ref().child("watchlists/");
+  final databaseRefJunk = FirebaseDatabase.instance.ref().child("junk/");
   Logger logger = Logger();
   @override
   Future<Movie> addMovie(Movie movie) async {
@@ -51,7 +52,8 @@ class DbServiceFirebase implements DbServiceInterface {
         popularity: 1,
         mediaType: mediaType,
         privateRating: 0,
-        firebaseId: '');
+        firebaseId: '',
+        addedAt: DateTime.now());
   }
 
   @override
@@ -73,8 +75,8 @@ class DbServiceFirebase implements DbServiceInterface {
   Future<void> removeMovie(Movie movie) async {
     try {
       await databaseRef.child(movie.firebaseId).remove();
-      final newPostKey = databaseRef.child('posts').push().key;
-      await databaseRef
+      final newPostKey = databaseRefJunk.child('posts').push().key;
+      await databaseRefJunk
           .child('deleted')
           .child(newPostKey!)
           .update(movie.toJson());
@@ -209,5 +211,28 @@ class DbServiceFirebase implements DbServiceInterface {
     } catch (e) {
       throw Exception("Error creating Watchlist: $e");
     }
+  }
+
+  Future<List<Movie>> removeDuplicates() async {
+    List<Movie> movies = await getMovies();
+    List<Movie> duplicates = [];
+    for (int i = 0; i < movies.length; i++) {
+      for (int j = i + 1; j < movies.length; j++) {
+        if (movies[i].id == movies[j].id &&
+            movies[i].mediaType == movies[j].mediaType) {
+          duplicates.add(movies[i]);
+        }
+      }
+    }
+    for (Movie m in duplicates) {
+      await databaseRef.child(m.firebaseId).remove();
+      logger.f("Removed duplicate: ${m.title}");
+      final newPostKey = databaseRefJunk.child('posts').push().key;
+      await databaseRefJunk
+          .child('doubles')
+          .child(newPostKey!)
+          .update(m.toJson());
+    }
+    return duplicates;
   }
 }

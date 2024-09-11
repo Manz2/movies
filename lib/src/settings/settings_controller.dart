@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_service.dart';
 
-
 class SettingsController with ChangeNotifier {
   SettingsController(this._settingsService);
 
@@ -53,5 +52,10 @@ class SettingsController with ChangeNotifier {
   Future<void> saveFontSize(double fontSize) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setDouble('font_size', fontSize);
+  }
+
+  Future<List<Movie>> removeDublicates() async {
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    return await dbServiceFirebase.removeDuplicates();
   }
 }

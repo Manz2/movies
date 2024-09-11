@@ -13,14 +13,14 @@ class TmdbService {
   Logger logger = Logger();
 
   Future<Movie> getMovie(
-      int id, String mediaType, double privateRating, String firebaseId) async {
+      int id, String mediaType, double privateRating, String firebaseId, DateTime addedAt) async {
     final url = '$baseUrl/$mediaType/$id?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       return _movieFromTmdb(
-          json.decode(response.body), mediaType, privateRating, firebaseId);
+          json.decode(response.body), mediaType, privateRating, firebaseId, addedAt);
     } else {
       throw HttpException("Failed to load movie with id=$id");
     }
@@ -31,7 +31,7 @@ class TmdbService {
     String mediaType = movie1.mediaType;
     double privateRating = movie1.privateRating;
     Movie movie =
-        await getMovie(id, mediaType, privateRating, movie1.firebaseId);
+        await getMovie(id, mediaType, privateRating, movie1.firebaseId, movie1.addedAt);
     String url;
     if (mediaType == 'movie') {
       url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
@@ -116,7 +116,7 @@ class TmdbService {
   }
 
   Movie _movieFromTmdb(Map<String, dynamic> json, String mediaType2,
-      double privateRating, String firebaseId) {
+      double privateRating, String firebaseId, DateTime addedAt) {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
     String title = json['title'] ??
@@ -166,7 +166,8 @@ class TmdbService {
         popularity: popularity,
         mediaType: mediaType,
         privateRating: privateRating,
-        firebaseId: firebaseId);
+        firebaseId: firebaseId,
+        addedAt: addedAt);
   }
 
   List<Actor> _creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
@@ -213,7 +214,7 @@ class TmdbService {
 
     if (response.statusCode == 200) {
       for (var movie in moviesJson['cast']) {
-        movies.add(_movieFromTmdb(movie, 'unbekannt', 0, ''));
+        movies.add(_movieFromTmdb(movie, 'unbekannt', 0, '', DateTime.now()));
       }
     } else {
       throw HttpException("Failed to load movie with id=$id");

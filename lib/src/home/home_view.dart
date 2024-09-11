@@ -136,7 +136,7 @@ class HomeViewState extends State<HomeView> {
                         foregroundImage: item.image.isNotEmpty
                             ? NetworkImage(item.image)
                             : const AssetImage(
-                                "assets/images/moviePlaceholder.png"),
+                                "assets/images/MoviePlaceholder.png"),
                       ),
                       onTap: () async {
                         Providers providers =

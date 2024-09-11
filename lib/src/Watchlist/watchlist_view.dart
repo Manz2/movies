@@ -166,7 +166,7 @@ class WatchlistViewState extends State<WatchlistView> {
                         foregroundImage: item.image.isNotEmpty
                             ? NetworkImage(item.image)
                             : const AssetImage(
-                                "assets/images/moviePlaceholder.png"),
+                                "assets/images/MoviePlaceholder.png"),
                       ),
                       onTap: () async {
                         Movie movie = await controller.getMovie(item);

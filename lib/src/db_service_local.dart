@@ -59,7 +59,8 @@ class DbServiceLocal implements DbServiceInterface {
           popularity: 1,
           mediaType: mediaType,
           privateRating: 0,
-          firebaseId: ''),
+          firebaseId: '',
+          addedAt: DateTime.now()),
     );
   }
 

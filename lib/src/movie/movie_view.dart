@@ -152,7 +152,16 @@ class MovieViewState extends State<MovieView> {
               floatingActionButton: _isFabVisible
                   ? FloatingActionButton(
                       onPressed: () async {
+                        showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (BuildContext dialogContext) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            });
                         await controller.addMovie();
+                        Navigator.of(context).pop();
                         _toggleFabVisibility();
                       },
                       child: const Icon(Icons.add),
@@ -260,8 +269,7 @@ class MovieViewState extends State<MovieView> {
                                 style: TextStyle(fontSize: _fontSize)),
                             const SizedBox(height: 8),
                             controller.model.movie.mediaType == 'movie'
-                                ? Text(
-                                    "Dauer: ${controller.model.movie.duration} Minuten",
+                                ? Text("Dauer: ${controller.getDuration()}",
                                     style: TextStyle(fontSize: _fontSize))
                                 : Text(
                                     "Dauer: ${controller.model.movie.duration} Staffeln",
@@ -340,7 +348,7 @@ class MovieViewState extends State<MovieView> {
                                       foregroundImage: actor.image.isNotEmpty
                                           ? NetworkImage(actor.image)
                                           : const AssetImage(
-                                              "assets/images/ActorPlaceholder.jpg"),
+                                              "assets/images/ActorPlaceholder.png"),
                                     ),
                                     title: Text(actor.name,
                                         style: TextStyle(fontSize: _fontSize)),

@@ -12,7 +12,8 @@ void main() {
     test('should get the Batman Movie', () async {
       // ID 268 wird als Beispiel für den Film "Batman" verwendet.
       final tmdbService = TmdbService();
-      final movie = await tmdbService.getMovie(268, 'movie', 0, '');
+      final movie =
+          await tmdbService.getMovie(268, 'movie', 0, '', DateTime.now());
       // Überprüfe, ob der Titel des Films "Batman" ist
       expect(movie.title, 'Batman');
       // Weitere Tests können hinzugefügt werden, z.B. ob die ID stimmt

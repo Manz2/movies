@@ -3,13 +3,13 @@ import 'package:movies/src/home/movie.dart';
 
 Actor testActor1 = Actor(
     name: "John Doe",
-    image: "assets/images/ActorPlaceholder.jpg",
+    image: "assets/images/ActorPlaceholder.png",
     roleName: "Badman",
     id: 2);
 
 Actor testActor2 = Actor(
     name: "Jane Smith",
-    image: "assets/images/ActorPlaceholder.jpg",
+    image: "assets/images/ActorPlaceholder.png",
     roleName: "joker",
     id: 1);
 
@@ -28,4 +28,5 @@ Movie testMovie = Movie(
     popularity: 10,
     mediaType: "TV",
     privateRating: 5,
-    firebaseId: '');
+    firebaseId: '',
+    addedAt: DateTime.now());

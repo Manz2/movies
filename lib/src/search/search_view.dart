@@ -78,7 +78,10 @@ class SearchViewState extends State<SearchView> {
                 radius: 35,
                 foregroundImage: result.image.isNotEmpty
                     ? NetworkImage(result.image)
-                    : const AssetImage("assets/images/ActorPlaceholder.jpg"),
+                    : result.type == 'person'
+                        ? const AssetImage("assets/images/ActorPlaceholder.png")
+                        : const AssetImage(
+                            "assets/images/MoviePlaceholder.png"),
               ),
               title:
                   Text(result.name, style: TextStyle(fontSize: _fontSize + 2)),

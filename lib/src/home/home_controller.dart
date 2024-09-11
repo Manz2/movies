@@ -25,7 +25,9 @@ class HomeController {
                 durationTo: 180,
                 rating: 0,
                 yearFrom: 0,
-                yearTo: 6000));
+                yearTo: 6000,
+                sortBy: '',
+                accending: false));
 
   HomeModel get model => _model;
 
