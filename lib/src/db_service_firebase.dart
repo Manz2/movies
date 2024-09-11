@@ -104,7 +104,6 @@ class DbServiceFirebase implements DbServiceInterface {
 
   @override
   Future<List<Movie>> syncMovies() {
-    // TODO: implement syncMovies
     throw UnimplementedError();
   }
 

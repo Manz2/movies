@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/search/search_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,6 +15,7 @@ class SearchView extends StatefulWidget {
 class SearchViewState extends State<SearchView> {
   SearchPageController controller = SearchPageController();
   double _fontSize = 16.0;
+  Logger logger = Logger();
 
   @override
   void initState() {
@@ -89,7 +91,7 @@ class SearchViewState extends State<SearchView> {
                       content: Text("Fehler beim aufrufen der Seite"),
                     ),
                   );
-                  print('Fehler beim aufrufen der Seite: $e');
+                  logger.e('Fehler beim aufrufen der Seite: $e');
                 }
               },
             ),

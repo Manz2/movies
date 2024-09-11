@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/home_model.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +13,7 @@ class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
   final _db = DbCombinator();
+  Logger logger = Logger();
 
   HomeController()
       : _model = HomeModel(
@@ -37,7 +38,7 @@ class HomeController {
       _model.addMovie(movie);
       _db.addMovie(movie);
     } on Exception catch (e) {
-      print(e.toString());
+      logger.e('Fehler beim Hinzufügen des Films: $e');
       if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -53,7 +54,7 @@ class HomeController {
       await _db.removeMovie(movie);
       _model.removeMovie(movie);
     } catch (e) {
-      print(e.toString());
+      logger.e('Fehler beim Entfernen des Films: $e');
     }
   }
 
@@ -108,9 +109,6 @@ class HomeController {
         filteredMovies.add(movie);
       }
     }
-
-    // Setze die gefilterten Filme in das Modell
-    print(filteredMovies.length);
     _model.movies = filteredMovies;
   }
 
@@ -134,7 +132,7 @@ class HomeController {
       try {
         return await _db.getWatchlistMovies(id);
       } finally {
-        print('should not happen');
+        logger.e('Fehler beim Laden der Watchlist');
       }
     }
   }
@@ -143,6 +141,7 @@ class HomeController {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.mediaType);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Provider: $e');
       return Providers(providers: [], link: '');
     }
   }
@@ -151,6 +150,7 @@ class HomeController {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
       return [];
     }
   }

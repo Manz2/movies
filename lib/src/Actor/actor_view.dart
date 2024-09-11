@@ -71,14 +71,18 @@ class ActorView extends StatelessWidget {
                       onTap: () async {
                         final movieWithCredits =
                             await controller.getMovieWithCredits(movie);
+                        Providers providers =
+                            await controller.getProviders(movie);
+                        List<String> trailers =
+                            await controller.getTrailers(movie);
                         if (!context.mounted) return;
                         Navigator.pushNamed(
                           context,
                           MovieView.routeName,
                           arguments: MovieViewArguments(
                               movie: movieWithCredits,
-                              providers: await controller.getProviders(movie),
-                              trailers: await controller.getTrailers(movie)),
+                              providers: providers,
+                              trailers: trailers),
                         );
                       },
                     );

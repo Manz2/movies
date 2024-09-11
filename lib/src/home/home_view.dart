@@ -4,7 +4,6 @@ import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_controller.dart';
-import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
@@ -64,8 +63,8 @@ class HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
             onPressed: () async {
-              if (!context.mounted) return;
               Watchlist watchlist = await _controller.getCurrentWatchlist();
+              if (!context.mounted) return;
               Navigator.pushNamed(context, WatchlistView.routeName,
                       arguments: watchlist)
                   .then((val) => _loadMovies());

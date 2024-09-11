@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/db_combinator.dart';
@@ -15,6 +16,7 @@ class SearchPageController {
   SearchPageController() : _model = SearchModel(results: []);
 
   SearchModel get model => _model;
+  Logger logger = Logger();
 
   Future<void> getResult(
       BuildContext context, Result result, double fontSize) async {
@@ -46,7 +48,7 @@ class SearchPageController {
         throw Exception('Fehler beim Laden des Films: $e');
       }
     } else {
-      print('Unbekannter media_type: ${result.type}');
+      logger.e('Unbekannter Typ: ${result.type}');
     }
   }
 
@@ -54,7 +56,7 @@ class SearchPageController {
     try {
       _model.results = await tmdbService.combinedSearch(text);
     } on Exception catch (e) {
-      print('Fehler beim kombinierten suchen: $e');
+      logger.e('Fehler beim Suchen: $e');
     }
   }
 
@@ -62,7 +64,7 @@ class SearchPageController {
     try {
       return await tmdbService.getCombinedCredits(actorId);
     } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
+      logger.e('Fehler beim Laden der Filme: $e');
     }
     return [];
   }
@@ -83,7 +85,7 @@ class SearchPageController {
     try {
       _model.results = await tmdbService.getPopular();
     } on Exception catch (e) {
-      print('Failed to get popular movies $e');
+      logger.d('Fehler beim Laden der beliebtesten Filme: $e');
     }
   }
 
@@ -91,6 +93,7 @@ class SearchPageController {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.mediaType);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Provider: $e');
       return Providers(providers: [], link: '');
     }
   }
@@ -100,6 +103,7 @@ class SearchPageController {
       return await tmdbService.getTrailers(
           movie.id.toString(), movie.mediaType);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
       return [];
     }
   }

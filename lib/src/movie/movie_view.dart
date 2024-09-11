@@ -32,8 +32,6 @@ class MovieViewState extends State<MovieView> {
   bool _isFabVisible = false;
   double _fontSize = 16.0;
   bool _isPlayerReady = false;
-  late PlayerState _playerState;
-  late YoutubeMetaData _videoMetaData;
 
   set rating(double rating) {
     controller.setRating(rating);
@@ -90,8 +88,6 @@ class MovieViewState extends State<MovieView> {
           showLiveFullscreenButton: false,
         ),
       )..addListener(listener);
-      _videoMetaData = const YoutubeMetaData();
-      _playerState = PlayerState.unknown;
     } else {
       _trailerController = YoutubePlayerController(
         initialVideoId: 'no_trailer',
@@ -105,17 +101,12 @@ class MovieViewState extends State<MovieView> {
           showLiveFullscreenButton: false,
         ),
       )..addListener(listener);
-      _videoMetaData = const YoutubeMetaData();
-      _playerState = PlayerState.unknown;
     }
   }
 
   void listener() {
     if (_isPlayerReady && mounted && !_trailerController.value.isFullScreen) {
-      setState(() {
-        _playerState = _trailerController.value.playerState;
-        _videoMetaData = _trailerController.metadata;
-      });
+      setState(() {});
     }
   }
 

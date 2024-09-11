@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
@@ -13,17 +13,14 @@ class MovieController {
   MovieController({required Movie movie, required Providers providers, required List<String> trailers}) : _model = MovieModel(movie: movie, providers: providers, trailers: trailers);
   final TmdbService tmdbService = TmdbService();
   MovieModel get model => _model;
+  Logger logger = Logger();
 
-  /*
-  * Returns all Movies from a specific actor sorted by Popularity
-  * param: actorId: a string representing the caracter id of the Actor
-  * returns: a list of Movies
-  */
+
   Future<List<Movie>> getMovies(int actorId) async {
     try {
       return await tmdbService.getCombinedCredits(actorId);
     } on Exception catch (e) {
-      print('Fehler beim Laden des Films: $e');
+      logger.e('Fehler beim Laden der Filme: $e');
     }
     return [];
   }
@@ -36,7 +33,7 @@ class MovieController {
     try {
       _model.movie = await _db.addMovie(_model.movie);
     } catch (e) {
-      print('Fehler beim Hinzufügen des Films: $e');
+      logger.e('Fehler beim Hinzufügen des Films: $e');
     }
   }
 

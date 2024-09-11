@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/search/search_model.dart';
@@ -9,6 +10,7 @@ import 'package:movies/src/secrets.dart';
 class TmdbService {
   final String apiKey = tmdbAPIKey;
   final String baseUrl = 'https://api.themoviedb.org/3';
+  Logger logger = Logger();
 
   Future<Movie> getMovie(
       int id, String mediaType, double privateRating, String firebaseId) async {
@@ -81,7 +83,7 @@ class TmdbService {
         }
       }
     }
-    print("Failed to load fsk for movie with id=$id");
+    logger.d("Failed to load fsk for movie with id=$id");
     return 'Unbekannt';
   }
 
@@ -109,7 +111,7 @@ class TmdbService {
         }
       }
     }
-    print("Failed to load fsk for movie with id=$id");
+    logger.d("Failed to load fsk for movie with id=$id");
     return 'Unbekannt';
   }
 

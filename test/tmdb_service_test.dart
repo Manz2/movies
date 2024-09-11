@@ -44,7 +44,6 @@ void main() {
       // ID 268 wird als Beispiel für den Film "Batman" verwendet.
       final tmdbService = TmdbService();
       final providers = await tmdbService.getProviders('13', 'movie');
-      print(providers);
       // Überprüfe, ob der Titel des Films "Batman" ist
       expect(providers.providers.length, isNot(0));
     });

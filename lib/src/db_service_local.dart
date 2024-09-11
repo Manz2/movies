@@ -1,10 +1,12 @@
 import 'package:json_store/json_store.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
 
 class DbServiceLocal implements DbServiceInterface {
   final _jsonStore = JsonStore(dbName: 'movies');
+  Logger logger = Logger();
 
   @override
   Future<List<Movie>> getMovies() async {
@@ -13,14 +15,14 @@ class DbServiceLocal implements DbServiceInterface {
       List<Map<String, dynamic>>? allItems =
           await _jsonStore.getListLike('movie_%');
       if (allItems == null) {
-        print("no movies found locally");
+        logger.d('No movies found');
         return movies;
       }
       for (var item in allItems) {
         movies.add(Movie.fromJson(item));
       }
     } on Exception catch (e) {
-      print(e.toString());
+      logger.e('Error getting movies: $e');
     }
     return movies;
   }

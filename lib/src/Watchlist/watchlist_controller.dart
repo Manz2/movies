@@ -1,3 +1,4 @@
+import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
@@ -12,6 +13,7 @@ class WatchlistController {
   WatchlistController({required Watchlist currentWatchlist})
       : _model = WatchlistModel(currentWatchlist: currentWatchlist);
   WatchlistModel get model => _model;
+  Logger logger = Logger();
 
   Future<void> getWatchlists() async {
     _model.watchlists = await _db.getWatchlists();
@@ -24,7 +26,7 @@ class WatchlistController {
     try {
       await _db.setWatchlist(watchlist);
     } catch (e) {
-      print('Fehler beim Hinzufügen der Watchlist: $e');
+      logger.e('Fehler beim Hinzufügen der Watchlist: $e');
     }
   }
 
@@ -41,7 +43,7 @@ class WatchlistController {
       final prefs = await SharedPreferences.getInstance();
       prefs.setString('current_watchlist', '');
     } catch (e) {
-      print('Fehler beim Entfernen der Watchlist: $e');
+      logger.e('Fehler beim Entfernen der Watchlist: $e');
     }
   }
 
@@ -50,7 +52,7 @@ class WatchlistController {
       await _db.addMovieToWatchlist(
           model.currentWatchlist, await _db.getMovie(entry.id, entry.type));
     } catch (e) {
-      print('Fehler beim Hinzufügen des Films zur Watchlist: $e');
+      logger.e('Fehler beim Hinzufügen des Films zur Watchlist: $e');
     }
   }
 
@@ -59,7 +61,7 @@ class WatchlistController {
       await _db.removeMovieFromWatchlist(model.currentWatchlist, entry);
       model.currentWatchlist.entries.remove(entry);
     } catch (e) {
-      print('Fehler beim Entfernen des Films von der Watchlist: $e');
+      logger.e('Fehler beim Entfernen des Films von der Watchlist: $e');
     }
   }
 
@@ -71,11 +73,12 @@ class WatchlistController {
       try {
         model.currentWatchlist = await _db.getWatchlistMovies(watchlist.id);
       } on Exception catch (e) {
+        logger.d('Fehler beim Laden der Filme aus der Watchlist: $e');
         model.currentWatchlist =
             Watchlist(id: '', name: 'Watchlist', entries: []);
       }
     } catch (e) {
-      print('Fehler beim Laden der Filme aus der Watchlist: $e');
+      logger.e('Fehler beim Laden der Filme aus der Watchlist: $e');
     }
   }
 
@@ -85,7 +88,7 @@ class WatchlistController {
       prefs.setString('current_watchlist', watchlist.id);
       model.currentWatchlist = watchlist;
     } catch (e) {
-      print('Fehler beim Ändern der Watchlist: $e');
+      logger.e('Fehler beim Ändern der Watchlist: $e');
     }
   }
 
@@ -105,6 +108,7 @@ class WatchlistController {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.type);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Provider: $e');
       return Providers(providers: [], link: '');
     }
   }
@@ -113,6 +117,7 @@ class WatchlistController {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.type);
     } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
       return [];
     }
   }
