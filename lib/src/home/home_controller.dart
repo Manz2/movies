@@ -131,9 +131,7 @@ class HomeController {
     } else {
       try {
         return await _db.getWatchlistMovies(id);
-      } finally {
-        logger.e('Fehler beim Laden der Watchlist');
-      }
+      } finally {}
     }
   }
 
@@ -146,7 +144,7 @@ class HomeController {
     }
   }
 
-  Future<List<String>> getTrailers(Movie item) async{
+  Future<List<String>> getTrailers(Movie item) async {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
     } on Exception catch (e) {
