@@ -28,6 +28,17 @@ class FilterViewState extends State<FilterView> {
   int yearFrom = 0;
   int yearTo = 6000;
   double _fontSize = 16.0;
+  bool accending = true;
+  List<String> sortOptions = [
+    'Standard',
+    'Hinzugefügt',
+    'Bewertung',
+    'Jahr',
+    'Public Rating',
+    'Alphabetisch',
+    'Dauer'
+  ];
+  TextEditingController dropdownController = TextEditingController();
 
   Future<void> _loadFontSize() async {
     final prefs = await SharedPreferences.getInstance();
@@ -55,6 +66,8 @@ class FilterViewState extends State<FilterView> {
       rating = controller.model.filter.rating;
       yearFrom = controller.model.filter.yearFrom;
       yearTo = controller.model.filter.yearTo;
+      dropdownController.text = controller.model.filter.sortBy;
+      accending = controller.model.filter.accending;
     });
     _loadFontSize();
     super.initState();
@@ -85,6 +98,10 @@ class FilterViewState extends State<FilterView> {
         movieIsSelected = true;
         tvIsSelected = true;
       } // Wechseln des Zustands
+      if (controller.model.filter.sortBy == 'Dauer') {
+        controller.setSortBy('Standard');
+        dropdownController.text = 'Standard';
+      }
     });
   }
 
@@ -123,6 +140,13 @@ class FilterViewState extends State<FilterView> {
     });
   }
 
+  _toggleAccending() {
+    controller.setAccending();
+    setState(() {
+      accending = !accending; // Wechseln des Zustands
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -141,6 +165,10 @@ class FilterViewState extends State<FilterView> {
               onPressed: () {
                 controller.resetFilter();
                 setState(() {
+                  controller.setSortBy('Standard');
+                  dropdownController.text = 'Standard';
+                  controller.model.filter.accending = true;
+                  accending = true;
                   movieIsSelected = true;
                   tvIsSelected = true;
                   fsk0 = false;
@@ -349,7 +377,53 @@ class FilterViewState extends State<FilterView> {
                   ),
                 ],
               ),
-              //Padding(padding: const EdgeInsets.only(top: 16),child: ,)
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                child: Text("Sortieren", style: TextStyle(fontSize: _fontSize)),
+              ),
+              Padding(
+                  padding: const EdgeInsets.only(top: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownMenu(
+                          initialSelection: controller.model.filter.sortBy,
+                          controller: dropdownController,
+                          dropdownMenuEntries: sortOptions
+                              .map<DropdownMenuEntry<String>>((String value) {
+                            return DropdownMenuEntry<String>(
+                                value: value, label: value);
+                          }).toList(),
+                          onSelected: (value) {
+                            dropdownController.text = value!;
+                            if (value == 'Dauer') {
+                              controller.model.filter.movie = 1;
+                              setState(() {
+                                tvIsSelected = false;
+                                movieIsSelected = true;
+                              });
+                            }
+                            controller.setSortBy(value.toString());
+                          }),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: accending
+                            ? IconButton(
+                                icon: const Icon(Icons.arrow_downward),
+                                onPressed: () {
+                                  _toggleAccending();
+                                },
+                              )
+                            : IconButton(
+                                icon: const Icon(Icons.arrow_upward),
+                                onPressed: () {
+                                  _toggleAccending();
+                                },
+                              ),
+                      ),
+                    ],
+                  )),
+              //sortieren nach hizugefügt am un nicht sortieren als standart
               Padding(
                 padding: const EdgeInsets.fromLTRB(25, 40, 25, 0),
                 child: SizedBox(

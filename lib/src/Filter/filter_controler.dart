@@ -113,7 +113,7 @@ class FilterController {
         rating: 0,
         yearFrom: 0,
         yearTo: 6000,
-        sortBy: '',
+        sortBy: 'Standard',
         accending: false);
   }
 }

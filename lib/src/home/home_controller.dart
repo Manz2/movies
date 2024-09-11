@@ -26,7 +26,7 @@ class HomeController {
                 rating: 0,
                 yearFrom: 0,
                 yearTo: 6000,
-                sortBy: '',
+                sortBy: 'Standard',
                 accending: false));
 
   HomeModel get model => _model;
@@ -110,6 +110,32 @@ class HomeController {
       if (matchesFilter) {
         filteredMovies.add(movie);
       }
+    }
+    //Dauer passt
+    if (filter.sortBy != 'Standard') {
+      filteredMovies.sort((a, b) {
+        if (filter.accending) {
+          final temp = a;
+          a = b;
+          b = temp;
+        }
+        switch (filter.sortBy) {
+          case 'Hinzugefügt':
+            return a.addedAt.compareTo(b.addedAt);
+          case 'Alphabetisch':
+            return b.title.compareTo(a.title);
+          case 'Dauer':
+            return a.duration.compareTo(b.duration);
+          case 'Public Rating':
+            return a.rating.compareTo(b.rating);
+          case 'Bewertung':
+            return a.privateRating.compareTo(b.privateRating);
+          case 'Jahr':
+            return a.year.compareTo(b.year);
+          default:
+            return 0;
+        }
+      });
     }
     _model.movies = filteredMovies;
   }
