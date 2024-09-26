@@ -12,15 +12,15 @@ class TmdbService {
   final String baseUrl = 'https://api.themoviedb.org/3';
   Logger logger = Logger();
 
-  Future<Movie> getMovie(
-      int id, String mediaType, double privateRating, String firebaseId, DateTime addedAt) async {
+  Future<Movie> getMovie(int id, String mediaType, double privateRating,
+      String firebaseId, DateTime addedAt) async {
     final url = '$baseUrl/$mediaType/$id?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return _movieFromTmdb(
-          json.decode(response.body), mediaType, privateRating, firebaseId, addedAt);
+      return _movieFromTmdb(json.decode(response.body), mediaType,
+          privateRating, firebaseId, addedAt);
     } else {
       throw HttpException("Failed to load movie with id=$id");
     }
@@ -30,8 +30,8 @@ class TmdbService {
     int id = int.parse(movie1.id);
     String mediaType = movie1.mediaType;
     double privateRating = movie1.privateRating;
-    Movie movie =
-        await getMovie(id, mediaType, privateRating, movie1.firebaseId, movie1.addedAt);
+    Movie movie = await getMovie(
+        id, mediaType, privateRating, movie1.firebaseId, movie1.addedAt);
     String url;
     if (mediaType == 'movie') {
       url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
@@ -120,6 +120,7 @@ class TmdbService {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
     String title = json['title'] ??
+        json['name'] ??
         json['original_title'] ??
         json['original_name'] ??
         "kein Titel";

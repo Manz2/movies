@@ -142,6 +142,16 @@ class HomeController {
 
   Future<void> syncMovies() async {
     _model.movies = await _db.syncMovies();
+    _model.filter = Filter(
+        movie: 3,
+        fsk: [],
+        durationFrom: 30,
+        durationTo: 180,
+        rating: 0,
+        yearFrom: 0,
+        yearTo: 6000,
+        sortBy: 'Standard',
+        accending: false);
   }
 
   Future<Watchlist> getCurrentWatchlist() async {

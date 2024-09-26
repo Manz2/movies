@@ -25,8 +25,9 @@ class HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
-    _syncMovies();
     _loadFontSize();
+    _loadMovies();
+    _syncMovies();
   }
 
   void _syncMovies() async {

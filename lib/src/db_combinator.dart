@@ -45,7 +45,7 @@ class DbCombinator implements DbServiceInterface {
   @override
   Future<List<Movie>> syncMovies() async {
     List<Movie> movies = await _dbServiceFirebase.getMovies();
-    _dbServiceLocal.setMovies(movies);
+    await _dbServiceLocal.setMovies(movies);
     return movies;
   }
 

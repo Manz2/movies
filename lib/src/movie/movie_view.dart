@@ -138,10 +138,10 @@ class MovieViewState extends State<MovieView> {
             _isPlayerReady = true;
           },
           onEnded: (data) {},
-          bottomActions: [
+          bottomActions: const [
             ProgressBar(
                 isExpanded: true,
-                colors: const ProgressBarColors(
+                colors: ProgressBarColors(
                     playedColor: Colors.blue,
                     handleColor: Colors.blue,
                     bufferedColor: Colors.white))
@@ -186,6 +186,7 @@ class MovieViewState extends State<MovieView> {
                   IconButton(
                     icon: const Icon(Icons.home),
                     onPressed: () {
+                      _trailerController.pause();
                       Navigator.popUntil(context, (route) => route.isFirst);
                     },
                   ),
@@ -358,6 +359,7 @@ class MovieViewState extends State<MovieView> {
                                     onTap: () async {
                                       final movies =
                                           await controller.getMovies(actor.id);
+                                      _trailerController.pause();
                                       if (!context.mounted) return;
                                       Navigator.pushNamed(
                                         context,
