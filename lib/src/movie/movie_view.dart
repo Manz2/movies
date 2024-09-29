@@ -161,7 +161,7 @@ class MovieViewState extends State<MovieView> {
                               );
                             });
                         await controller.addMovie();
-                        if(!context.mounted) return;
+                        if (!context.mounted) return;
                         Navigator.of(context).pop();
                         _toggleFabVisibility();
                       },
@@ -198,6 +198,7 @@ class MovieViewState extends State<MovieView> {
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       controller.model.movie.image != ''
                           ? Padding(
@@ -332,49 +333,66 @@ class MovieViewState extends State<MovieView> {
                             controller.model.trailers.isNotEmpty
                                 ? player
                                 : const Text(""),
-                            const SizedBox(height: 16),
+                            const SizedBox(height: 8),
                             Text("Schauspieler:",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: _fontSize)),
                             SizedBox(
-                              height: 500,
-                              child: ListView.builder(
-                                scrollDirection: Axis.vertical,
-                                itemCount: controller.model.movie.actors.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  final actor =
-                                      controller.model.movie.actors[index];
-                                  return ListTile(
-                                    leading: CircleAvatar(
-                                      foregroundImage: actor.image.isNotEmpty
-                                          ? NetworkImage(actor.image)
-                                          : const AssetImage(
-                                              "assets/images/ActorPlaceholder.png"),
-                                    ),
-                                    title: Text(actor.name,
-                                        style: TextStyle(fontSize: _fontSize)),
-                                    subtitle: Text(actor.roleName,
-                                        style:
-                                            TextStyle(fontSize: _fontSize - 4)),
-                                    onTap: () async {
-                                      final movies =
-                                          await controller.getMovies(actor.id);
-                                      _trailerController.pause();
-                                      if (!context.mounted) return;
-                                      Navigator.pushNamed(
-                                        context,
-                                        ActorView.routeName,
-                                        arguments: ActorViewArguments(
-                                            actor: actor,
-                                            movies: movies,
-                                            fontSize: _fontSize),
+                              height: 200,
+                              child: Expanded(
+                                child: ListView.builder(
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount:
+                                        controller.model.movie.actors.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final actor =
+                                          controller.model.movie.actors[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: GestureDetector(
+                                          onTap: () async {
+                                            final movies = await controller
+                                                .getMovies(actor.id);
+                                            _trailerController.pause();
+                                            if (!context.mounted) return;
+                                            Navigator.pushNamed(
+                                              context,
+                                              ActorView.routeName,
+                                              arguments: ActorViewArguments(
+                                                  actor: actor,
+                                                  movies: movies,
+                                                  fontSize: _fontSize),
+                                            );
+                                          },
+                                          child: SizedBox(
+                                            width: 100,
+                                            child: Column(children: [
+                                              CircleAvatar(
+                                                radius: 40,
+                                                foregroundImage: actor
+                                                        .image.isNotEmpty
+                                                    ? NetworkImage(actor.image)
+                                                    : const AssetImage(
+                                                        "assets/images/ActorPlaceholder.png"),
+                                              ),
+                                              Text(actor.name,
+                                                  style: TextStyle(
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      fontSize: _fontSize)),
+                                              Text(actor.roleName,
+                                                  softWrap: true,
+                                                  style: TextStyle(
+                                                      fontSize: _fontSize - 4)),
+                                            ]),
+                                          ),
+                                        ),
                                       );
-                                    },
-                                  );
-                                },
+                                    }),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
