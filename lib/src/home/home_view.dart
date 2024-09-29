@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Filter/filter_view.dart';
@@ -135,7 +136,7 @@ class HomeViewState extends State<HomeView> {
                       leading: CircleAvatar(
                         radius: 35,
                         foregroundImage: item.image.isNotEmpty
-                            ? NetworkImage(item.image)
+                            ? CachedNetworkImageProvider(item.image)
                             : const AssetImage(
                                 "assets/images/Movie.png"),
                       ),
