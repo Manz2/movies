@@ -22,7 +22,8 @@ dependencies:
   logger: ^2.4.0
   shared_preferences: ^2.3.2
   url_launcher: ^6.3.0
-  youtube_player_flutter: ^9.1.0
+  youtube_player_flutter: ^9.1.1
+  flutter_launcher_icons: ^0.14.1
 
 dev_dependencies:
   flutter_test:

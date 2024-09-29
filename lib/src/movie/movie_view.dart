@@ -161,6 +161,7 @@ class MovieViewState extends State<MovieView> {
                               );
                             });
                         await controller.addMovie();
+                        if(!context.mounted) return;
                         Navigator.of(context).pop();
                         _toggleFabVisibility();
                       },
@@ -337,7 +338,7 @@ class MovieViewState extends State<MovieView> {
                                     fontWeight: FontWeight.bold,
                                     fontSize: _fontSize)),
                             SizedBox(
-                              height: 400,
+                              height: 500,
                               child: ListView.builder(
                                 scrollDirection: Axis.vertical,
                                 itemCount: controller.model.movie.actors.length,

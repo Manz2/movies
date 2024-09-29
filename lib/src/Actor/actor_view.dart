@@ -64,7 +64,7 @@ class ActorView extends StatelessWidget {
                         foregroundImage: movie.image.isNotEmpty
                             ? NetworkImage(movie.image)
                             : const AssetImage(
-                                "assets/images/MoviePlaceholder.png"),
+                                "assets/images/Movie.png"),
                       ),
                       title: Text(movie.title,
                           style: TextStyle(fontSize: fontSize + 2)),

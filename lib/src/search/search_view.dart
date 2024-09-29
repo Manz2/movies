@@ -81,7 +81,7 @@ class SearchViewState extends State<SearchView> {
                     : result.type == 'person'
                         ? const AssetImage("assets/images/ActorPlaceholder.png")
                         : const AssetImage(
-                            "assets/images/MoviePlaceholder.png"),
+                            "assets/images/Movie.png"),
               ),
               title:
                   Text(result.name, style: TextStyle(fontSize: _fontSize + 2)),
