@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
-import 'package:movies/src/Actor/actor_model.dart';
-import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -338,60 +337,10 @@ class MovieViewState extends State<MovieView> {
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: _fontSize)),
-                            SizedBox(
-                              height: 200,
-                              child: Expanded(
-                                child: ListView.builder(
-                                    scrollDirection: Axis.horizontal,
-                                    itemCount:
-                                        controller.model.movie.actors.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      final actor =
-                                          controller.model.movie.actors[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            final movies = await controller
-                                                .getMovies(actor.id);
-                                            _trailerController.pause();
-                                            if (!context.mounted) return;
-                                            Navigator.pushNamed(
-                                              context,
-                                              ActorView.routeName,
-                                              arguments: ActorViewArguments(
-                                                  actor: actor,
-                                                  movies: movies,
-                                                  fontSize: _fontSize),
-                                            );
-                                          },
-                                          child: SizedBox(
-                                            width: 100,
-                                            child: Column(children: [
-                                              CircleAvatar(
-                                                radius: 40,
-                                                foregroundImage: actor
-                                                        .image.isNotEmpty
-                                                    ? NetworkImage(actor.image)
-                                                    : const AssetImage(
-                                                        "assets/images/ActorPlaceholder.png"),
-                                              ),
-                                              Text(actor.name,
-                                                  style: TextStyle(
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      fontSize: _fontSize)),
-                                              Text(actor.roleName,
-                                                  softWrap: true,
-                                                  style: TextStyle(
-                                                      fontSize: _fontSize - 4)),
-                                            ]),
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                              ),
+                            ActorList(
+                              actors: controller.model.movie.actors,
+                              controller: controller,
+                              fontSize: _fontSize,
                             ),
                           ],
                         ),

@@ -8,7 +8,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
   final databaseRef =
-      FirebaseDatabase.instance.ref().child("moviesTest"); // Database reference
+      FirebaseDatabase.instance.ref().child("movies"); // Database reference
   final databaseRefWatchlist =
       FirebaseDatabase.instance.ref().child("watchlists/");
   final databaseRefJunk = FirebaseDatabase.instance.ref().child("junk/");
