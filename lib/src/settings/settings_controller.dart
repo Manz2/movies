@@ -12,7 +12,7 @@ class SettingsController with ChangeNotifier {
   SettingsController(this._settingsService);
 
   final SettingsService _settingsService;
-  late ThemeMode _themeMode;
+  ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
   Logger logger = Logger();
 

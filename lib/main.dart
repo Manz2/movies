@@ -12,28 +12,33 @@ void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
-
       await Firebase.initializeApp(
         name: 'my_app',
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
-      // Crashlytics initialisieren
       FlutterError.onError =
           FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-      FirebaseCrashlytics.instance.log("🚀 main() gestartet");
-
       final settingsController = SettingsController(SettingsService());
-      await settingsController.loadSettings();
-
-      FirebaseCrashlytics.instance.log("✅ Settings geladen – starte App");
 
       runApp(MyApp(settingsController: settingsController));
     },
-    (error, stack) {
-      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-      debugPrint("❌ Fehler in main(): $error");
+    (error, stackTrace) {
+      FirebaseCrashlytics.instance.recordError(error, stackTrace, fatal: true);
+
+      runApp(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: Text(
+                "❌ Fehler beim Start: $error",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ),
+        ),
+      );
     },
   );
 }
