@@ -7,12 +7,17 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      name: 'my_app',
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
+
   final settingsController = SettingsController(SettingsService());
   await settingsController.loadSettings();
 
-WidgetsFlutterBinding.ensureInitialized(); 
-  await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
   runApp(MyApp(settingsController: settingsController));
 }

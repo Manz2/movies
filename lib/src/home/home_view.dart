@@ -9,6 +9,7 @@ import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
+import 'package:movies/src/shared_widgets/confirm_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeView extends StatefulWidget {
@@ -104,30 +105,39 @@ class HomeViewState extends State<HomeView> {
                 padding: const EdgeInsets.only(top: 8, bottom: 8),
                 child: Dismissible(
                   key: Key(item.id),
+                  confirmDismiss: (direction) async {
+                    return await showConfirmDialog(
+                      context: context,
+                      message: 'Möchtest du "${item.title}" wirklich löschen?',
+                    );
+                  },
                   onDismissed: (direction) async {
                     showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext dialogContext) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        });
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext dialogContext) {
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    );
+
                     await _controller.removeMovie(item);
+
                     if (!context.mounted) return;
                     Navigator.of(context, rootNavigator: true).pop();
                     setState(() {});
-                    String title = item.title;
-                    if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("$title wurde gelöscht"),
-                      action: SnackBarAction(
-                          label: "undo",
-                          onPressed: () async => {
-                                await _controller.addMovie(context, item),
-                                setState(() {})
-                              }),
-                    ));
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('${item.title} wurde gelöscht'),
+                        action: SnackBarAction(
+                          label: 'undo',
+                          onPressed: () async {
+                            await _controller.addMovie(context, item);
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    );
                   },
                   background: Container(color: Colors.red),
                   child: ListTile(
@@ -137,8 +147,7 @@ class HomeViewState extends State<HomeView> {
                         radius: 35,
                         foregroundImage: item.image.isNotEmpty
                             ? CachedNetworkImageProvider(item.image)
-                            : const AssetImage(
-                                "assets/images/Movie.png"),
+                            : const AssetImage("assets/images/Movie.png"),
                       ),
                       onTap: () async {
                         Providers providers =
