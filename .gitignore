@@ -5,9 +5,11 @@
 *.swp
 .DS_Store
 .atom/
+.build/
 .buildlog/
 .history
 .svn/
+.swiftpm/
 migrate_working_dir/
 
 # IntelliJ related
@@ -59,3 +61,5 @@ linux/flutter/generated_plugins.cmake
 macos/Flutter/GeneratedPluginRegistrant.swift
 windows/flutter/generated_plugins.cmake
 ios/Runner/GoogleService-Info.plist
+ios/GoogleService-Info.plist
+ios/Runner/GoogleService-Info 2.plist

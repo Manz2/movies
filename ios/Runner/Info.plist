@@ -49,5 +49,16 @@
 	<false/>
 	<key>FirebaseCrashlyticsCollectionEnabled</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	<key>allowsInlineMediaPlayback</key>
+	<true/>
+	<key>mediaPlaybackRequiresUserAction</key>
+	<false/>
 </dict>
 </plist>

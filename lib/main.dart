@@ -14,7 +14,6 @@ void main() {
       WidgetsFlutterBinding.ensureInitialized();
 
       await Firebase.initializeApp(
-        name: 'my_app',
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
