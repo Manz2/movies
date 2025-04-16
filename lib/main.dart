@@ -12,6 +12,7 @@ void main() {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+
       await Firebase.initializeApp(
         name: 'my_app',
         options: DefaultFirebaseOptions.currentPlatform,
@@ -21,6 +22,9 @@ void main() {
           FirebaseCrashlytics.instance.recordFlutterFatalError;
 
       final settingsController = SettingsController(SettingsService());
+      await settingsController.loadSettings(); // ⬅️ fehlte!
+
+      FirebaseCrashlytics.instance.log("✅ Settings geladen");
 
       runApp(MyApp(settingsController: settingsController));
     },
