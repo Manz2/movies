@@ -1,6 +1,7 @@
 plugins {
     id "com.android.application"
-    id 'com.google.gms.google-services' // Firebase
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics' // Firebase
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin" // Flutter Plugin muss zuletzt
 }
