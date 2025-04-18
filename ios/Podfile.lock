@@ -1,4 +1,8 @@
 PODS:
+  - AppCheckCore (11.2.0):
+    - GoogleUtilities/Environment (~> 8.0)
+    - GoogleUtilities/UserDefaults (~> 8.0)
+    - PromisesObjC (~> 2.4)
   - Firebase/Analytics (11.10.0):
     - Firebase/Core
   - Firebase/Core (11.10.0):
@@ -15,6 +19,11 @@ PODS:
   - firebase_analytics (11.4.5):
     - Firebase/Analytics (= 11.10.0)
     - firebase_core
+    - Flutter
+  - firebase_app_check (0.3.2-5):
+    - Firebase/CoreOnly (~> 11.10.0)
+    - firebase_core
+    - FirebaseAppCheck (~> 11.10.0)
     - Flutter
   - firebase_core (3.13.0):
     - Firebase/CoreOnly (= 11.10.0)
@@ -45,6 +54,12 @@ PODS:
     - GoogleUtilities/Network (~> 8.0)
     - "GoogleUtilities/NSData+zlib (~> 8.0)"
     - nanopb (~> 3.30910.0)
+  - FirebaseAppCheck (11.10.0):
+    - AppCheckCore (~> 11.0)
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseCore (~> 11.10.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GoogleUtilities/UserDefaults (~> 8.0)
   - FirebaseAppCheckInterop (11.11.0)
   - FirebaseCore (11.10.0):
     - FirebaseCoreInternal (~> 11.10.0)
@@ -169,6 +184,7 @@ PODS:
 
 DEPENDENCIES:
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
+  - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_crashlytics (from `.symlinks/plugins/firebase_crashlytics/ios`)
   - firebase_database (from `.symlinks/plugins/firebase_database/ios`)
@@ -182,8 +198,10 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - AppCheckCore
     - Firebase
     - FirebaseAnalytics
+    - FirebaseAppCheck
     - FirebaseAppCheckInterop
     - FirebaseCore
     - FirebaseCoreExtension
@@ -206,6 +224,8 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   firebase_analytics:
     :path: ".symlinks/plugins/firebase_analytics/ios"
+  firebase_app_check:
+    :path: ".symlinks/plugins/firebase_app_check/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   firebase_crashlytics:
@@ -228,12 +248,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   Firebase: 1fe1c0a7d9aaea32efe01fbea5f0ebd8d70e53a2
   firebase_analytics: 1998960b8fa16fd0cd9e77a6f9fd35a2009ad65e
+  firebase_app_check: f91e7deb97687856aed4b12f02dba10be437492a
   firebase_core: 2d4534e7b489907dcede540c835b48981d890943
   firebase_crashlytics: 961a0812ba79ed8f89a8d5d1e3763daa6267a87a
   firebase_database: 9206087343504a4554718494c5880360f3ce375b
   FirebaseAnalytics: 4e42333f02cf78ed93703a5c36f36dd518aebdef
+  FirebaseAppCheck: 9687ebd909702469bc09d2d58008697b83f4ac27
   FirebaseAppCheckInterop: f23709c9ce92d810aa53ff4ce12ad3e666a3c7be
   FirebaseCore: 8344daef5e2661eb004b177488d6f9f0f24251b7
   FirebaseCoreExtension: 6f357679327f3614e995dc7cf3f2d600bdc774ac

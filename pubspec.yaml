@@ -9,6 +9,7 @@ version: 1.0.0+30
 environment:
   sdk: ^3.7.2
 
+
 dependencies:
   flutter:
     sdk: flutter
@@ -27,6 +28,7 @@ dependencies:
   flutter_launcher_icons: ^0.14.3
   cached_network_image: ^3.4.1
   firebase_analytics: ^11.4.5
+  firebase_app_check: ^0.3.2+5
 
 dev_dependencies:
   flutter_test:
