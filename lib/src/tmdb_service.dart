@@ -12,15 +12,25 @@ class TmdbService {
   final String baseUrl = 'https://api.themoviedb.org/3';
   Logger logger = Logger();
 
-  Future<Movie> getMovie(int id, String mediaType, double privateRating,
-      String firebaseId, DateTime addedAt) async {
+  Future<Movie> getMovie(
+    int id,
+    String mediaType,
+    double privateRating,
+    String firebaseId,
+    DateTime addedAt,
+  ) async {
     final url = '$baseUrl/$mediaType/$id?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      return _movieFromTmdb(json.decode(response.body), mediaType,
-          privateRating, firebaseId, addedAt);
+      return _movieFromTmdb(
+        json.decode(response.body),
+        mediaType,
+        privateRating,
+        firebaseId,
+        addedAt,
+      );
     } else {
       throw HttpException("Failed to load movie with id=$id");
     }
@@ -31,7 +41,12 @@ class TmdbService {
     String mediaType = movie1.mediaType;
     double privateRating = movie1.privateRating;
     Movie movie = await getMovie(
-        id, mediaType, privateRating, movie1.firebaseId, movie1.addedAt);
+      id,
+      mediaType,
+      privateRating,
+      movie1.firebaseId,
+      movie1.addedAt,
+    );
     String url;
     if (mediaType == 'movie') {
       url = '$baseUrl/$mediaType/$id/credits?api_key=$apiKey&language=de-DE';
@@ -41,8 +56,10 @@ class TmdbService {
     }
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
-      List<Actor> actors =
-          _creditsFromTmdb(json.decode(response.body), mediaType);
+      List<Actor> actors = _creditsFromTmdb(
+        json.decode(response.body),
+        mediaType,
+      );
       movie.actors = actors;
     } else {
       throw HttpException("Failed to load credits for movie with id=$id");
@@ -115,29 +132,40 @@ class TmdbService {
     return 'Unbekannt';
   }
 
-  Movie _movieFromTmdb(Map<String, dynamic> json, String mediaType2,
-      double privateRating, String firebaseId, DateTime addedAt) {
+  Movie _movieFromTmdb(
+    Map<String, dynamic> json,
+    String mediaType2,
+    double privateRating,
+    String firebaseId,
+    DateTime addedAt,
+  ) {
     // Extrahieren der Basisinformationen aus dem JSON-Objekt
     String id = json['id'].toString();
-    String title = json['title'] ??
+    String title =
+        json['title'] ??
         json['name'] ??
         json['original_title'] ??
         json['original_name'] ??
         "kein Titel";
     String description = json['overview'] ?? 'Keine Beschreibung verfügbar';
-    String fsk = json['age_rating'] ??
+    String fsk =
+        json['age_rating'] ??
         'Unbekannt'; // Hier könnte eine spezifische Logik für FSK notwendig sein
-    int rating = (json['vote_average'] * 10)
-        .round(); // Umwandlung des Ratings in Prozent
-    int year = json['release_date'] != null && json['release_date'].isNotEmpty
-        ? DateTime.parse(json['release_date']).year
-        : 0;
-    int duration = json['runtime'] ??
+    int rating =
+        (json['vote_average'] * 10)
+            .round(); // Umwandlung des Ratings in Prozent
+    int year =
+        json['release_date'] != null && json['release_date'].isNotEmpty
+            ? DateTime.parse(json['release_date']).year
+            : 0;
+    int duration =
+        json['runtime'] ??
         json["number_of_seasons"] ??
         0; // Default auf 0, wenn keine Dauer angegeben
-    String image = json['poster_path'] != null
-        ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
-        : '';
+    String image =
+        json['poster_path'] != null
+            ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
+            : '';
     double popularity = json['popularity'] ?? 0;
     String mediaType = json['media_type'] ?? mediaType2;
 
@@ -148,27 +176,29 @@ class TmdbService {
     }
 
     // Extrahieren der Genres
-    List<String> genre = json['genres'] != null
-        ? List<String>.from(json['genres'].map((g) => g['name']))
-        : [];
+    List<String> genre =
+        json['genres'] != null
+            ? List<String>.from(json['genres'].map((g) => g['name']))
+            : [];
 
     // Erstellen des Movie-Objekts
     return Movie(
-        id: id,
-        title: title,
-        description: description,
-        fsk: fsk,
-        rating: rating,
-        year: year,
-        duration: duration,
-        image: image,
-        actors: [],
-        genre: genre,
-        popularity: popularity,
-        mediaType: mediaType,
-        privateRating: privateRating,
-        firebaseId: firebaseId,
-        addedAt: addedAt);
+      id: id,
+      title: title,
+      description: description,
+      fsk: fsk,
+      rating: rating,
+      year: year,
+      duration: duration,
+      image: image,
+      actors: [],
+      genre: genre,
+      popularity: popularity,
+      mediaType: mediaType,
+      privateRating: privateRating,
+      firebaseId: firebaseId,
+      addedAt: addedAt,
+    );
   }
 
   List<Actor> _creditsFromTmdb(Map<String, dynamic> json, String mediaType) {
@@ -177,9 +207,10 @@ class TmdbService {
       for (var actorJson in json['cast']) {
         Actor actor = Actor(
           name: actorJson['name'],
-          image: actorJson['profile_path'] != null
-              ? 'https://image.tmdb.org/t/p/w500${actorJson['profile_path']}'
-              : '',
+          image:
+              actorJson['profile_path'] != null
+                  ? 'https://image.tmdb.org/t/p/w500${actorJson['profile_path']}'
+                  : '',
           roleName: actorJson['character'] ?? 'Unbekannt',
           id: actorJson['id'] ?? 0, //Hier sollte nicht 0 stehen
         );
@@ -210,17 +241,30 @@ class TmdbService {
         '$baseUrl/person/$id/combined_credits?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
-    Map<String, dynamic> moviesJson = json.decode(response.body);
-    List<Movie> movies = [];
-
-    if (response.statusCode == 200) {
-      for (var movie in moviesJson['cast']) {
-        movies.add(_movieFromTmdb(movie, 'unbekannt', 0, '', DateTime.now()));
-      }
-    } else {
+    if (response.statusCode != 200) {
       throw HttpException("Failed to load movie with id=$id");
     }
-    return movies;
+
+    final Map<String, dynamic> jsonMap = json.decode(response.body);
+    final List<dynamic> castList = jsonMap['cast'];
+
+    // Optional: check if popularity exists and is double
+    castList.sort((a, b) {
+      final popA = (a['vote_count'] ?? 0).toDouble();
+      final popB = (b['vote_count'] ?? 0).toDouble();
+      return popB.compareTo(popA); // Absteigend
+    });
+
+    // Duplikate entfernen basierend auf der ID
+    final Map<int, Movie> uniqueMovies = {};
+
+    for (var json in castList) {
+      final movie = _movieFromTmdb(json, 'unbekannt', 0, '', DateTime.now());
+      uniqueMovies[int.parse(movie.id)] =
+          movie; // Map überschreibt bei doppelter ID automatisch
+    }
+
+    return uniqueMovies.values.toList();
   }
 
   Future<List<Result>> combinedSearch(String search) async {
@@ -243,7 +287,8 @@ class TmdbService {
 
   Result _resultFromTmdb(Map<String, dynamic> json) {
     String id = json['id'].toString();
-    String name = json['name'] ??
+    String name =
+        json['name'] ??
         json['title'] ??
         json['original_name'] ??
         json['original_title'] ??
@@ -292,24 +337,32 @@ class TmdbService {
           resultJson['results']['DE'] != null) {
         if (resultJson['results']['DE']['flatrate'] != null) {
           for (var provider in resultJson['results']['DE']['flatrate']) {
-            providers.add(Provider(
-                icon: provider['logo_path'] != null
-                    ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                    : '',
+            providers.add(
+              Provider(
+                icon:
+                    provider['logo_path'] != null
+                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                        : '',
                 id: provider['provider_id'].toString(),
-                type: 'flatrate'));
+                type: 'flatrate',
+              ),
+            );
           }
         }
         if (resultJson['results']['DE']['rent'] != null) {
           for (var provider in resultJson['results']['DE']['rent']) {
             providers.any((p) => p.id == provider['provider_id'].toString()) ==
                     false
-                ? providers.add(Provider(
-                    icon: provider['logo_path'] != null
-                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                        : '',
+                ? providers.add(
+                  Provider(
+                    icon:
+                        provider['logo_path'] != null
+                            ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                            : '',
                     id: provider['provider_id'].toString(),
-                    type: 'rent'))
+                    type: 'rent',
+                  ),
+                )
                 : null;
           }
         }
@@ -317,12 +370,16 @@ class TmdbService {
           for (var provider in resultJson['results']['DE']['buy']) {
             providers.any((p) => p.id == provider['provider_id'].toString()) ==
                     false
-                ? providers.add(Provider(
-                    icon: provider['logo_path'] != null
-                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                        : '',
+                ? providers.add(
+                  Provider(
+                    icon:
+                        provider['logo_path'] != null
+                            ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                            : '',
                     id: provider['provider_id'].toString(),
-                    type: 'buy'))
+                    type: 'buy',
+                  ),
+                )
                 : null;
           }
         }
