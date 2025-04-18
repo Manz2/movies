@@ -1,47 +1,39 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'firebase_options.dart';
 import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 
-void main() {
-  runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
-
-      FlutterError.onError =
-          FirebaseCrashlytics.instance.recordFlutterFatalError;
-
-      final settingsController = SettingsController(SettingsService());
-      await settingsController.loadSettings(); // ⬅️ fehlte!
-
-      FirebaseCrashlytics.instance.log("✅ Settings geladen");
-
-      runApp(MyApp(settingsController: settingsController));
-    },
-    (error, stackTrace) {
-      FirebaseCrashlytics.instance.recordError(error, stackTrace, fatal: true);
-
-      runApp(
-        MaterialApp(
-          home: Scaffold(
-            body: Center(
-              child: Text(
-                "❌ Fehler beim Start: $error",
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ),
-        ),
-      );
-    },
+  // Sichere Initialisierung ohne duplicate-app Fehler
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code == 'duplicate-app') {
+      // App existiert schon (z. B. bei Hot Reload) → nichts tun
+    } else {
+      rethrow;
+    }
+  }
+  /*
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.playIntegrity,
+    appleProvider: AppleProvider.deviceCheck,
+  );*/
+  await FirebaseAppCheck.instance.activate(
+    androidProvider: AndroidProvider.debug,
+    appleProvider: AppleProvider.debug,
   );
+
+  final settingsController = SettingsController(SettingsService());
+  await settingsController.loadSettings();
+
+  runApp(MyApp(settingsController: settingsController));
 }
