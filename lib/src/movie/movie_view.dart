@@ -351,28 +351,16 @@ class MovieViewState extends State<MovieView> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          controller.model.trailers.isNotEmpty
-                              ? Text(
-                                "Trailer:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: _fontSize,
-                                ),
-                              )
-                              : const Text(""),
-                          const SizedBox(height: 8),
-                          controller.model.trailers.isNotEmpty
-                              ? player
-                              : const Text(""),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Schauspieler:",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: _fontSize,
+                          if (controller.model.trailers.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Text(
+                              "Trailer:",
+                              style: TextStyle(fontSize: _fontSize),
                             ),
-                          ),
+                            player,
+                          ],
+                          const SizedBox(height: 8),
+                          Text("Cast:", style: TextStyle(fontSize: _fontSize)),
                           ActorList(
                             actors: controller.model.movie.actors,
                             controller: controller,
