@@ -9,7 +9,6 @@ version: 1.0.0+31
 environment:
   sdk: ^3.7.2
 
-
 dependencies:
   flutter:
     sdk: flutter
@@ -27,21 +26,16 @@ dependencies:
   youtube_player_flutter: ^9.1.1
   flutter_launcher_icons: ^0.14.3
   cached_network_image: ^3.4.1
-  firebase_analytics: ^11.4.5
-  firebase_app_check: ^0.3.2+5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^5.0.0
 
 flutter:
   uses-material-design: true
 
-  # Enable generation of localized Strings from arb files.
   generate: true
 
   assets:
-    # Add assets from the images directory to the application.
     - assets/images/

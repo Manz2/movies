@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Filter/filter_view.dart';

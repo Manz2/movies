@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/Filter/filter_model.dart';
@@ -16,10 +14,7 @@ import 'settings/settings_view.dart';
 
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.settingsController,
-  });
+  const MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
 
@@ -30,24 +25,12 @@ class MyApp extends StatelessWidget {
       builder: (BuildContext context, Widget? child) {
         return MaterialApp(
           restorationScopeId: 'app',
-
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en', ''), 
-          ],
-
-          onGenerateTitle: (BuildContext context) =>
-              AppLocalizations.of(context)!.appTitle,
-
+          supportedLocales: const [Locale('en', '')],
           theme: ThemeData(),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           debugShowCheckedModeBanner: false,
+          title: 'movies',
 
           onGenerateRoute: (RouteSettings routeSettings) {
             return MaterialPageRoute<void>(
@@ -59,7 +42,10 @@ class MyApp extends StatelessWidget {
                   case MovieView.routeName:
                     final args = routeSettings.arguments as MovieViewArguments;
                     return MovieView(
-                        movie: args.movie, providers: args.providers, trailers: args.trailers,);
+                      movie: args.movie,
+                      providers: args.providers,
+                      trailers: args.trailers,
+                    );
                   case SearchView.routeName:
                     return const SearchView();
                   case ActorView.routeName:
@@ -74,9 +60,7 @@ class MyApp extends StatelessWidget {
                     return FilterView(filter: args);
                   case WatchlistView.routeName:
                     final args = routeSettings.arguments as Watchlist;
-                    return WatchlistView(
-                      currentWatchlist: args,
-                    );
+                    return WatchlistView(currentWatchlist: args);
                   case HomeView.routeName:
                   default:
                     return const HomeView();
