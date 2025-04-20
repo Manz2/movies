@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
@@ -24,6 +25,10 @@ class HomeView extends StatefulWidget {
 class HomeViewState extends State<HomeView> {
   final HomeController _controller = HomeController();
   final ScrollController _carouselScrollController = ScrollController();
+  final ScrollController _listScrollController = ScrollController();
+  final TextEditingController _searchController = TextEditingController();
+  String _searchText = '';
+  bool _showSearchBar = true;
 
   double _fontSize = 16.0;
   bool _showCoverView = false;
@@ -34,11 +39,31 @@ class HomeViewState extends State<HomeView> {
     _loadFontSize();
     _loadMovies();
     _syncMovies();
+    _listScrollController.addListener(() {
+      // Wenn gescrollt wird
+      if (_listScrollController.position.userScrollDirection ==
+          ScrollDirection.reverse) {
+        if (_showSearchBar) {
+          setState(() {
+            _showSearchBar = false;
+          });
+        }
+      } else if (_listScrollController.position.userScrollDirection ==
+          ScrollDirection.forward) {
+        if (!_showSearchBar) {
+          setState(() {
+            _showSearchBar = true;
+          });
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
     _carouselScrollController.dispose();
+    _searchController.dispose();
+    _listScrollController.dispose(); // nicht vergessen!
     super.dispose();
   }
 
@@ -50,6 +75,7 @@ class HomeViewState extends State<HomeView> {
   void _loadMovies() async {
     await _controller.loadMovies();
     _loadFontSize();
+    _applySearchFilter();
     setState(() {}); // Aktualisiert die UI nach dem Laden der Filme
   }
 
@@ -62,6 +88,22 @@ class HomeViewState extends State<HomeView> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
+    });
+  }
+
+  void _applySearchFilter() {
+    setState(() {
+      if (_searchText.isEmpty) {
+        _controller.model.filteredMovies = _controller.model.movies;
+      } else {
+        _controller.model.filteredMovies =
+            _controller.model.movies
+                .where(
+                  (m) =>
+                      m.title.toLowerCase().contains(_searchText.toLowerCase()),
+                )
+                .toList();
+      }
     });
   }
 
@@ -116,89 +158,115 @@ class HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Center(
-        child: RefreshIndicator(
-          onRefresh: _syncMovies,
-          child:
-              _showCoverView
-                  ? MovieCoverCarousel(
-                    movies: _controller.model.movies,
-                    onTap: (movie) async {
-                      final providers = await _controller.getProviders(movie);
-                      final trailers = await _controller.getTrailers(movie);
-                      if (!context.mounted) return;
-                      Navigator.pushNamed(
-                        context,
-                        MovieView.routeName,
-                        arguments: MovieViewArguments(
-                          movie: movie,
-                          providers: providers,
-                          trailers: trailers,
-                        ),
-                      ).then((val) => _loadMovies());
-                    },
-                    scrollController: _carouselScrollController,
-                  )
-                  : ListView.builder(
-                    restorationId: 'sampleItemListView',
-                    itemCount: _controller.model.movies.length,
-                    itemBuilder: (context, index) {
-                      final item = _controller.model.movies[index];
-                      return MovieListTileView(
-                        movie: item,
-                        fontSize: _fontSize,
-                        onTap: () async {
+      body: Column(
+        children: [
+          if (!_showCoverView && _showSearchBar)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(
+                  hintText: 'Suche nach Filmtitel', // <- ersetzt labelText
+                  border: InputBorder.none,
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (value) {
+                  _searchText = value;
+                  _applySearchFilter();
+                },
+              ),
+            ),
+
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _syncMovies,
+              child:
+                  _showCoverView
+                      ? MovieCoverCarousel(
+                        movies: _controller.model.movies,
+                        onTap: (movie) async {
                           final providers = await _controller.getProviders(
-                            item,
+                            movie,
                           );
-                          final trailers = await _controller.getTrailers(item);
+                          final trailers = await _controller.getTrailers(movie);
                           if (!context.mounted) return;
                           Navigator.pushNamed(
                             context,
                             MovieView.routeName,
                             arguments: MovieViewArguments(
-                              movie: item,
+                              movie: movie,
                               providers: providers,
                               trailers: trailers,
                             ),
                           ).then((val) => _loadMovies());
                         },
-                        confirmDismiss:
-                            () => showConfirmDialog(
-                              context: context,
-                              message:
-                                  'Möchtest du "${item.title}" wirklich löschen?',
-                            ),
-                        onDismissed: () async {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder:
-                                (_) => const Center(
-                                  child: CircularProgressIndicator(),
+                        scrollController: _carouselScrollController,
+                      )
+                      : ListView.builder(
+                        controller: _listScrollController,
+                        restorationId: 'sampleItemListView',
+                        itemCount: _controller.model.filteredMovies.length,
+                        itemBuilder: (context, index) {
+                          final item = _controller.model.filteredMovies[index];
+                          return MovieListTileView(
+                            movie: item,
+                            fontSize: _fontSize,
+                            onTap: () async {
+                              final providers = await _controller.getProviders(
+                                item,
+                              );
+                              final trailers = await _controller.getTrailers(
+                                item,
+                              );
+                              if (!context.mounted) return;
+                              Navigator.pushNamed(
+                                context,
+                                MovieView.routeName,
+                                arguments: MovieViewArguments(
+                                  movie: item,
+                                  providers: providers,
+                                  trailers: trailers,
                                 ),
-                          );
-                          await _controller.removeMovie(item);
-                          if (!context.mounted) return;
-                          Navigator.of(context, rootNavigator: true).pop();
-                          setState(() {});
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${item.title} wurde gelöscht'),
-                              action: SnackBarAction(
-                                label: 'undo',
-                                onPressed: () async {
-                                  await _controller.addMovie(context, item);
-                                  setState(() {});
-                                },
-                              ),
-                            ),
+                              ).then((val) => _loadMovies());
+                            },
+                            confirmDismiss:
+                                () => showConfirmDialog(
+                                  context: context,
+                                  message:
+                                      'Möchtest du "${item.title}" wirklich löschen?',
+                                ),
+                            onDismissed: () async {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder:
+                                    (_) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                              );
+                              await _controller.removeMovie(item);
+                              if (!context.mounted) return;
+                              Navigator.of(context, rootNavigator: true).pop();
+                              setState(() {});
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('${item.title} wurde gelöscht'),
+                                  action: SnackBarAction(
+                                    label: 'undo',
+                                    onPressed: () async {
+                                      await _controller.addMovie(context, item);
+                                      setState(() {});
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
-        ),
+                      ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
