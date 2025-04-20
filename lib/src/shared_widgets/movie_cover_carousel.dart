@@ -5,17 +5,22 @@ import 'package:movies/src/home/movie.dart';
 class MovieCoverCarousel extends StatelessWidget {
   final List<Movie> movies;
   final void Function(Movie movie) onTap;
+  final ScrollController scrollController;
 
   const MovieCoverCarousel({
     super.key,
     required this.movies,
     required this.onTap,
+    required this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      controller: scrollController,
+      key: const PageStorageKey('movie_cover_carousel_scroll'),
       padding: const EdgeInsets.all(8),
       child: Row(
         children:
@@ -27,7 +32,8 @@ class MovieCoverCarousel extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: SizedBox(
-                      height: 600,
+                      height: screenHeight,
+
                       child:
                           movie.image.isNotEmpty
                               ? CachedNetworkImage(

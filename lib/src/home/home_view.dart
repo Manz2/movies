@@ -23,6 +23,8 @@ class HomeView extends StatefulWidget {
 
 class HomeViewState extends State<HomeView> {
   final HomeController _controller = HomeController();
+  final ScrollController _carouselScrollController = ScrollController();
+
   double _fontSize = 16.0;
   bool _showCoverView = false;
 
@@ -32,6 +34,12 @@ class HomeViewState extends State<HomeView> {
     _loadFontSize();
     _loadMovies();
     _syncMovies();
+  }
+
+  @override
+  void dispose() {
+    _carouselScrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _syncMovies() async {
@@ -129,6 +137,7 @@ class HomeViewState extends State<HomeView> {
                         ),
                       ).then((val) => _loadMovies());
                     },
+                    scrollController: _carouselScrollController,
                   )
                   : ListView.builder(
                     restorationId: 'sampleItemListView',
