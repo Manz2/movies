@@ -14,6 +14,7 @@ class Movie {
   double privateRating;
   String firebaseId;
   DateTime addedAt;
+  bool onList = false;
   Movie(
       {required this.id,
       required this.title,
@@ -34,6 +35,12 @@ class Movie {
   @override
   String toString() {
     return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt}';
+  }
+
+  bool get getOnList => onList;
+
+  setOnList(bool value) {
+    onList = value;
   }
 
   // toJson Methode
