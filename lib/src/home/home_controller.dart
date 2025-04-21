@@ -16,18 +16,20 @@ class HomeController {
   Logger logger = Logger();
 
   HomeController()
-      : _model = HomeModel(
-            movies: [],
-            filter: Filter(
-                movie: 3,
-                fsk: [],
-                durationFrom: 30,
-                durationTo: 180,
-                rating: 0,
-                yearFrom: 0,
-                yearTo: 6000,
-                sortBy: 'Standard',
-                accending: false));
+    : _model = HomeModel(
+        movies: [],
+        filter: Filter(
+          movie: 3,
+          fsk: [],
+          durationFrom: 30,
+          durationTo: 180,
+          rating: 0,
+          yearFrom: 0,
+          yearTo: 6000,
+          sortBy: 'Standard',
+          accending: false,
+        ),
+      );
 
   HomeModel get model => _model;
 
@@ -44,8 +46,9 @@ class HomeController {
       if (!context.mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text("Film mit der id $movie.id konnte nicht hinzugefügt werden"),
+          content: Text(
+            "Film mit der id $movie.id konnte nicht hinzugefügt werden",
+          ),
         ),
       );
     }
@@ -138,20 +141,23 @@ class HomeController {
       });
     }
     _model.movies = filteredMovies;
+    _model.filteredMovies = filteredMovies;
   }
 
   Future<void> syncMovies() async {
     _model.movies = await _db.syncMovies();
+    _model.filteredMovies = _model.movies;
     _model.filter = Filter(
-        movie: 3,
-        fsk: [],
-        durationFrom: 30,
-        durationTo: 180,
-        rating: 0,
-        yearFrom: 0,
-        yearTo: 6000,
-        sortBy: 'Standard',
-        accending: false);
+      movie: 3,
+      fsk: [],
+      durationFrom: 30,
+      durationTo: 180,
+      rating: 0,
+      yearFrom: 0,
+      yearTo: 6000,
+      sortBy: 'Standard',
+      accending: false,
+    );
   }
 
   Future<Watchlist> getCurrentWatchlist() async {
