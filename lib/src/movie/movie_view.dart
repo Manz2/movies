@@ -3,6 +3,7 @@ import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/movie/watchlist_dialog.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:movies/src/shared_widgets/expandable_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -352,15 +353,71 @@ class MovieViewState extends State<MovieView> {
                               ),
                             ),
                           ),
+                          if (controller.model.trailers.isNotEmpty)
+                            OrientationBuilder(
+                              builder: (context, orientation) {
+                                final isLandscape =
+                                    orientation == Orientation.landscape;
+
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (isLandscape) ...[
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        "Trailer:",
+                                        style: TextStyle(fontSize: _fontSize),
+                                      ),
+                                      player,
+                                    ] else
+                                      // nötig, damit Player geladen bleibt – aber unsichtbar
+                                      Offstage(child: player),
+                                  ],
+                                );
+                              },
+                            ),
+                          const SizedBox(height: 8),
                           if (controller.model.trailers.isNotEmpty) ...[
-                            const SizedBox(height: 8),
                             Text(
                               "Trailer:",
                               style: TextStyle(fontSize: _fontSize),
                             ),
-                            player,
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const SizedBox(
+                                  width: 12,
+                                ), // gleicht das Icon vom Button aus
+                                const Icon(
+                                  Icons.screen_rotation_outlined,
+                                  size: 20,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "Gerät rotieren",
+                                  style: TextStyle(
+                                    fontSize: _fontSize,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            TextButton.icon(
+                              onPressed: () {
+                                final videoId = controller.model.trailers[0];
+                                final youtubeUrl =
+                                    'https://www.youtube.com/watch?v=$videoId';
+                                _launchURL(youtubeUrl);
+                              },
+                              icon: const Icon(Icons.open_in_new),
+                              label: const Text(
+                                "Oder Trailer in YouTube öffnen",
+                              ),
+                            ),
+                            const SizedBox(height: 8),
                           ],
-                          const SizedBox(height: 8),
                           Text("Cast:", style: TextStyle(fontSize: _fontSize)),
                           ActorList(
                             actors: controller.model.movie.actors,
@@ -375,125 +432,6 @@ class MovieViewState extends State<MovieView> {
               ),
             ),
           ),
-    );
-  }
-}
-
-class WatchlistDialog extends StatelessWidget {
-  const WatchlistDialog({
-    super.key,
-    required double fontSize,
-    required this.controller,
-  }) : _fontSize = fontSize;
-
-  final double _fontSize;
-  final MovieController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(
-        'Zur Watchlist hinzufügen?',
-        style: TextStyle(fontSize: _fontSize),
-      ),
-      content: Container(
-        constraints: const BoxConstraints(maxHeight: 200),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (final watchlist in controller.model.watchlists)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: GestureDetector(
-                    onTap: () async {
-                      await controller.addMovieToWatchlist(watchlist, context);
-                      if (!context.mounted) return;
-                      Navigator.pop(context);
-                    },
-                    child: Container(
-                      width: 400,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).focusColor,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Center(
-                        child: Text(
-                          watchlist.name,
-                          style: TextStyle(fontSize: _fontSize),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          child: Text('Abbrechen', style: TextStyle(fontSize: _fontSize)),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        TextButton(
-          child: Text('Neue Liste', style: TextStyle(fontSize: _fontSize)),
-          onPressed: () async {
-            Navigator.pop(context);
-            TextEditingController textController = TextEditingController();
-            await showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text(
-                    'Neue Watchlist erstellen?',
-                    style: TextStyle(fontSize: _fontSize),
-                  ),
-                  content: TextField(
-                    controller: textController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name der Watchlist',
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      child: Text(
-                        'Abbrechen',
-                        style: TextStyle(fontSize: _fontSize),
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    TextButton(
-                      child: Text(
-                        'Erstellen',
-                        style: TextStyle(fontSize: _fontSize),
-                      ),
-                      onPressed: () async {
-                        await controller.addWatchlist(textController.text);
-                        if (!context.mounted) return;
-                        Navigator.pop(context);
-                        await showDialog(
-                          context: context,
-                          builder: (context) {
-                            return WatchlistDialog(
-                              fontSize: _fontSize,
-                              controller: controller,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        ),
-      ],
     );
   }
 }
