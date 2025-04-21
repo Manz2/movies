@@ -13,6 +13,7 @@ class Filter {
   int yearTo;
   String sortBy;
   bool accending;
+  List<String> genres;
 
   Filter({
     required this.movie,
@@ -24,5 +25,6 @@ class Filter {
     required this.yearTo,
     required this.sortBy,
     required this.accending,
+    required this.genres,
   });
 }

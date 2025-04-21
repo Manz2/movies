@@ -92,6 +92,10 @@ class FilterController {
     }
   }
 
+  setGenres(List<String> genres) {
+    _model.filter.genres = genres;
+  }
+
   setRating(rating) {
     _model.filter.rating = rating;
   }
@@ -114,6 +118,7 @@ class FilterController {
         yearFrom: 0,
         yearTo: 6000,
         sortBy: 'Standard',
-        accending: false);
+        accending: false,
+        genres: []);
   }
 }

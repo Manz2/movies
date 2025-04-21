@@ -28,6 +28,7 @@ class HomeController {
           yearTo: 6000,
           sortBy: 'Standard',
           accending: false,
+          genres: [],
         ),
       );
 
@@ -85,6 +86,12 @@ class HomeController {
         matchesFilter = false;
       } else if (filter.movie == 3 &&
           !(movie.mediaType == 'movie' || movie.mediaType == 'tv')) {
+        matchesFilter = false;
+      }
+
+      // Filtere nach Genre
+      if (filter.genres.isNotEmpty &&
+          !movie.genre.any((genre) => filter.genres.contains(genre))) {
         matchesFilter = false;
       }
 
@@ -157,6 +164,7 @@ class HomeController {
       yearTo: 6000,
       sortBy: 'Standard',
       accending: false,
+      genres: [],
     );
   }
 
