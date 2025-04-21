@@ -8,7 +8,7 @@ import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
-import 'package:movies/src/movie/movie_view_without_trailer.dart';
+import 'package:movies/src/movie/movie_view_without_autoplay.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -43,13 +43,14 @@ class MyApp extends StatelessWidget {
                   case MovieView.routeName:
                     final args = routeSettings.arguments as MovieViewArguments;
 
-                    if (args.trailers.isEmpty) {
-                      return MovieViewWithoutTrailer(
+                    if (args.autoplay != null && args.autoplay == true) {
+                      return MovieView(
                         movie: args.movie,
                         providers: args.providers,
+                        trailers: args.trailers,
                       );
                     } else {
-                      return MovieView(
+                      return MovieViewWithoutAutoplay(
                         movie: args.movie,
                         providers: args.providers,
                         trailers: args.trailers,

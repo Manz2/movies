@@ -6,7 +6,11 @@ class MovieModel {
   List<Watchlist> watchlists = [];
   Providers providers;
   List<String> trailers;
-  MovieModel({required this.movie, required this.providers, required this.trailers});
+  MovieModel({
+    required this.movie,
+    required this.providers,
+    required this.trailers,
+  });
 }
 
 class Provider {
@@ -26,5 +30,11 @@ class MovieViewArguments {
   Movie movie;
   Providers providers;
   List<String> trailers;
-  MovieViewArguments({required this.movie, required this.providers, required this.trailers});
+  bool? autoplay;
+  MovieViewArguments({
+    required this.movie,
+    required this.providers,
+    required this.trailers,
+    this.autoplay,
+  });
 }

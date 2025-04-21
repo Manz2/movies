@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_details_content.dart';
 import 'package:movies/src/movie/movie_model.dart';
-import 'package:movies/src/movie/movie_view_without_trailer.dart';
 import 'package:movies/src/movie/watchlist_dialog.dart';
-import 'package:movies/src/shared_widgets/actor_list.dart';
-import 'package:movies/src/shared_widgets/expandable_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class MovieView extends StatefulWidget {
@@ -44,20 +39,6 @@ class MovieViewState extends State<MovieView> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final orientation = MediaQuery.of(context).orientation;
-
-      if (widget.trailers.isEmpty || orientation == Orientation.landscape) {
-        Navigator.of(context).pushReplacementNamed(
-          MovieViewWithoutTrailer.routeName,
-          arguments: MovieViewArguments(
-            movie: widget.movie,
-            providers: widget.providers,
-            trailers: [],
-          ),
-        );
-      }
-    });
     controller = MovieController(
       movie: widget.movie,
       providers: widget.providers,
@@ -84,13 +65,6 @@ class MovieViewState extends State<MovieView> {
     setState(() {
       _fontSize = prefs.getDouble('font_size') ?? 16.0; // Standardwert
     });
-  }
-
-  _launchURL(String url2) async {
-    final Uri url = Uri.parse(url2);
-    if (!await launchUrl(url)) {
-      throw Exception('Could not launch $url');
-    }
   }
 
   _initTrailer() {
@@ -225,90 +199,39 @@ class MovieViewState extends State<MovieView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(30, 8, 30, 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MovieDetailsContent(
-                          controller: controller,
-                          fontSize: _fontSize,
-                          isFabVisible: _isFabVisible,
-                          onRatingChanged:
-                              (rating) => setState(() => this.rating = rating),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MovieDetailsContent(
+                        controller: controller,
+                        fontSize: _fontSize,
+                        isFabVisible: _isFabVisible,
+                        onRatingChanged:
+                            (rating) => setState(() => this.rating = rating),
+                      ),
+                      if (controller.model.trailers.isNotEmpty)
+                        OrientationBuilder(
+                          builder: (context, orientation) {
+                            final isLandscape =
+                                orientation == Orientation.landscape;
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (isLandscape) ...[
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    "Trailer:",
+                                    style: TextStyle(fontSize: _fontSize),
+                                  ),
+                                  player,
+                                ] else
+                                  // nötig, damit Player geladen bleibt – aber unsichtbar
+                                  Offstage(child: player),
+                              ],
+                            );
+                          },
                         ),
-
-                        if (controller.model.trailers.isNotEmpty)
-                          OrientationBuilder(
-                            builder: (context, orientation) {
-                              final isLandscape =
-                                  orientation == Orientation.landscape;
-
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (isLandscape) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Trailer:",
-                                      style: TextStyle(fontSize: _fontSize),
-                                    ),
-                                    player,
-                                  ] else
-                                    // nötig, damit Player geladen bleibt – aber unsichtbar
-                                    Offstage(child: player),
-                                ],
-                              );
-                            },
-                          ),
-                        const SizedBox(height: 8),
-                        if (controller.model.trailers.isNotEmpty) ...[
-                          Text(
-                            "Trailer:",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const SizedBox(
-                                width: 12,
-                              ), // gleicht das Icon vom Button aus
-                              const Icon(
-                                Icons.screen_rotation_outlined,
-                                size: 20,
-                                color: Colors.grey,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                "Gerät rotieren",
-                                style: TextStyle(
-                                  fontSize: _fontSize,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                          TextButton.icon(
-                            onPressed: () {
-                              final videoId = controller.model.trailers[0];
-                              final youtubeUrl =
-                                  'https://www.youtube.com/watch?v=$videoId';
-                              _launchURL(youtubeUrl);
-                            },
-                            icon: const Icon(Icons.smart_display),
-                            label: const Text("YouTube"),
-                          ),
-                          const SizedBox(height: 8),
-                        ],
-                        Text("Cast:", style: TextStyle(fontSize: _fontSize)),
-                        ActorList(
-                          actors: controller.model.movie.actors,
-                          controller: controller,
-                          fontSize: _fontSize,
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ],
               ),

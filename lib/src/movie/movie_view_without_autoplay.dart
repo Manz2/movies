@@ -1,32 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_details_content.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/movie/watchlist_dialog.dart';
-import 'package:movies/src/shared_widgets/actor_list.dart';
-import 'package:movies/src/shared_widgets/expandable_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-class MovieViewWithoutTrailer extends StatefulWidget {
+class MovieViewWithoutAutoplay extends StatefulWidget {
   final Movie movie;
   final Providers providers;
+  final List<String> trailers;
 
   static const routeName = '/movie_details';
 
-  const MovieViewWithoutTrailer({
+  const MovieViewWithoutAutoplay({
     super.key,
     required this.movie,
     required this.providers,
+    required this.trailers,
   });
 
   @override
   MovieViewState createState() => MovieViewState();
 }
 
-class MovieViewState extends State<MovieViewWithoutTrailer> {
+class MovieViewState extends State<MovieViewWithoutAutoplay> {
   late final MovieController controller;
   bool _isFabVisible = false;
   double _fontSize = 16.0;
@@ -38,10 +37,25 @@ class MovieViewState extends State<MovieViewWithoutTrailer> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final orientation = MediaQuery.of(context).orientation;
+
+      if (widget.trailers.isNotEmpty && orientation != Orientation.landscape) {
+        Navigator.of(context).pushReplacementNamed(
+          MovieView.routeName,
+          arguments: MovieViewArguments(
+            movie: widget.movie,
+            providers: widget.providers,
+            trailers: widget.trailers,
+            autoplay: true,
+          ),
+        );
+      }
+    });
     controller = MovieController(
       movie: widget.movie,
       providers: widget.providers,
-      trailers: [],
+      trailers: widget.trailers,
     );
     _istSaved();
     _loadFontSize();
@@ -115,27 +129,11 @@ class MovieViewState extends State<MovieViewWithoutTrailer> {
         ],
       ),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(30, 8, 30, 8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MovieDetailsContent(
-                controller: controller,
-                fontSize: _fontSize,
-                isFabVisible: _isFabVisible,
-                onRatingChanged:
-                    (rating) => setState(() => this.rating = rating),
-              ),
-              const SizedBox(height: 8),
-              Text("Cast:", style: TextStyle(fontSize: _fontSize)),
-              ActorList(
-                actors: controller.model.movie.actors,
-                controller: controller,
-                fontSize: _fontSize,
-              ),
-            ],
-          ),
+        child: MovieDetailsContent(
+          controller: controller,
+          fontSize: _fontSize,
+          isFabVisible: _isFabVisible,
+          onRatingChanged: (rating) => setState(() => this.rating = rating),
         ),
       ),
     );
