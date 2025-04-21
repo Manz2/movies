@@ -40,34 +40,23 @@ class FilterViewState extends State<FilterView> {
   ];
   final List<String> allGenres = [
     'Action',
+    'Komödie',
+    'Drama',
+    'Thriller',
     'Adventure',
     'Animation',
-    'Comedy',
-    'Crime',
-    'Documentary',
-    'Drama',
-    'Family',
+    'Krimi',
+    'Familie',
     'Fantasy',
-    'History',
+    'Historie',
     'Horror',
-    'Music',
-    'Mystery',
-    'Romance',
+    'Liebesfilm',
     'Science Fiction',
-    'Thriller',
-    'TV Movie',
-    'War',
+    'Kriegsfilm',
     'Western',
   ];
 
-  final List<String> initialGenres = [
-    'Action',
-    'Comedy',
-    'Drama',
-    'Fantasy',
-    'Horror',
-    'Romance',
-  ];
+  final List<String> initialGenres = ['Action', 'Komödie', 'Drama', 'Thriller'];
 
   List<String> selectedGenres = [];
   bool showAllGenres = false;

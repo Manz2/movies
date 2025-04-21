@@ -89,9 +89,14 @@ class HomeController {
         matchesFilter = false;
       }
 
-      // Filtere nach Genre
       if (filter.genres.isNotEmpty &&
-          !movie.genre.any((genre) => filter.genres.contains(genre))) {
+          !filter.genres.every(
+            (selectedGenre) => movie.genre.any(
+              (movieGenre) => movieGenre.toLowerCase().contains(
+                selectedGenre.toLowerCase(),
+              ),
+            ),
+          )) {
         matchesFilter = false;
       }
 
