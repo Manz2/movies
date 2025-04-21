@@ -27,17 +27,31 @@ class MovieListTileView extends StatelessWidget {
         confirmDismiss: (_) => confirmDismiss?.call() ?? Future.value(false),
         onDismissed: (_) => onDismissed?.call(),
         background: Container(color: Colors.red),
-        child: ListTile(
-          title: Text(movie.title, style: TextStyle(fontSize: fontSize + 2)),
-          leading: CircleAvatar(
-            radius: 35,
-            foregroundImage:
-                movie.image.isNotEmpty
-                    ? CachedNetworkImageProvider(movie.image)
-                    : const AssetImage("assets/images/Movie.png")
-                        as ImageProvider,
-          ),
+        child: InkWell(
           onTap: onTap,
+          child: Row(
+            children: [
+              const SizedBox(width: 12),
+              CircleAvatar(
+                radius: 40,
+                foregroundImage:
+                    movie.image.isNotEmpty
+                        ? CachedNetworkImageProvider(movie.image)
+                        : const AssetImage("assets/images/Movie.png")
+                            as ImageProvider,
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  movie.title,
+                  style: TextStyle(
+                    fontSize: fontSize + 2,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
