@@ -4,6 +4,7 @@ import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
+import 'package:movies/src/shared_widgets/expandable_text.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -267,9 +268,9 @@ class MovieViewState extends State<MovieView> {
                             ],
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            controller.model.movie.description,
-                            style: TextStyle(fontSize: _fontSize),
+                          ExpandableText(
+                            text: controller.model.movie.description,
+                            fontSize: _fontSize,
                           ),
                           const SizedBox(height: 8),
                           Text(
