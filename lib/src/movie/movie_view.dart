@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
+import 'package:movies/src/movie/movie_details_content.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/movie/movie_view_without_trailer.dart';
 import 'package:movies/src/movie/watchlist_dialog.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:movies/src/shared_widgets/expandable_text.dart';
@@ -42,6 +44,20 @@ class MovieViewState extends State<MovieView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final orientation = MediaQuery.of(context).orientation;
+
+      if (widget.trailers.isEmpty || orientation == Orientation.landscape) {
+        Navigator.of(context).pushReplacementNamed(
+          MovieViewWithoutTrailer.routeName,
+          arguments: MovieViewArguments(
+            movie: widget.movie,
+            providers: widget.providers,
+            trailers: [],
+          ),
+        );
+      }
+    });
     controller = MovieController(
       movie: widget.movie,
       providers: widget.providers,
@@ -204,229 +220,97 @@ class MovieViewState extends State<MovieView> {
                 ),
               ],
             ),
-            body: Padding(
-              padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    controller.model.movie.image != ''
-                        ? Padding(
-                          padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(10),
-                            ),
-                            child: Image.network(
-                              controller.model.movie.image,
-                              height: 300,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        )
-                        : const Padding(padding: EdgeInsets.all(16)),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  controller.model.movie.title,
-                                  style: TextStyle(
-                                    fontSize: _fontSize + 8,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                  overflow:
-                                      TextOverflow
-                                          .visible, // Kürzt den Text, wenn er zu lang ist
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ), // Abstand zwischen Titel und Bild
-                              controller.model.movie.fsk == '0' ||
-                                      controller.model.movie.fsk == '6' ||
-                                      controller.model.movie.fsk == '12' ||
-                                      controller.model.movie.fsk == '16' ||
-                                      controller.model.movie.fsk == '18'
-                                  ? SizedBox(
-                                    height: 30, // Höhe anpassen
-                                    child: Image(
-                                      image: AssetImage(
-                                        'assets/images/FSK${controller.model.movie.fsk}.png',
-                                      ),
-                                      fit:
-                                          BoxFit
-                                              .contain, // Bild innerhalb des SizedBox skalieren
-                                    ),
-                                  )
-                                  : const SizedBox(), // Leerraum, wenn FSK unbekannt
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          ExpandableText(
-                            text: controller.model.movie.description,
-                            fontSize: _fontSize,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "FSK: ${controller.model.movie.fsk}",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Öffentliches Rating: ${controller.model.movie.rating}",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Jahr: ${controller.model.movie.year}",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Genre: ${controller.model.movie.genre.join(', ')}",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          controller.model.movie.mediaType == 'movie'
-                              ? Text(
-                                "Dauer: ${controller.getDuration()}",
-                                style: TextStyle(fontSize: _fontSize),
-                              )
-                              : Text(
-                                "Dauer: ${controller.model.movie.duration} Staffeln",
-                                style: TextStyle(fontSize: _fontSize),
-                              ),
-                          const SizedBox(height: 8),
-                          !_isFabVisible
-                              ? Text(
-                                "Privates Rating: ",
-                                style: TextStyle(fontSize: _fontSize),
-                              )
-                              : const SizedBox(height: 0),
-                          const SizedBox(height: 8),
-                          !_isFabVisible
-                              ? StarRating(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                size: 40.0,
-                                rating: controller.model.movie.privateRating,
-                                color: Colors.orange,
-                                borderColor: Colors.grey,
-                                allowHalfRating: true,
-                                starCount: 5,
-                                onRatingChanged:
-                                    (rating) => setState(() {
-                                      this.rating = rating;
-                                    }),
-                              )
-                              : const SizedBox(height: 0),
-                          const SizedBox(height: 8),
-                          Text(
-                            "Anbieter:",
-                            style: TextStyle(fontSize: _fontSize),
-                          ),
-                          const SizedBox(height: 8),
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: GestureDetector(
-                              onTap: () async {
-                                _launchURL(controller.model.providers.link);
-                              },
-                              child: Row(
-                                children: [
-                                  for (final provider
-                                      in controller.model.providers.providers)
-                                    Padding(
-                                      padding: const EdgeInsets.only(right: 8),
-                                      child: Image.network(
-                                        provider.icon,
-                                        height: 50,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (controller.model.trailers.isNotEmpty)
-                            OrientationBuilder(
-                              builder: (context, orientation) {
-                                final isLandscape =
-                                    orientation == Orientation.landscape;
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(30, 8, 30, 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MovieDetailsContent(
+                          controller: controller,
+                          fontSize: _fontSize,
+                          isFabVisible: _isFabVisible,
+                          onRatingChanged:
+                              (rating) => setState(() => this.rating = rating),
+                        ),
 
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (isLandscape) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        "Trailer:",
-                                        style: TextStyle(fontSize: _fontSize),
-                                      ),
-                                      player,
-                                    ] else
-                                      // nötig, damit Player geladen bleibt – aber unsichtbar
-                                      Offstage(child: player),
-                                  ],
-                                );
-                              },
-                            ),
+                        if (controller.model.trailers.isNotEmpty)
+                          OrientationBuilder(
+                            builder: (context, orientation) {
+                              final isLandscape =
+                                  orientation == Orientation.landscape;
+
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (isLandscape) ...[
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      "Trailer:",
+                                      style: TextStyle(fontSize: _fontSize),
+                                    ),
+                                    player,
+                                  ] else
+                                    // nötig, damit Player geladen bleibt – aber unsichtbar
+                                    Offstage(child: player),
+                                ],
+                              );
+                            },
+                          ),
+                        const SizedBox(height: 8),
+                        if (controller.model.trailers.isNotEmpty) ...[
+                          Text(
+                            "Trailer:",
+                            style: TextStyle(fontSize: _fontSize),
+                          ),
                           const SizedBox(height: 8),
-                          if (controller.model.trailers.isNotEmpty) ...[
-                            Text(
-                              "Trailer:",
-                              style: TextStyle(fontSize: _fontSize),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const SizedBox(
-                                  width: 12,
-                                ), // gleicht das Icon vom Button aus
-                                const Icon(
-                                  Icons.screen_rotation_outlined,
-                                  size: 20,
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const SizedBox(
+                                width: 12,
+                              ), // gleicht das Icon vom Button aus
+                              const Icon(
+                                Icons.screen_rotation_outlined,
+                                size: 20,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "Gerät rotieren",
+                                style: TextStyle(
+                                  fontSize: _fontSize,
                                   color: Colors.grey,
                                 ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  "Gerät rotieren",
-                                  style: TextStyle(
-                                    fontSize: _fontSize,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            TextButton.icon(
-                              onPressed: () {
-                                final videoId = controller.model.trailers[0];
-                                final youtubeUrl =
-                                    'https://www.youtube.com/watch?v=$videoId';
-                                _launchURL(youtubeUrl);
-                              },
-                              icon: const Icon(Icons.smart_display),
-                              label: const Text("YouTube"),
-                            ),
-                            const SizedBox(height: 8),
-                          ],
-                          Text("Cast:", style: TextStyle(fontSize: _fontSize)),
-                          ActorList(
-                            actors: controller.model.movie.actors,
-                            controller: controller,
-                            fontSize: _fontSize,
+                              ),
+                            ],
                           ),
+                          TextButton.icon(
+                            onPressed: () {
+                              final videoId = controller.model.trailers[0];
+                              final youtubeUrl =
+                                  'https://www.youtube.com/watch?v=$videoId';
+                              _launchURL(youtubeUrl);
+                            },
+                            icon: const Icon(Icons.smart_display),
+                            label: const Text("YouTube"),
+                          ),
+                          const SizedBox(height: 8),
                         ],
-                      ),
+                        Text("Cast:", style: TextStyle(fontSize: _fontSize)),
+                        ActorList(
+                          actors: controller.model.movie.actors,
+                          controller: controller,
+                          fontSize: _fontSize,
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),

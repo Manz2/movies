@@ -8,6 +8,7 @@ import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/movie/movie_view_without_trailer.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
@@ -41,11 +42,19 @@ class MyApp extends StatelessWidget {
                     return SettingsView(controller: settingsController);
                   case MovieView.routeName:
                     final args = routeSettings.arguments as MovieViewArguments;
-                    return MovieView(
-                      movie: args.movie,
-                      providers: args.providers,
-                      trailers: args.trailers,
-                    );
+
+                    if (args.trailers.isEmpty) {
+                      return MovieViewWithoutTrailer(
+                        movie: args.movie,
+                        providers: args.providers,
+                      );
+                    } else {
+                      return MovieView(
+                        movie: args.movie,
+                        providers: args.providers,
+                        trailers: args.trailers,
+                      );
+                    }
                   case SearchView.routeName:
                     return const SearchView();
                   case ActorView.routeName:
