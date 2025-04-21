@@ -5,6 +5,7 @@ import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MovieController {
   final MovieModel _model;
@@ -73,6 +74,24 @@ class MovieController {
 
   Future<void> getWatchlists() async {
     _model.watchlists = await _db.getWatchlists();
+
+    final prefs = await SharedPreferences.getInstance();
+    String currentId = prefs.getString('current_watchlist') ?? '';
+
+    if (currentId.isNotEmpty) {
+      Watchlist? current;
+
+      try {
+        current = _model.watchlists.firstWhere((w) => w.id == currentId);
+      } catch (_) {
+        current = null;
+      }
+
+      if (current != null) {
+        _model.watchlists.removeWhere((w) => w.id == currentId);
+        _model.watchlists.insert(0, current);
+      }
+    }
   }
 
   Future<void> addMovieToWatchlist(
