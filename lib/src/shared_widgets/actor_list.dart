@@ -26,7 +26,7 @@ class ActorList extends StatelessWidget {
         itemBuilder: (context, index) {
           final actor = actors[index];
           return Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(4.0),
             child: GestureDetector(
               onTap: () async {
                 final movies = await controller.getMovies(actor.id);
@@ -35,7 +35,10 @@ class ActorList extends StatelessWidget {
                   context,
                   ActorView.routeName,
                   arguments: ActorViewArguments(
-                      actor: actor, movies: movies, fontSize: fontSize),
+                    actor: actor,
+                    movies: movies,
+                    fontSize: fontSize,
+                  ),
                 );
               },
               child: SizedBox(
@@ -43,21 +46,40 @@ class ActorList extends StatelessWidget {
                 child: Column(
                   children: [
                     CircleAvatar(
-                      radius: 40,
-                      foregroundImage: actor.image.isNotEmpty
-                          ? NetworkImage(actor.image)
-                          : const AssetImage(
-                              "assets/images/ActorPlaceholder.png",
-                            ) as ImageProvider,
+                      radius: 50,
+                      foregroundImage:
+                          actor.image.isNotEmpty
+                              ? NetworkImage(actor.image)
+                              : const AssetImage(
+                                    "assets/images/ActorPlaceholder.png",
+                                  )
+                                  as ImageProvider,
                     ),
-                    Text(actor.name,
-                        style: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          fontSize: fontSize,
-                        )),
-                    Text(actor.roleName,
+                    Tooltip(
+                      message: actor.name,
+                      child: Text(
+                        actor.name,
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(fontSize: fontSize - 2),
+                      ),
+                    ),
+
+                    Tooltip(
+                      message: actor.roleName,
+                      child: Text(
+                        actor.roleName,
+                        textAlign: TextAlign.center,
                         softWrap: true,
-                        style: TextStyle(fontSize: fontSize - 4)),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        style: TextStyle(
+                          fontSize: fontSize - 4,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

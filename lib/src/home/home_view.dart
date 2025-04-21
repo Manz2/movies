@@ -176,7 +176,6 @@ class HomeViewState extends State<HomeView> {
                 },
               ),
             ),
-
           Expanded(
             child: RefreshIndicator(
               onRefresh: _syncMovies,
