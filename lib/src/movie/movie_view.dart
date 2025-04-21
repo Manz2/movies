@@ -411,10 +411,8 @@ class MovieViewState extends State<MovieView> {
                                     'https://www.youtube.com/watch?v=$videoId';
                                 _launchURL(youtubeUrl);
                               },
-                              icon: const Icon(Icons.open_in_new),
-                              label: const Text(
-                                "Oder Trailer in YouTube öffnen",
-                              ),
+                              icon: const Icon(Icons.smart_display),
+                              label: const Text("YouTube"),
                             ),
                             const SizedBox(height: 8),
                           ],
