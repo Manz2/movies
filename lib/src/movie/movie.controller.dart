@@ -29,17 +29,18 @@ class MovieController {
       // Lokale Movies laden
       List<Movie> localMovies = await _db.getMovies();
 
-      // IDs aus der lokalen Liste extrahieren
-      Set<String> localMovieIds = localMovies.map((m) => m.id).toSet();
+      // Set aus kombinierten "id|mediaType"-Strings erstellen
+      Set<String> localMovieKeys =
+          localMovies.map((m) => '${m.id}|${m.mediaType}').toSet();
 
-      // Combined Credits vom TMDB-Service holen (bereits sortiert nach Rating)
       List<Movie> combinedCredits = await tmdbService.getCombinedCredits(
         actorId,
       );
 
-      // Alle Filme markieren, die in der lokalen Liste sind
+      // Alle Filme markieren, die in der lokalen Liste sind (id UND mediaType matchen)
       for (var movie in combinedCredits) {
-        movie.setOnList(localMovieIds.contains(movie.id));
+        String key = '${movie.id}|${movie.mediaType}';
+        movie.setOnList(localMovieKeys.contains(key));
       }
 
       // Neu sortieren: zuerst alle mit onList == true (Reihenfolge beibehalten), dann der Rest

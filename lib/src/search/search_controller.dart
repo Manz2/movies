@@ -19,7 +19,10 @@ class SearchPageController {
   Logger logger = Logger();
 
   Future<void> getResult(
-      BuildContext context, Result result, double fontSize) async {
+    BuildContext context,
+    Result result,
+    double fontSize,
+  ) async {
     if (result.type == 'person') {
       final movies = await _getMovies(int.parse(result.id));
       if (!context.mounted) return;
@@ -27,13 +30,15 @@ class SearchPageController {
         context,
         ActorView.routeName,
         arguments: ActorViewArguments(
-            actor: Actor(
-                name: result.name,
-                image: result.image,
-                roleName: "roleName",
-                id: int.parse(result.id)),
-            movies: movies,
-            fontSize: fontSize),
+          actor: Actor(
+            name: result.name,
+            image: result.image,
+            roleName: "roleName",
+            id: int.parse(result.id),
+          ),
+          movies: movies,
+          fontSize: fontSize,
+        ),
       );
     } else if (result.type == 'movie' || result.type == 'tv') {
       try {
@@ -41,9 +46,15 @@ class SearchPageController {
         Providers providers = await _getProviders(movie);
         List<String> trailers = await _getTrailers(movie);
         if (!context.mounted) return;
-        Navigator.pushNamed(context, MovieView.routeName,
-            arguments: MovieViewArguments(
-                movie: movie, providers: providers, trailers: trailers));
+        Navigator.pushNamed(
+          context,
+          MovieView.routeName,
+          arguments: MovieViewArguments(
+            movie: movie,
+            providers: providers,
+            trailers: trailers,
+          ),
+        );
       } on Exception catch (e) {
         throw Exception('Fehler beim Laden des Films: $e');
       }
@@ -62,7 +73,30 @@ class SearchPageController {
 
   Future<List<Movie>> _getMovies(int actorId) async {
     try {
-      return await tmdbService.getCombinedCredits(actorId);
+      // Lokale Movies laden
+      List<Movie> localMovies = await _db.getMovies();
+
+      // Set aus kombinierten "id|mediaType"-Strings erstellen
+      Set<String> localMovieKeys =
+          localMovies.map((m) => '${m.id}|${m.mediaType}').toSet();
+
+      List<Movie> combinedCredits = await tmdbService.getCombinedCredits(
+        actorId,
+      );
+
+      // Alle Filme markieren, die in der lokalen Liste sind (id UND mediaType matchen)
+      for (var movie in combinedCredits) {
+        String key = '${movie.id}|${movie.mediaType}';
+        movie.setOnList(localMovieKeys.contains(key));
+      }
+
+      // Neu sortieren: zuerst alle mit onList == true (Reihenfolge beibehalten), dann der Rest
+      List<Movie> sorted = [
+        ...combinedCredits.where((m) => m.onList),
+        ...combinedCredits.where((m) => !m.onList),
+      ];
+
+      return sorted;
     } on Exception catch (e) {
       logger.e('Fehler beim Laden der Filme: $e');
     }
@@ -101,7 +135,9 @@ class SearchPageController {
   Future<List<String>> _getTrailers(Movie movie) async {
     try {
       return await tmdbService.getTrailers(
-          movie.id.toString(), movie.mediaType);
+        movie.id.toString(),
+        movie.mediaType,
+      );
     } on Exception catch (e) {
       logger.d('Fehler beim Laden der Trailer: $e');
       return [];
