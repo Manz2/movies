@@ -30,6 +30,7 @@ class HomeViewState extends State<HomeView> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = '';
   bool _showSearchBar = true;
+  bool _loading = false;
 
   double _fontSize = 16.0;
   bool _showCoverView = false;
@@ -76,8 +77,14 @@ class HomeViewState extends State<HomeView> {
   }
 
   Future<void> _syncMovies() async {
+    setState(() {
+      _loading = true;
+    });
     await _controller.syncMovies();
     setState(() {});
+    setState(() {
+      _loading = false;
+    });
   }
 
   void _loadMovies() async {
@@ -171,13 +178,21 @@ class HomeViewState extends State<HomeView> {
       ),
       body: Column(
         children: [
-          if (_controller.model.movies.isEmpty)
-            IconButton(
-              icon: const Icon(Icons.sync),
-              onPressed: () {
-                _syncMovies();
-              },
-            ),
+          if (_controller.model.movies.isEmpty) ...[
+            if (_loading)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: const Center(child: CircularProgressIndicator()),
+              )
+            else ...[
+              Text(
+                "Keine Filme gefunden",
+                style: TextStyle(fontSize: _fontSize),
+              ),
+              IconButton(icon: const Icon(Icons.sync), onPressed: _syncMovies),
+            ],
+          ],
+
           if (!_showCoverView &&
               _showSearchBar &&
               _controller.model.movies.isNotEmpty)

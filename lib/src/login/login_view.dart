@@ -110,8 +110,17 @@ class LoginViewState extends State<LoginView> {
             key: _formKey,
             child: Column(
               children: [
-                Text("Login", style: TextStyle(fontSize: _fontSize)),
-                const SizedBox(height: 32),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Image(image: AssetImage('assets/images/login.png')),
+                  ),
+                ),
+                const SizedBox(height: 16),
                 TextFormField(
                   decoration: const InputDecoration(labelText: 'E-Mail'),
                   keyboardType: TextInputType.emailAddress,
