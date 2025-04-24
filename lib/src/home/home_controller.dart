@@ -12,11 +12,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomeController {
   final HomeModel _model;
   final TmdbService tmdbService = TmdbService();
-  final _db = DbCombinator();
+  final DbCombinator _db;
   Logger logger = Logger();
+  final String uid;
 
-  HomeController()
-    : _model = HomeModel(
+  HomeController({required this.uid})
+    : _db = DbCombinator(uid: uid),
+      _model = HomeModel(
         movies: [],
         filter: Filter(
           movie: 3,

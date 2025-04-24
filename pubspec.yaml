@@ -19,13 +19,14 @@ dependencies:
   flutter_rating: ^2.0.2 
   firebase_core: ^3.13.0
   firebase_database: ^11.3.5
-  firebase_crashlytics: ^4.3.5
+  firebase_auth: ^5.5.2
   logger: ^2.5.0
   shared_preferences: ^2.5.3
   url_launcher: ^6.3.1
   youtube_player_flutter: ^9.1.1
   flutter_launcher_icons: ^0.14.3
   cached_network_image: ^3.4.1
+
 
 dev_dependencies:
   flutter_test:

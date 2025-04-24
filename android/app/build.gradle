@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         applicationId = "com.movies2.android"
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName

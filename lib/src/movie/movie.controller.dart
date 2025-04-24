@@ -9,9 +9,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class MovieController {
   final MovieModel _model;
-  final _db = DbCombinator();
+  final String uid;
+  final DbCombinator _db;
 
   MovieController({
+    required this.uid,
     required Movie movie,
     required Providers providers,
     required List<String> trailers,
@@ -19,7 +21,8 @@ class MovieController {
          movie: movie,
          providers: providers,
          trailers: trailers,
-       );
+       ),
+       _db = DbCombinator(uid: uid);
   final TmdbService tmdbService = TmdbService();
   MovieModel get model => _model;
   Logger logger = Logger();

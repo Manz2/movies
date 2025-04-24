@@ -9,7 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'settings_service.dart';
 
 class SettingsController with ChangeNotifier {
-  SettingsController(this._settingsService);
+  final String? uid;
+  SettingsController(this._settingsService, {required this.uid});
 
   final SettingsService _settingsService;
   ThemeMode _themeMode = ThemeMode.system;
@@ -31,7 +32,7 @@ class SettingsController with ChangeNotifier {
   }
 
   Future<void> syncMovies() async {
-    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     TmdbService tmdbService = TmdbService();
     List<Movie> movies = await dbServiceFirebase.getMovies();
     for (Movie movie in movies) {
@@ -55,7 +56,7 @@ class SettingsController with ChangeNotifier {
   }
 
   Future<List<Movie>> removeDublicates() async {
-    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     return await dbServiceFirebase.removeDuplicates();
   }
 }

@@ -17,8 +17,9 @@ class ActorView extends StatelessWidget {
     required this.actor,
     required this.movies,
     required this.fontSize,
+    required String uid,
   }) {
-    controller = ActorController(actor: actor, movies: movies);
+    controller = ActorController(uid: uid, actor: actor, movies: movies);
   }
 
   @override

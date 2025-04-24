@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
@@ -39,7 +40,14 @@ class MovieViewState extends State<MovieView> {
   @override
   void initState() {
     super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) {
+      return;
+    }
+
     controller = MovieController(
+      uid: uid,
       movie: widget.movie,
       providers: widget.providers,
       trailers: widget.trailers,

@@ -12,8 +12,9 @@ class DbServiceLocal implements DbServiceInterface {
   Future<List<Movie>> getMovies() async {
     List<Movie> movies = [];
     try {
-      List<Map<String, dynamic>>? allItems =
-          await _jsonStore.getListLike('movie_%');
+      List<Map<String, dynamic>>? allItems = await _jsonStore.getListLike(
+        'movie_%',
+      );
       if (allItems == null) {
         logger.d('No movies found');
         return movies;
@@ -32,8 +33,11 @@ class DbServiceLocal implements DbServiceInterface {
     try {
       await _jsonStore.deleteLike('movie_%');
       for (var movie in movies) {
-        _jsonStore.setItem('movie_${movie.firebaseId}', movie.toJson(),
-            encrypt: false);
+        _jsonStore.setItem(
+          'movie_${movie.firebaseId}',
+          movie.toJson(),
+          encrypt: false,
+        );
       }
     } on Exception catch (e) {
       throw Exception('Error setting movies: $e');
@@ -45,29 +49,34 @@ class DbServiceLocal implements DbServiceInterface {
     List<Movie> movies = await getMovies();
     return movies.firstWhere(
       (movie) => movie.id == id && movie.mediaType == mediaType,
-      orElse: () => Movie(
-          id: id,
-          title: "title",
-          description: "description",
-          fsk: "fsk",
-          rating: 1,
-          year: 1,
-          duration: 1,
-          image: "image",
-          actors: [],
-          genre: [],
-          popularity: 1,
-          mediaType: mediaType,
-          privateRating: 0,
-          firebaseId: '',
-          addedAt: DateTime.now()),
+      orElse:
+          () => Movie(
+            id: id,
+            title: "title",
+            description: "description",
+            fsk: "fsk",
+            rating: 1,
+            year: 1,
+            duration: 1,
+            image: "image",
+            actors: [],
+            genre: [],
+            popularity: 1,
+            mediaType: mediaType,
+            privateRating: 0,
+            firebaseId: '',
+            addedAt: DateTime.now(),
+          ),
     );
   }
 
   @override
   Future<Movie> addMovie(movie) async {
-    _jsonStore.setItem('movie_${movie.firebaseId}', movie.toJson(),
-        encrypt: false);
+    _jsonStore.setItem(
+      'movie_${movie.firebaseId}',
+      movie.toJson(),
+      encrypt: false,
+    );
     return movie;
   }
 
@@ -78,8 +87,11 @@ class DbServiceLocal implements DbServiceInterface {
 
   @override
   Future<void> setMovie(Movie movie2) async {
-    _jsonStore.setItem('movie_${movie2.firebaseId}', movie2.toJson(),
-        encrypt: false);
+    _jsonStore.setItem(
+      'movie_${movie2.firebaseId}',
+      movie2.toJson(),
+      encrypt: false,
+    );
   }
 
   @override
@@ -116,9 +128,14 @@ class DbServiceLocal implements DbServiceInterface {
   Future<void> removeWatchlist(String id) {
     throw UnimplementedError();
   }
-  
+
   @override
   Future<Watchlist> setWatchlist(Watchlist watchlist) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> initializeUserData() {
     throw UnimplementedError();
   }
 }

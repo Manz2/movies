@@ -8,9 +8,11 @@ import 'package:movies/src/tmdb_service.dart';
 class ActorController {
   final ActorModel _model;
   final TmdbService tmdbService = TmdbService();
-  final DbCombinator _db = DbCombinator();
-  ActorController({required Actor actor, required movies})
-      : _model = ActorModel(actor: actor, movies: movies);
+  final String uid;
+  final DbCombinator _db;
+  ActorController({required Actor actor, required movies, required this.uid})
+    : _db = DbCombinator(uid: uid),
+      _model = ActorModel(actor: actor, movies: movies);
 
   ActorModel get model => _model;
   Logger logger = Logger();

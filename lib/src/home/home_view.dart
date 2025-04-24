@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:movies/src/Filter/filter_model.dart';
@@ -23,7 +24,7 @@ class HomeView extends StatefulWidget {
 }
 
 class HomeViewState extends State<HomeView> {
-  final HomeController _controller = HomeController();
+  late final HomeController _controller;
   final ScrollController _carouselScrollController = ScrollController();
   final ScrollController _listScrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -36,6 +37,13 @@ class HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) {
+      return;
+    }
+
+    _controller = HomeController(uid: uid);
     _loadFontSize();
     _loadMovies();
     _syncMovies();
@@ -160,14 +168,16 @@ class HomeViewState extends State<HomeView> {
       ),
       body: Column(
         children: [
-          if( _controller.model.movies.isEmpty)
+          if (_controller.model.movies.isEmpty)
             IconButton(
               icon: const Icon(Icons.sync),
               onPressed: () {
                 _syncMovies();
               },
             ),
-          if (!_showCoverView && _showSearchBar && _controller.model.movies.isNotEmpty)
+          if (!_showCoverView &&
+              _showSearchBar &&
+              _controller.model.movies.isNotEmpty)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
