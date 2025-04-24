@@ -8,10 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class WatchlistController {
   final WatchlistModel _model;
-  final DbCombinator _db = DbCombinator();
   TmdbService tmdbService = TmdbService();
-  WatchlistController({required Watchlist currentWatchlist})
-      : _model = WatchlistModel(currentWatchlist: currentWatchlist);
+  final DbCombinator _db;
+  WatchlistController({
+    required Watchlist currentWatchlist,
+    required String uid,
+  }) : _model = WatchlistModel(currentWatchlist: currentWatchlist),
+       _db = DbCombinator(uid: uid);
   WatchlistModel get model => _model;
   Logger logger = Logger();
 
@@ -50,7 +53,9 @@ class WatchlistController {
   Future<void> addMovieToWatchlist(Entry entry) async {
     try {
       await _db.addMovieToWatchlist(
-          model.currentWatchlist, await _db.getMovie(entry.id, entry.type));
+        model.currentWatchlist,
+        await _db.getMovie(entry.id, entry.type),
+      );
     } catch (e) {
       logger.e('Fehler beim Hinzufügen des Films zur Watchlist: $e');
     }
@@ -74,8 +79,11 @@ class WatchlistController {
         model.currentWatchlist = await _db.getWatchlistMovies(watchlist.id);
       } on Exception catch (e) {
         logger.d('Fehler beim Laden der Filme aus der Watchlist: $e');
-        model.currentWatchlist =
-            Watchlist(id: '', name: 'Watchlist', entries: []);
+        model.currentWatchlist = Watchlist(
+          id: '',
+          name: 'Watchlist',
+          entries: [],
+        );
       }
     } catch (e) {
       logger.e('Fehler beim Laden der Filme aus der Watchlist: $e');
@@ -104,6 +112,7 @@ class WatchlistController {
       throw Exception('Fehler beim Laden des Films: $e');
     }
   }
+
   Future<Providers> getProviders(Entry item) async {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.type);
@@ -113,7 +122,7 @@ class WatchlistController {
     }
   }
 
-  Future<List<String>> getTrailers(Entry item) async{
+  Future<List<String>> getTrailers(Entry item) async {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.type);
     } on Exception catch (e) {

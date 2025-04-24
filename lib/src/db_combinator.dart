@@ -5,8 +5,13 @@ import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
 
 class DbCombinator implements DbServiceInterface {
+  final String uid;
   final DbServiceInterface _dbServiceLocal = DbServiceLocal();
-  final DbServiceInterface _dbServiceFirebase = DbServiceFirebase();
+  late final DbServiceInterface _dbServiceFirebase;
+
+  DbCombinator({required this.uid}) {
+    _dbServiceFirebase = DbServiceFirebase(uid);
+  }
 
   @override
   Future<Movie> addMovie(Movie movie) async {
@@ -51,7 +56,9 @@ class DbCombinator implements DbServiceInterface {
 
   @override
   Future<Watchlist> addMovieToWatchlist(
-      Watchlist watchlist, Movie movie) async {
+    Watchlist watchlist,
+    Movie movie,
+  ) async {
     return await _dbServiceFirebase.addMovieToWatchlist(watchlist, movie);
   }
 
@@ -72,7 +79,9 @@ class DbCombinator implements DbServiceInterface {
 
   @override
   Future<void> removeMovieFromWatchlist(
-      Watchlist watchlist, Entry entry) async {
+    Watchlist watchlist,
+    Entry entry,
+  ) async {
     await _dbServiceFirebase.removeMovieFromWatchlist(watchlist, entry);
   }
 
@@ -84,5 +93,10 @@ class DbCombinator implements DbServiceInterface {
   @override
   Future<Watchlist> setWatchlist(Watchlist watchlist) async {
     return await _dbServiceFirebase.setWatchlist(watchlist);
+  }
+
+  @override
+  Future<void> initializeUserData() async {
+    await _dbServiceFirebase.initializeUserData();
   }
 }

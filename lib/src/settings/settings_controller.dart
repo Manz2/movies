@@ -1,15 +1,18 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:json_store/json_store.dart';
 import 'package:logger/logger.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/login/login_view.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_service.dart';
 
 class SettingsController with ChangeNotifier {
-  SettingsController(this._settingsService);
+  final String? uid;
+  SettingsController(this._settingsService, {required this.uid});
 
   final SettingsService _settingsService;
   ThemeMode _themeMode = ThemeMode.system;
@@ -31,7 +34,7 @@ class SettingsController with ChangeNotifier {
   }
 
   Future<void> syncMovies() async {
-    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     TmdbService tmdbService = TmdbService();
     List<Movie> movies = await dbServiceFirebase.getMovies();
     for (Movie movie in movies) {
@@ -55,7 +58,20 @@ class SettingsController with ChangeNotifier {
   }
 
   Future<List<Movie>> removeDublicates() async {
-    DbServiceFirebase dbServiceFirebase = DbServiceFirebase();
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     return await dbServiceFirebase.removeDuplicates();
+  }
+
+  void logout(BuildContext context) async {
+    final jsonStore = JsonStore(dbName: 'movies');
+    jsonStore.clearDataBase();
+    final prefs = SharedPreferences.getInstance();
+    prefs.then((value) => value.clear());
+    FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      LoginView.routeName,
+      (route) => false,
+    );
   }
 }

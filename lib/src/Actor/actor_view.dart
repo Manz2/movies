@@ -3,6 +3,7 @@ import 'package:movies/src/Actor/actor_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/home/home_view.dart';
 
 class ActorView extends StatelessWidget {
   final Actor actor;
@@ -17,8 +18,9 @@ class ActorView extends StatelessWidget {
     required this.actor,
     required this.movies,
     required this.fontSize,
+    required String uid,
   }) {
-    controller = ActorController(actor: actor, movies: movies);
+    controller = ActorController(uid: uid, actor: actor, movies: movies);
   }
 
   @override
@@ -30,7 +32,11 @@ class ActorView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                HomeView.routeName,
+                (route) => false,
+              );
             },
           ),
         ],

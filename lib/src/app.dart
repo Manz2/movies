@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
@@ -6,6 +7,8 @@ import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_view.dart';
+import 'package:movies/src/login/login.controller.dart';
+import 'package:movies/src/login/login_view.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/movie/movie_view_without_autoplay.dart';
@@ -34,9 +37,16 @@ class MyApp extends StatelessWidget {
           title: 'movies',
 
           onGenerateRoute: (RouteSettings routeSettings) {
+            final user = FirebaseAuth.instance.currentUser;
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
+                // Wenn nicht eingeloggt → Login anzeigen
+                if (user == null && routeSettings.name != LoginView.routeName) {
+                  return LoginView(controller: LoginController());
+                }
+
+                // Dann wie bisher weiterleiten:
                 switch (routeSettings.name) {
                   case SettingsView.routeName:
                     return SettingsView(controller: settingsController);
@@ -61,6 +71,7 @@ class MyApp extends StatelessWidget {
                   case ActorView.routeName:
                     final args = routeSettings.arguments as ActorViewArguments;
                     return ActorView(
+                      uid: user!.uid,
                       actor: args.actor,
                       movies: args.movies,
                       fontSize: args.fontSize,
@@ -71,6 +82,8 @@ class MyApp extends StatelessWidget {
                   case WatchlistView.routeName:
                     final args = routeSettings.arguments as Watchlist;
                     return WatchlistView(currentWatchlist: args);
+                  case LoginView.routeName:
+                    return LoginView(controller: LoginController());
                   case HomeView.routeName:
                   default:
                     return const HomeView();

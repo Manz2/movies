@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:movies/src/search/search_controller.dart';
@@ -13,13 +14,22 @@ class SearchView extends StatefulWidget {
 }
 
 class SearchViewState extends State<SearchView> {
-  SearchPageController controller = SearchPageController();
+  late final SearchPageController controller;
   double _fontSize = 16.0;
   Logger logger = Logger();
 
   @override
   void initState() {
     super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) {
+      // Optional: zur Login-Page weiterleiten oder Fehlermeldung anzeigen
+      logger.e("Kein Nutzer eingeloggt");
+      return;
+    }
+
+    controller = SearchPageController(uid: uid);
     _getPopular();
     _loadFontSize();
   }
@@ -41,24 +51,22 @@ class SearchViewState extends State<SearchView> {
     return Scaffold(
       appBar: AppBar(
         title: SearchBar(
-          leading: IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
-          ),
+          leading: IconButton(icon: const Icon(Icons.search), onPressed: () {}),
           hintText: "suche",
           hintStyle: WidgetStateProperty.all<TextStyle>(
-              TextStyle(fontSize: _fontSize)),
+            TextStyle(fontSize: _fontSize),
+          ),
           constraints: BoxConstraints(
-              maxWidth: (MediaQuery.of(context).size.width) - 140),
+            maxWidth: (MediaQuery.of(context).size.width) - 140,
+          ),
           onSubmitted: (text) async {
             showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (BuildContext dialogContext) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                });
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext dialogContext) {
+                return const Center(child: CircularProgressIndicator());
+              },
+            );
             await controller.search(text);
             setState(() {});
             if (!context.mounted) return;
@@ -76,15 +84,17 @@ class SearchViewState extends State<SearchView> {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 35,
-                foregroundImage: result.image.isNotEmpty
-                    ? NetworkImage(result.image)
-                    : result.type == 'person'
+                foregroundImage:
+                    result.image.isNotEmpty
+                        ? NetworkImage(result.image)
+                        : result.type == 'person'
                         ? const AssetImage("assets/images/ActorPlaceholder.png")
-                        : const AssetImage(
-                            "assets/images/Movie.png"),
+                        : const AssetImage("assets/images/Movie.png"),
               ),
-              title:
-                  Text(result.name, style: TextStyle(fontSize: _fontSize + 2)),
+              title: Text(
+                result.name,
+                style: TextStyle(fontSize: _fontSize + 2),
+              ),
               onTap: () {
                 try {
                   controller.getResult(context, result, _fontSize);

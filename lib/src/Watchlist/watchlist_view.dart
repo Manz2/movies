@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/Watchlist/watchlist_controller.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
@@ -29,7 +30,14 @@ class WatchlistViewState extends State<WatchlistView> {
 
   @override
   void initState() {
-    controller = WatchlistController(currentWatchlist: widget.currentWatchlist);
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      return;
+    }
+    controller = WatchlistController(
+      currentWatchlist: widget.currentWatchlist,
+      uid: uid,
+    );
     setState(() {});
     _loadFontSize();
     super.initState();
@@ -45,81 +53,100 @@ class WatchlistViewState extends State<WatchlistView> {
       appBar: AppBar(
         title: Text(controller.model.currentWatchlist.name),
         actions: [
-          Text(controller.model.currentWatchlist.entries.length.toString(),
-              style: TextStyle(fontSize: _fontSize)),
+          Text(
+            controller.model.currentWatchlist.entries.length.toString(),
+            style: TextStyle(fontSize: _fontSize),
+          ),
           IconButton(
-              onPressed: () async {
-                await controller.getWatchlists();
-                if (!context.mounted) return;
-                await showDialog(
-                    context: context,
-                    builder: (context) {
-                      return WatchlistDialog(
-                          fontSize: _fontSize,
-                          controller: controller,
-                          function: _loadState);
-                    }).then((_) {
-                  _loadState();
-                });
-              },
-              icon: const Icon(Icons.remove_red_eye_rounded)),
+            onPressed: () async {
+              await controller.getWatchlists();
+              if (!context.mounted) return;
+              await showDialog(
+                context: context,
+                builder: (context) {
+                  return WatchlistDialog(
+                    fontSize: _fontSize,
+                    controller: controller,
+                    function: _loadState,
+                  );
+                },
+              ).then((_) {
+                _loadState();
+              });
+            },
+            icon: const Icon(Icons.remove_red_eye_rounded),
+          ),
           (controller.model.currentWatchlist.id != '')
               ? IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () async {
-                    await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: Text('Watchlist löschen',
-                                style: TextStyle(fontSize: _fontSize)),
-                            content: Text(
-                              "Möchten Sie ${controller.model.currentWatchlist.name} wirklich löschen?",
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  await showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text(
+                          'Watchlist löschen',
+                          style: TextStyle(fontSize: _fontSize),
+                        ),
+                        content: Text(
+                          "Möchten Sie ${controller.model.currentWatchlist.name} wirklich löschen?",
+                          style: TextStyle(fontSize: _fontSize),
+                        ),
+                        actions: [
+                          TextButton(
+                            child: Text(
+                              'Abbrechen',
                               style: TextStyle(fontSize: _fontSize),
                             ),
-                            actions: [
-                              TextButton(
-                                child: Text('Abbrechen',
-                                    style: TextStyle(fontSize: _fontSize)),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                              TextButton(
-                                child: Text('Löschen',
-                                    style: TextStyle(fontSize: _fontSize)),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  controller.removeWatchlist(
-                                      controller.model.currentWatchlist);
-                                  if (!context.mounted) return;
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(SnackBar(
-                                    content: Text(
-                                        "${controller.model.currentWatchlist.name} wurde gelöscht"),
-                                    action: SnackBarAction(
-                                        label: "undo",
-                                        onPressed: () async => {
-                                              await controller.addWatchlist(
-                                                  controller
-                                                      .model.currentWatchlist),
-                                            }),
-                                  ));
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        });
-                  })
-              : const Text("")
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                          TextButton(
+                            child: Text(
+                              'Löschen',
+                              style: TextStyle(fontSize: _fontSize),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              controller.removeWatchlist(
+                                controller.model.currentWatchlist,
+                              );
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "${controller.model.currentWatchlist.name} wurde gelöscht",
+                                  ),
+                                  action: SnackBarAction(
+                                    label: "undo",
+                                    onPressed:
+                                        () async => {
+                                          await controller.addWatchlist(
+                                            controller.model.currentWatchlist,
+                                          ),
+                                        },
+                                  ),
+                                ),
+                              );
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+              )
+              : const Text(""),
         ],
       ),
       body: Center(
         child: RefreshIndicator(
           onRefresh: () async {
             await controller.getMoviesForCurrentWatchlist(
-                controller.model.currentWatchlist);
+              controller.model.currentWatchlist,
+            );
             setState(() {});
           },
           child: ListView.builder(
@@ -134,54 +161,63 @@ class WatchlistViewState extends State<WatchlistView> {
                   key: Key(item.id),
                   onDismissed: (direction) async {
                     showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (BuildContext dialogContext) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        });
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext dialogContext) {
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    );
                     await controller.removeMovieFromWatchlist(item);
                     if (!context.mounted) return;
                     Navigator.of(context).pop();
                     setState(() {});
                     String title = item.name;
                     if (!context.mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("$title wurde gelöscht"),
-                      action: SnackBarAction(
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("$title wurde gelöscht"),
+                        action: SnackBarAction(
                           label: "undo",
-                          onPressed: () async => {
+                          onPressed:
+                              () async => {
                                 await controller.addMovieToWatchlist(item),
-                                setState(() {})
-                              }),
-                    ));
+                                setState(() {}),
+                              },
+                        ),
+                      ),
+                    );
                   },
                   background: Container(color: Colors.red),
                   child: ListTile(
-                      title: Text(item.name,
-                          style: TextStyle(fontSize: _fontSize + 2)),
-                      leading: CircleAvatar(
-                        radius: 35,
-                        foregroundImage: item.image.isNotEmpty
-                            ? NetworkImage(item.image)
-                            : const AssetImage(
-                                "assets/images/Movie.png"),
-                      ),
-                      onTap: () async {
-                        Movie movie = await controller.getMovie(item);
-                        Providers providers =
-                            await controller.getProviders(item);
-                        List<String> trailers =
-                            await controller.getTrailers(item);
-                        if (!context.mounted) return;
-                        Navigator.pushNamed(context, MovieView.routeName,
-                                arguments: MovieViewArguments(
-                                    movie: movie,
-                                    providers: providers,
-                                    trailers: trailers))
-                            .then((val) => _loadMovies());
-                      }),
+                    title: Text(
+                      item.name,
+                      style: TextStyle(fontSize: _fontSize + 2),
+                    ),
+                    leading: CircleAvatar(
+                      radius: 35,
+                      foregroundImage:
+                          item.image.isNotEmpty
+                              ? NetworkImage(item.image)
+                              : const AssetImage("assets/images/Movie.png"),
+                    ),
+                    onTap: () async {
+                      Movie movie = await controller.getMovie(item);
+                      Providers providers = await controller.getProviders(item);
+                      List<String> trailers = await controller.getTrailers(
+                        item,
+                      );
+                      if (!context.mounted) return;
+                      Navigator.pushNamed(
+                        context,
+                        MovieView.routeName,
+                        arguments: MovieViewArguments(
+                          movie: movie,
+                          providers: providers,
+                          trailers: trailers,
+                        ),
+                      ).then((val) => _loadMovies());
+                    },
+                  ),
                 ),
               );
             },
@@ -192,8 +228,9 @@ class WatchlistViewState extends State<WatchlistView> {
   }
 
   _loadMovies() async {
-    await controller
-        .getMoviesForCurrentWatchlist(controller.model.currentWatchlist);
+    await controller.getMoviesForCurrentWatchlist(
+      controller.model.currentWatchlist,
+    );
     setState(() {});
   }
 }
@@ -239,10 +276,11 @@ class WatchlistDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Center(
-                          child: Text(
-                        watchlist.name,
-                        style: TextStyle(fontSize: _fontSize),
-                      )),
+                        child: Text(
+                          watchlist.name,
+                          style: TextStyle(fontSize: _fontSize),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -263,45 +301,54 @@ class WatchlistDialog extends StatelessWidget {
             Navigator.pop(context);
             TextEditingController textController = TextEditingController();
             await showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text('Neue Watchlist erstellen?',
-                        style: TextStyle(fontSize: _fontSize)),
-                    content: TextField(
-                      controller: textController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name der Watchlist',
-                      ),
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text(
+                    'Neue Watchlist erstellen?',
+                    style: TextStyle(fontSize: _fontSize),
+                  ),
+                  content: TextField(
+                    controller: textController,
+                    decoration: const InputDecoration(
+                      labelText: 'Name der Watchlist',
                     ),
-                    actions: [
-                      TextButton(
-                        child: Text('Abbrechen',
-                            style: TextStyle(fontSize: _fontSize)),
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                  ),
+                  actions: [
+                    TextButton(
+                      child: Text(
+                        'Abbrechen',
+                        style: TextStyle(fontSize: _fontSize),
                       ),
-                      TextButton(
-                        child: Text('Erstellen',
-                            style: TextStyle(fontSize: _fontSize)),
-                        onPressed: () async {
-                          await controller.addNewWatchlist(textController.text);
-                          if (!context.mounted) return;
-                          Navigator.pop(context);
-                          await showDialog(
-                              context: context,
-                              builder: (context) {
-                                return WatchlistDialog(
-                                    fontSize: _fontSize,
-                                    controller: controller,
-                                    function: function);
-                              });
-                        },
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    TextButton(
+                      child: Text(
+                        'Erstellen',
+                        style: TextStyle(fontSize: _fontSize),
                       ),
-                    ],
-                  );
-                });
+                      onPressed: () async {
+                        await controller.addNewWatchlist(textController.text);
+                        if (!context.mounted) return;
+                        Navigator.pop(context);
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return WatchlistDialog(
+                              fontSize: _fontSize,
+                              controller: controller,
+                              function: function,
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
           },
         ),
       ],

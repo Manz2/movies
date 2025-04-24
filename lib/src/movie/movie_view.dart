@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
@@ -6,6 +7,7 @@ import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/watchlist_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:movies/src/home/home_view.dart';
 
 class MovieView extends StatefulWidget {
   final Movie movie;
@@ -39,7 +41,14 @@ class MovieViewState extends State<MovieView> {
   @override
   void initState() {
     super.initState();
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+    if (uid == null) {
+      return;
+    }
+
     controller = MovieController(
+      uid: uid,
       movie: widget.movie,
       providers: widget.providers,
       trailers: widget.trailers,
@@ -189,7 +198,11 @@ class MovieViewState extends State<MovieView> {
                   icon: const Icon(Icons.home),
                   onPressed: () {
                     _trailerController.pause();
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      HomeView.routeName,
+                      (route) => false,
+                    );
                   },
                 ),
               ],

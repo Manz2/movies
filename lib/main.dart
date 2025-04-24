@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -19,8 +20,10 @@ void main() async {
       rethrow;
     }
   }
+  final uid = FirebaseAuth.instance.currentUser?.uid;
 
-  final settingsController = SettingsController(SettingsService());
+  final settingsController = SettingsController(SettingsService(), uid: uid);
+
   await settingsController.loadSettings();
 
   runApp(MyApp(settingsController: settingsController));

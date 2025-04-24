@@ -12,8 +12,12 @@ import 'package:movies/src/tmdb_service.dart';
 class SearchPageController {
   final SearchModel _model;
   final TmdbService tmdbService = TmdbService();
-  final DbCombinator _db = DbCombinator();
-  SearchPageController() : _model = SearchModel(results: []);
+  final DbCombinator _db;
+  final String uid;
+
+  SearchPageController({required this.uid})
+    : _model = SearchModel(results: []),
+      _db = DbCombinator(uid: uid);
 
   SearchModel get model => _model;
   Logger logger = Logger();
