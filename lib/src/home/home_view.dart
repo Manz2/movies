@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:logger/web.dart';
 import 'package:movies/src/Filter/filter_model.dart';
 import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
@@ -31,6 +32,7 @@ class HomeViewState extends State<HomeView> {
   String _searchText = '';
   bool _showSearchBar = true;
   bool _loading = false;
+  Logger logger = Logger();
 
   double _fontSize = 16.0;
   bool _showCoverView = false;
@@ -144,15 +146,28 @@ class HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
             onPressed: () async {
-              Watchlist watchlist = await _controller.getCurrentWatchlist(
-                context,
-              );
-              if (!context.mounted || watchlist.id == '') return;
-              Navigator.pushNamed(
-                context,
-                WatchlistView.routeName,
-                arguments: watchlist,
-              ).then((val) => _loadMovies());
+              try {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder:
+                      (_) => const Center(child: CircularProgressIndicator()),
+                );
+                Watchlist watchlist = await _controller.getCurrentWatchlist(
+                  context,
+                );
+                if (!context.mounted) return;
+                Navigator.of(context, rootNavigator: true).pop();
+                if (!context.mounted || watchlist.id == '') return;
+                Navigator.pushNamed(
+                  context,
+                  WatchlistView.routeName,
+                  arguments: watchlist,
+                ).then((val) => _loadMovies());
+              } on Exception catch (e) {
+                logger.log(Level.error, e.toString());
+                Navigator.of(context, rootNavigator: true).pop();
+              }
             },
           ),
           IconButton(
@@ -219,20 +234,37 @@ class HomeViewState extends State<HomeView> {
                       ? MovieCoverCarousel(
                         movies: _controller.model.movies,
                         onTap: (movie) async {
-                          final providers = await _controller.getProviders(
-                            movie,
-                          );
-                          final trailers = await _controller.getTrailers(movie);
-                          if (!context.mounted) return;
-                          Navigator.pushNamed(
-                            context,
-                            MovieView.routeName,
-                            arguments: MovieViewArguments(
-                              movie: movie,
-                              providers: providers,
-                              trailers: trailers,
-                            ),
-                          ).then((val) => _loadMovies());
+                          try {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder:
+                                  (_) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                            );
+                            final providers = await _controller.getProviders(
+                              movie,
+                            );
+                            final trailers = await _controller.getTrailers(
+                              movie,
+                            );
+                            if (!context.mounted) return;
+                            Navigator.of(context, rootNavigator: true).pop();
+                            if (!context.mounted) return;
+                            Navigator.pushNamed(
+                              context,
+                              MovieView.routeName,
+                              arguments: MovieViewArguments(
+                                movie: movie,
+                                providers: providers,
+                                trailers: trailers,
+                              ),
+                            ).then((val) => _loadMovies());
+                          } on Exception catch (e) {
+                            logger.log(Level.error, e.toString());
+                            Navigator.of(context, rootNavigator: true).pop();
+                          }
                         },
                         scrollController: _carouselScrollController,
                       )
@@ -246,22 +278,42 @@ class HomeViewState extends State<HomeView> {
                             movie: item,
                             fontSize: _fontSize,
                             onTap: () async {
-                              final providers = await _controller.getProviders(
-                                item,
-                              );
-                              final trailers = await _controller.getTrailers(
-                                item,
-                              );
-                              if (!context.mounted) return;
-                              Navigator.pushNamed(
-                                context,
-                                MovieView.routeName,
-                                arguments: MovieViewArguments(
-                                  movie: item,
-                                  providers: providers,
-                                  trailers: trailers,
-                                ),
-                              ).then((val) => _loadMovies());
+                              try {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder:
+                                      (_) => const Center(
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                );
+                                final providers = await _controller
+                                    .getProviders(item);
+                                final trailers = await _controller.getTrailers(
+                                  item,
+                                );
+                                if (!context.mounted) return;
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                                if (!context.mounted) return;
+                                Navigator.pushNamed(
+                                  context,
+                                  MovieView.routeName,
+                                  arguments: MovieViewArguments(
+                                    movie: item,
+                                    providers: providers,
+                                    trailers: trailers,
+                                  ),
+                                ).then((val) => _loadMovies());
+                              } on Exception catch (e) {
+                                logger.log(Level.error, e.toString());
+                                Navigator.of(
+                                  context,
+                                  rootNavigator: true,
+                                ).pop();
+                              }
                             },
                             confirmDismiss:
                                 () => showConfirmDialog(

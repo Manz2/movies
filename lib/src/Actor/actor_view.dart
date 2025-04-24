@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Actor/actor_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
@@ -25,6 +26,7 @@ class ActorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.model.actor.name),
@@ -93,24 +95,38 @@ class ActorView extends StatelessWidget {
                           ],
                         ),
                         onTap: () async {
-                          final movieWithCredits = await controller
-                              .getMovieWithCredits(movie);
-                          Providers providers = await controller.getProviders(
-                            movie,
-                          );
-                          List<String> trailers = await controller.getTrailers(
-                            movie,
-                          );
-                          if (!context.mounted) return;
-                          Navigator.pushNamed(
-                            context,
-                            MovieView.routeName,
-                            arguments: MovieViewArguments(
-                              movie: movieWithCredits,
-                              providers: providers,
-                              trailers: trailers,
-                            ),
-                          );
+                          try {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder:
+                                  (_) => const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                            );
+                            final movieWithCredits = await controller
+                                .getMovieWithCredits(movie);
+                            Providers providers = await controller.getProviders(
+                              movie,
+                            );
+                            List<String> trailers = await controller
+                                .getTrailers(movie);
+                            if (!context.mounted) return;
+                            Navigator.of(context, rootNavigator: true).pop();
+                            if (!context.mounted) return;
+                            Navigator.pushNamed(
+                              context,
+                              MovieView.routeName,
+                              arguments: MovieViewArguments(
+                                movie: movieWithCredits,
+                                providers: providers,
+                                trailers: trailers,
+                              ),
+                            );
+                          } on Exception catch (e) {
+                            logger.log(Level.error, e.toString());
+                            Navigator.of(context, rootNavigator: true).pop();
+                          }
                         },
                       ),
                     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
@@ -18,6 +19,7 @@ class ActorList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
     return SizedBox(
       height: 200,
       child: ListView.builder(
@@ -29,17 +31,30 @@ class ActorList extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child: GestureDetector(
               onTap: () async {
-                final movies = await controller.getMovies(actor.id);
-                if (!context.mounted) return;
-                Navigator.pushNamed(
-                  context,
-                  ActorView.routeName,
-                  arguments: ActorViewArguments(
-                    actor: actor,
-                    movies: movies,
-                    fontSize: fontSize,
-                  ),
-                );
+                try {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder:
+                        (_) => const Center(child: CircularProgressIndicator()),
+                  );
+                  final movies = await controller.getMovies(actor.id);
+                  if (!context.mounted) return;
+                  Navigator.of(context, rootNavigator: true).pop();
+                  if (!context.mounted) return;
+                  Navigator.pushNamed(
+                    context,
+                    ActorView.routeName,
+                    arguments: ActorViewArguments(
+                      actor: actor,
+                      movies: movies,
+                      fontSize: fontSize,
+                    ),
+                  );
+                } on Exception catch (e) {
+                  logger.log(Level.error, e.toString());
+                  Navigator.of(context, rootNavigator: true).pop();
+                }
               },
               child: SizedBox(
                 width: 100,

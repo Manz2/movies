@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/login/login.controller.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginView extends StatefulWidget {
@@ -17,7 +16,6 @@ class LoginView extends StatefulWidget {
 }
 
 class LoginViewState extends State<LoginView> {
-  double _fontSize = 16.0;
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
   final _auth = FirebaseAuth.instance;
@@ -25,14 +23,6 @@ class LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    _loadFontSize();
-  }
-
-  Future<void> _loadFontSize() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _fontSize = prefs.getDouble('font_size') ?? 16.0;
-    });
   }
 
   Future<void> _login() async {
