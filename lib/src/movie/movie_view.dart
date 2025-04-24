@@ -7,6 +7,7 @@ import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/watchlist_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:movies/src/home/home_view.dart';
 
 class MovieView extends StatefulWidget {
   final Movie movie;
@@ -197,7 +198,11 @@ class MovieViewState extends State<MovieView> {
                   icon: const Icon(Icons.home),
                   onPressed: () {
                     _trailerController.pause();
-                    Navigator.popUntil(context, (route) => route.isFirst);
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      HomeView.routeName,
+                      (route) => false,
+                    );
                   },
                 ),
               ],

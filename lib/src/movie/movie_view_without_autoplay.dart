@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:movies/src/home/home_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_details_content.dart';
@@ -131,7 +132,11 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                HomeView.routeName,
+                (route) => false,
+              );
             },
           ),
         ],

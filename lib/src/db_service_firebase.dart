@@ -163,13 +163,18 @@ class DbServiceFirebase implements DbServiceInterface {
 
   @override
   Future<List<Watchlist>> getWatchlists() async {
-    final snapshot = await watchlistRef.get();
-    if (snapshot.exists) {
-      return snapshot.children.map((e) {
-        return Watchlist.fromJson(jsonDecode(jsonEncode(e.value)));
-      }).toList();
-    } else {
-      logger.d("No data available in the database");
+    try {
+      final snapshot = await watchlistRef.get();
+      if (snapshot.exists) {
+        return snapshot.children.map((e) {
+          return Watchlist.fromJson(jsonDecode(jsonEncode(e.value)));
+        }).toList();
+      } else {
+        logger.d("No data available in the database");
+        return [];
+      }
+    } catch (e) {
+      logger.e("Error fetching watchlists: $e");
       return [];
     }
   }

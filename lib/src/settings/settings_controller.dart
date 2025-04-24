@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:json_store/json_store.dart';
 import 'package:logger/logger.dart';
 import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/login/login_view.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -58,5 +60,18 @@ class SettingsController with ChangeNotifier {
   Future<List<Movie>> removeDublicates() async {
     DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     return await dbServiceFirebase.removeDuplicates();
+  }
+
+  void logout(BuildContext context) async {
+    final jsonStore = JsonStore(dbName: 'movies');
+    jsonStore.clearDataBase();
+    final prefs = SharedPreferences.getInstance();
+    prefs.then((value) => value.clear());
+    FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      LoginView.routeName,
+      (route) => false,
+    );
   }
 }

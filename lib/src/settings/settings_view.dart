@@ -40,19 +40,14 @@ class SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Theme:",
-                style: TextStyle(fontSize: _fontSize),
-              ),
+              child: Text("Theme:", style: TextStyle(fontSize: _fontSize)),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -71,7 +66,7 @@ class SettingsViewState extends State<SettingsView> {
                   DropdownMenuItem(
                     value: ThemeMode.dark,
                     child: Text('Dark Theme'),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -94,16 +89,14 @@ class SettingsViewState extends State<SettingsView> {
                   });
                   _saveFontSize(value); // Schriftgröße speichern
                   widget.controller.saveFontSize(
-                      value); // Schriftgröße in den Controller speichern (optional)
+                    value,
+                  ); // Schriftgröße in den Controller speichern (optional)
                 },
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Sync:",
-                style: TextStyle(fontSize: _fontSize),
-              ),
+              child: Text("Sync:", style: TextStyle(fontSize: _fontSize)),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -116,8 +109,10 @@ class SettingsViewState extends State<SettingsView> {
                       String correctPassword = '1234'; // Festgelegtes Passwort
 
                       return AlertDialog(
-                        title: Text('Filme Synchronisieren',
-                            style: TextStyle(fontSize: _fontSize)),
+                        title: Text(
+                          'Filme Synchronisieren',
+                          style: TextStyle(fontSize: _fontSize),
+                        ),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -139,15 +134,19 @@ class SettingsViewState extends State<SettingsView> {
                         ),
                         actions: [
                           TextButton(
-                            child: Text('Abbrechen',
-                                style: TextStyle(fontSize: _fontSize)),
+                            child: Text(
+                              'Abbrechen',
+                              style: TextStyle(fontSize: _fontSize),
+                            ),
                             onPressed: () {
                               Navigator.pop(context); // Dialog schließen
                             },
                           ),
                           TextButton(
-                            child: Text('Sync',
-                                style: TextStyle(fontSize: _fontSize)),
+                            child: Text(
+                              'Sync',
+                              style: TextStyle(fontSize: _fontSize),
+                            ),
                             onPressed: () {
                               if (passwordInput == correctPassword) {
                                 Navigator.pop(context); // Dialog schließen
@@ -157,7 +156,8 @@ class SettingsViewState extends State<SettingsView> {
                                 // Zeige eine Warnung an, dass das Passwort falsch ist
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                      content: Text('Falsches Passwort')),
+                                    content: Text('Falsches Passwort'),
+                                  ),
                                 );
                               }
                             },
@@ -167,16 +167,15 @@ class SettingsViewState extends State<SettingsView> {
                     },
                   );
                 },
-                child:
-                    Text('Sync Movies', style: TextStyle(fontSize: _fontSize)),
+                child: Text(
+                  'Sync Movies',
+                  style: TextStyle(fontSize: _fontSize),
+                ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "DB:",
-                style: TextStyle(fontSize: _fontSize),
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Text("DB:", style: TextStyle(fontSize: _fontSize)),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -184,8 +183,10 @@ class SettingsViewState extends State<SettingsView> {
                 onPressed: () {
                   widget.controller.clearDataBase();
                 },
-                child: Text('Lokale DB Löschen',
-                    style: TextStyle(fontSize: _fontSize)),
+                child: Text(
+                  'Lokale DB Löschen',
+                  style: TextStyle(fontSize: _fontSize),
+                ),
               ),
             ),
             Padding(
@@ -202,16 +203,28 @@ class SettingsViewState extends State<SettingsView> {
                     ),
                   );
                 },
-                child: Text('Duplikate löschen',
-                    style: TextStyle(fontSize: _fontSize)),
+                child: Text(
+                  'Duplikate löschen',
+                  style: TextStyle(fontSize: _fontSize),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+              child: Text("Account:", style: TextStyle(fontSize: _fontSize)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  widget.controller.logout(context);
+                },
+                child: Text('Abmelden', style: TextStyle(fontSize: _fontSize)),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Credits:",
-                style: TextStyle(fontSize: _fontSize),
-              ),
+              child: Text("Credits:", style: TextStyle(fontSize: _fontSize)),
             ),
             const Padding(
               padding: EdgeInsets.all(16.0),

@@ -175,22 +175,41 @@ class HomeController {
     );
   }
 
-  Future<Watchlist> getCurrentWatchlist() async {
+  Future<Watchlist> getCurrentWatchlist(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
     String id = prefs.getString('current_watchlist') ?? '';
+    if (!context.mounted) {
+      return Watchlist(id: '', name: 'Watchlist', entries: []);
+    }
     if (id == '') {
-      return _db.getWatchlists().then((value) {
-        if (value.isNotEmpty) {
-          prefs.setString('current_watchlist', value.first.id);
-          return value.first;
-        } else {
-          return Watchlist(id: '', name: 'Watchlist', entries: []);
-        }
-      });
+      return await getWatchlists(prefs, context);
     } else {
       try {
         return await _db.getWatchlistMovies(id);
-      } finally {}
+      } catch (e) {
+        return await getWatchlists(prefs, context);
+      }
+    }
+  }
+
+  Future<Watchlist> getWatchlists(
+    SharedPreferences prefs,
+    BuildContext context,
+  ) async {
+    final value = await _db.getWatchlists();
+    if (value.isNotEmpty) {
+      prefs.setString('current_watchlist', value.first.id);
+      return value.first;
+    } else {
+      if (!context.mounted) {
+        return Watchlist(id: '', name: 'Watchlist', entries: []);
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bitte zuerst einen Film zur Watchlist hinzufügen.'),
+        ),
+      );
+      return Watchlist(id: '', name: 'Watchlist', entries: []);
     }
   }
 

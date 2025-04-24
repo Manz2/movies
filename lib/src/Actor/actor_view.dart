@@ -3,6 +3,7 @@ import 'package:movies/src/Actor/actor_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/home/home_view.dart';
 
 class ActorView extends StatelessWidget {
   final Actor actor;
@@ -31,7 +32,11 @@ class ActorView extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                HomeView.routeName,
+                (route) => false,
+              );
             },
           ),
         ],

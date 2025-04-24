@@ -119,6 +119,7 @@ class HomeViewState extends State<HomeView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Movies'),
         actions: [
           IconButton(
@@ -136,8 +137,10 @@ class HomeViewState extends State<HomeView> {
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
             onPressed: () async {
-              Watchlist watchlist = await _controller.getCurrentWatchlist();
-              if (!context.mounted) return;
+              Watchlist watchlist = await _controller.getCurrentWatchlist(
+                context,
+              );
+              if (!context.mounted || watchlist.id == '') return;
               Navigator.pushNamed(
                 context,
                 WatchlistView.routeName,

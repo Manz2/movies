@@ -82,10 +82,10 @@ class LoginViewState extends State<LoginView> {
         }
 
         if (!mounted) return;
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Registrierung erfolgreich!')),
         );
+        Navigator.pushNamed(context, HomeView.routeName);
       } on FirebaseAuthException catch (e) {
         if (!mounted) return;
 
