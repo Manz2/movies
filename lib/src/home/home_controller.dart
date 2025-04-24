@@ -37,6 +37,8 @@ class HomeController {
   HomeModel get model => _model;
 
   Future<void> loadMovies() async {
+    // Hole die Liste aller Filme
+    _model.movies = await _db.getMovies();
     await _getFilteredMovies();
   }
 
@@ -68,9 +70,6 @@ class HomeController {
 
   // Die Methode zur Filterung der Filme
   Future<void> _getFilteredMovies() async {
-    // Hole die Liste aller Filme
-    _model.movies = await _db.getMovies();
-
     // Initialisiere die Liste der gefilterten Filme
     List<Movie> filteredMovies = [];
 
@@ -128,7 +127,19 @@ class HomeController {
         filteredMovies.add(movie);
       }
     }
-    //Dauer passt
+    if (filter.sortBy == 'Standard') {
+      final prefs = await SharedPreferences.getInstance();
+      final savedSort = prefs.getString('default_sort_by');
+      final savedAccending = prefs.getBool('default_accending');
+
+      if (savedSort != null) {
+        filter.sortBy = savedSort;
+      }
+
+      if (savedAccending != null) {
+        filter.accending = savedAccending;
+      }
+    }
     if (filter.sortBy != 'Standard') {
       filteredMovies.sort((a, b) {
         if (filter.accending) {
@@ -160,7 +171,6 @@ class HomeController {
 
   Future<void> syncMovies() async {
     _model.movies = await _db.syncMovies();
-    _model.filteredMovies = _model.movies;
     _model.filter = Filter(
       movie: 3,
       fsk: [],
@@ -173,6 +183,7 @@ class HomeController {
       accending: false,
       genres: [],
     );
+    _getFilteredMovies();
   }
 
   Future<Watchlist> getCurrentWatchlist(BuildContext context) async {

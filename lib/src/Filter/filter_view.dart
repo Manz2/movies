@@ -93,11 +93,25 @@ class FilterViewState extends State<FilterView> {
       yearFrom = controller.model.filter.yearFrom;
       yearTo = controller.model.filter.yearTo;
       dropdownController.text = controller.model.filter.sortBy;
+      if (controller.model.filter.sortBy == "Standard") {
+        _loadPreferences();
+      }
       accending = controller.model.filter.accending;
       selectedGenres = controller.model.filter.genres.toList();
     });
     _loadFontSize();
     super.initState();
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    accending = prefs.getBool('default_accending') ?? false;
+    final savedSort = prefs.getString('default_sort_by');
+
+    if (savedSort != null && savedSort != 'Dauer') {
+      controller.model.filter.sortBy = savedSort;
+      dropdownController.text = savedSort;
+    }
   }
 
   _toggleMovieButton() {
@@ -514,7 +528,43 @@ class FilterViewState extends State<FilterView> {
                 ],
               ),
             ),
-            const SizedBox(height: 100),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 35, 0, 0),
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.save),
+                label: const Text("Sortierung als Standard speichern"),
+                onPressed: () async {
+                  final sortBy = controller.model.filter.sortBy;
+
+                  if (sortBy == 'Dauer') {
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Die Sortierung "Dauer" kann nicht als Standard gespeichert werden.',
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('default_sort_by', sortBy);
+                  await prefs.setBool('default_accending', accending);
+
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Standard-Sortierung erfolgreich gespeichert!',
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 50),
           ],
         ),
       ),
