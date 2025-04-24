@@ -128,6 +128,7 @@ class DbServiceFirebase implements DbServiceInterface {
       type: movie.mediaType,
       firebaseId: newPostKey!,
       image: movie.image,
+      addedAt: DateTime.now(),
     );
     watchlist.entries.add(entry);
     try {
@@ -158,7 +159,12 @@ class DbServiceFirebase implements DbServiceInterface {
   @override
   Future<Watchlist> getWatchlistMovies(String id) async {
     final snapshot = await watchlistRef.child(id).get();
-    return Watchlist.fromJson(jsonDecode(jsonEncode(snapshot.value)));
+    final watchlist = Watchlist.fromJson(
+      jsonDecode(jsonEncode(snapshot.value)),
+    );
+    watchlist.entries.sort((a, b) => b.addedAt.compareTo(a.addedAt));
+
+    return watchlist;
   }
 
   @override
