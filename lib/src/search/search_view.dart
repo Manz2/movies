@@ -81,20 +81,7 @@ class SearchViewState extends State<SearchView> {
           final result = controller.model.results[index];
           return Padding(
             padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 35,
-                foregroundImage:
-                    result.image.isNotEmpty
-                        ? NetworkImage(result.image)
-                        : result.type == 'person'
-                        ? const AssetImage("assets/images/ActorPlaceholder.png")
-                        : const AssetImage("assets/images/Movie.png"),
-              ),
-              title: Text(
-                result.name,
-                style: TextStyle(fontSize: _fontSize + 2),
-              ),
+            child: InkWell(
               onTap: () {
                 try {
                   controller.getResult(context, result, _fontSize);
@@ -107,6 +94,32 @@ class SearchViewState extends State<SearchView> {
                   logger.e('Fehler beim aufrufen der Seite: $e');
                 }
               },
+              child: Row(
+                children: [
+                  const SizedBox(width: 12),
+                  CircleAvatar(
+                    radius: 40,
+                    foregroundImage:
+                        result.image.isNotEmpty
+                            ? NetworkImage(result.image)
+                            : result.type == 'person'
+                            ? const AssetImage(
+                              "assets/images/ActorPlaceholder.png",
+                            )
+                            : const AssetImage("assets/images/Movie.png"),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      result.name,
+                      style: TextStyle(
+                        fontSize: _fontSize + 2,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

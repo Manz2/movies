@@ -183,18 +183,7 @@ class WatchlistViewState extends State<WatchlistView> {
                     setState(() {});
                   },
                   background: Container(color: Colors.red),
-                  child: ListTile(
-                    title: Text(
-                      item.name,
-                      style: TextStyle(fontSize: _fontSize + 2),
-                    ),
-                    leading: CircleAvatar(
-                      radius: 35,
-                      foregroundImage:
-                          item.image.isNotEmpty
-                              ? NetworkImage(item.image)
-                              : const AssetImage("assets/images/Movie.png"),
-                    ),
+                  child: InkWell(
                     onTap: () async {
                       try {
                         showDialog(
@@ -228,6 +217,28 @@ class WatchlistViewState extends State<WatchlistView> {
                         Navigator.of(context, rootNavigator: true).pop();
                       }
                     },
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 12),
+                        CircleAvatar(
+                          radius: 35,
+                          foregroundImage:
+                              item.image.isNotEmpty
+                                  ? NetworkImage(item.image)
+                                  : const AssetImage("assets/images/Movie.png"),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            item.name,
+                            style: TextStyle(
+                              fontSize: _fontSize + 2,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
