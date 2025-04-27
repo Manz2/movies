@@ -46,10 +46,17 @@ class SearchPageController {
       );
     } else if (result.type == 'movie' || result.type == 'tv') {
       try {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator()),
+        );
         Movie movie = await _getMovie(result.id, result.type);
         Providers providers = await _getProviders(movie);
         List<String> trailers = await _getTrailers(movie);
         if (!context.mounted) return;
+        Navigator.of(context, rootNavigator: true).pop();
+
         Navigator.pushNamed(
           context,
           MovieView.routeName,
@@ -60,6 +67,7 @@ class SearchPageController {
           ),
         );
       } on Exception catch (e) {
+        Navigator.of(context, rootNavigator: true).pop();
         throw Exception('Fehler beim Laden des Films: $e');
       }
     } else {

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_controller.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/home/movie.dart';
@@ -50,6 +51,7 @@ class WatchlistViewState extends State<WatchlistView> {
 
   @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.model.currentWatchlist.name),
@@ -194,21 +196,37 @@ class WatchlistViewState extends State<WatchlistView> {
                               : const AssetImage("assets/images/Movie.png"),
                     ),
                     onTap: () async {
-                      Movie movie = await controller.getMovie(item);
-                      Providers providers = await controller.getProviders(item);
-                      List<String> trailers = await controller.getTrailers(
-                        item,
-                      );
-                      if (!context.mounted) return;
-                      Navigator.pushNamed(
-                        context,
-                        MovieView.routeName,
-                        arguments: MovieViewArguments(
-                          movie: movie,
-                          providers: providers,
-                          trailers: trailers,
-                        ),
-                      ).then((val) => _loadMovies());
+                      try {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder:
+                              (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                        );
+                        Movie movie = await controller.getMovie(item);
+                        Providers providers = await controller.getProviders(
+                          item,
+                        );
+                        List<String> trailers = await controller.getTrailers(
+                          item,
+                        );
+                        if (!context.mounted) return;
+                        Navigator.of(context, rootNavigator: true).pop();
+                        Navigator.pushNamed(
+                          context,
+                          MovieView.routeName,
+                          arguments: MovieViewArguments(
+                            movie: movie,
+                            providers: providers,
+                            trailers: trailers,
+                          ),
+                        ).then((val) => _loadMovies());
+                      } on Exception catch (e) {
+                        logger.log(Level.error, e.toString());
+                        Navigator.of(context, rootNavigator: true).pop();
+                      }
                     },
                   ),
                 ),
