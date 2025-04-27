@@ -54,6 +54,7 @@ class SearchPageController {
         Movie movie = await _getMovie(result.id, result.type);
         Providers providers = await _getProviders(movie);
         List<String> trailers = await _getTrailers(movie);
+        List<Movie> recommendations = await getRecommendations(movie);
         if (!context.mounted) return;
         Navigator.of(context, rootNavigator: true).pop();
 
@@ -64,6 +65,7 @@ class SearchPageController {
             movie: movie,
             providers: providers,
             trailers: trailers,
+            recommendations: recommendations
           ),
         );
       } on Exception catch (e) {
@@ -147,6 +149,18 @@ class SearchPageController {
   Future<List<String>> _getTrailers(Movie movie) async {
     try {
       return await tmdbService.getTrailers(
+        movie.id.toString(),
+        movie.mediaType,
+      );
+    } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
+      return [];
+    }
+  }
+
+  Future<List<Movie>> getRecommendations(Movie movie) async {
+    try {
+      return await tmdbService.getRecommendations(
         movie.id.toString(),
         movie.mediaType,
       );

@@ -6,10 +6,12 @@ class MovieModel {
   List<Watchlist> watchlists = [];
   Providers providers;
   List<String> trailers;
+  List<Movie> recommendations = [];
   MovieModel({
     required this.movie,
     required this.providers,
     required this.trailers,
+    required this.recommendations
   });
 }
 
@@ -31,10 +33,12 @@ class MovieViewArguments {
   Providers providers;
   List<String> trailers;
   bool? autoplay;
+  List<Movie> recommendations;
   MovieViewArguments({
     required this.movie,
     required this.providers,
     required this.trailers,
+    required this.recommendations,
     this.autoplay,
   });
 }

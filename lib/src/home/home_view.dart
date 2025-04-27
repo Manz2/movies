@@ -249,6 +249,9 @@ class HomeViewState extends State<HomeView> {
                             final trailers = await _controller.getTrailers(
                               movie,
                             );
+                            final recomendartions = await _controller.getRecommendations(
+                              movie,
+                            );
                             if (!context.mounted) return;
                             Navigator.of(context, rootNavigator: true).pop();
                             if (!context.mounted) return;
@@ -259,6 +262,7 @@ class HomeViewState extends State<HomeView> {
                                 movie: movie,
                                 providers: providers,
                                 trailers: trailers,
+                                recommendations: recomendartions,
                               ),
                             ).then((val) => _loadMovies());
                           } on Exception catch (e) {
@@ -292,6 +296,9 @@ class HomeViewState extends State<HomeView> {
                                 final trailers = await _controller.getTrailers(
                                   item,
                                 );
+                                final recomendartions = await _controller.getRecommendations(
+                                  item,
+                                );
                                 if (!context.mounted) return;
                                 Navigator.of(
                                   context,
@@ -305,6 +312,7 @@ class HomeViewState extends State<HomeView> {
                                     movie: item,
                                     providers: providers,
                                     trailers: trailers,
+                                    recommendations: recomendartions
                                   ),
                                 ).then((val) => _loadMovies());
                               } on Exception catch (e) {

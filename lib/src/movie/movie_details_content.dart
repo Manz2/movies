@@ -3,6 +3,7 @@ import 'package:flutter_rating/flutter_rating.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:movies/src/shared_widgets/expandable_text.dart';
+import 'package:movies/src/shared_widgets/recommendation_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovieDetailsContent extends StatelessWidget {
@@ -208,8 +209,19 @@ class MovieDetailsContent extends StatelessWidget {
                 const SizedBox(height: 8),
               ],
               Text("Cast:", style: TextStyle(fontSize: fontSize)),
+              const SizedBox(height: 8),
               ActorList(
                 actors: controller.model.movie.actors,
+                controller: controller,
+                fontSize: fontSize,
+              ),
+              Text(
+                "Das könnte dir gefallen:",
+                style: TextStyle(fontSize: fontSize),
+              ),
+              const SizedBox(height: 8),
+              RecommendationList(
+                movies: controller.model.recommendations,
                 controller: controller,
                 fontSize: fontSize,
               ),

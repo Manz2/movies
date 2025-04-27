@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
-import 'package:movies/src/Actor/actor_model.dart';
-import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
+import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/movie/movie_view.dart';
 
-class ActorList extends StatelessWidget {
-  final List<Actor> actors;
+class RecommendationList extends StatelessWidget {
+  final List<Movie> movies;
   final MovieController controller;
   final double fontSize;
 
-  const ActorList({
+  const RecommendationList({
     super.key,
-    required this.actors,
+    required this.movies,
     required this.controller,
     required this.fontSize,
   });
@@ -21,12 +21,12 @@ class ActorList extends StatelessWidget {
   Widget build(BuildContext context) {
     Logger logger = Logger();
     return SizedBox(
-      height: 190,
+      height: 230,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: actors.length,
+        itemCount: movies.length,
         itemBuilder: (context, index) {
-          final actor = actors[index];
+          final movie = movies[index];
           return Padding(
             padding: const EdgeInsets.all(4.0),
             child: GestureDetector(
@@ -38,17 +38,23 @@ class ActorList extends StatelessWidget {
                     builder:
                         (_) => const Center(child: CircularProgressIndicator()),
                   );
-                  final movies = await controller.getMovies(actor.id);
+                  Movie newMovie = await controller.getMovie(movie);
+                  Providers providers = await controller.getProviders(newMovie);
+                  List<String> trailers = await controller.getTrailers(
+                    newMovie,
+                  );
+                  List<Movie> recommendations = await controller
+                      .getRecommendations(newMovie);
                   if (!context.mounted) return;
                   Navigator.of(context, rootNavigator: true).pop();
-                  if (!context.mounted) return;
                   Navigator.pushNamed(
                     context,
-                    ActorView.routeName,
-                    arguments: ActorViewArguments(
-                      actor: actor,
-                      movies: movies,
-                      fontSize: fontSize,
+                    MovieView.routeName,
+                    arguments: MovieViewArguments(
+                      movie: newMovie,
+                      providers: providers,
+                      trailers: trailers,
+                      recommendations: recommendations,
                     ),
                   );
                 } on Exception catch (e) {
@@ -57,42 +63,36 @@ class ActorList extends StatelessWidget {
                 }
               },
               child: SizedBox(
-                width: 100,
+                width: 120,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      foregroundImage:
-                          actor.image.isNotEmpty
-                              ? NetworkImage(actor.image)
-                              : const AssetImage(
-                                    "assets/images/ActorPlaceholder.png",
-                                  )
-                                  as ImageProvider,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child:
+                          movie.image.isNotEmpty
+                              ? Image.network(
+                                movie.image,
+                                height: 160,
+                                width: 110,
+                                fit: BoxFit.cover,
+                              )
+                              : Image.asset(
+                                "assets/images/Movie.png",
+                                height: 160,
+                                width: 110,
+                                fit: BoxFit.cover,
+                              ),
                     ),
+                    const SizedBox(height: 8),
                     Tooltip(
-                      message: actor.name,
+                      message: movie.title,
                       child: Text(
-                        actor.name,
+                        movie.title,
                         textAlign: TextAlign.center,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 2,
                         style: TextStyle(fontSize: fontSize - 2),
-                      ),
-                    ),
-
-                    Tooltip(
-                      message: actor.roleName,
-                      child: Text(
-                        actor.roleName,
-                        textAlign: TextAlign.center,
-                        softWrap: true,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                        style: TextStyle(
-                          fontSize: fontSize - 4,
-                          color: Colors.grey,
-                        ),
                       ),
                     ),
                   ],

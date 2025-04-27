@@ -58,12 +58,14 @@ class MyApp extends StatelessWidget {
                         movie: args.movie,
                         providers: args.providers,
                         trailers: args.trailers,
+                        recommendations: args.recommendations,
                       );
                     } else {
                       return MovieViewWithoutAutoplay(
                         movie: args.movie,
                         providers: args.providers,
                         trailers: args.trailers,
+                        recommendations: args.recommendations,
                       );
                     }
                   case SearchView.routeName:

@@ -46,4 +46,16 @@ class ActorController {
       return [];
     }
   }
+
+  Future<List<Movie>> getRecommendations(Movie movie) async {
+    try {
+      return await tmdbService.getRecommendations(
+        movie.id.toString(),
+        movie.mediaType,
+      );
+    } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
+      return [];
+    }
+  }
 }

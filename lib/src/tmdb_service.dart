@@ -425,4 +425,26 @@ class TmdbService {
     }
     return trailers;
   }
+
+  Future<List<Movie>> getRecommendations(String id, String mediaType) async {
+  final url = '$baseUrl/$mediaType/$id/recommendations?api_key=$apiKey&language=de-DE';
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode != 200) {
+    throw HttpException("Failed to load recommendations for id=$id");
+  }
+
+  final Map<String, dynamic> jsonMap = json.decode(response.body);
+  final List<dynamic> results = jsonMap['results'];
+
+  List<Movie> recommendedMovies = [];
+
+  for (var result in results) {
+    Movie movie = _movieFromTmdb(result, mediaType, 0, '', DateTime.now());
+    recommendedMovies.add(movie);
+  }
+
+  return recommendedMovies;
+}
+
 }

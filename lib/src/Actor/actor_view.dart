@@ -111,6 +111,8 @@ class ActorView extends StatelessWidget {
                             );
                             List<String> trailers = await controller
                                 .getTrailers(movie);
+                            List<Movie> recommendations = await controller
+                                .getRecommendations(movie);
                             if (!context.mounted) return;
                             Navigator.of(context, rootNavigator: true).pop();
                             if (!context.mounted) return;
@@ -121,6 +123,7 @@ class ActorView extends StatelessWidget {
                                 movie: movieWithCredits,
                                 providers: providers,
                                 trailers: trailers,
+                                recommendations: recommendations,
                               ),
                             );
                           } on Exception catch (e) {

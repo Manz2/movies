@@ -17,10 +17,12 @@ class MovieController {
     required Movie movie,
     required Providers providers,
     required List<String> trailers,
+    required List<Movie> recommendations,
   }) : _model = MovieModel(
          movie: movie,
          providers: providers,
          trailers: trailers,
+         recommendations: recommendations,
        ),
        _db = DbCombinator(uid: uid);
   final TmdbService tmdbService = TmdbService();
@@ -136,5 +138,48 @@ class MovieController {
     int hours = durationInMinutes ~/ 60; // Ganze Stunden
     int minutes = durationInMinutes % 60;
     return "$hours Std. $minutes Min."; // Verbleibende Minuten
+  }
+
+  Future<Providers> getProviders(Movie item) async {
+    try {
+      return await tmdbService.getProviders(item.id.toString(), item.mediaType);
+    } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Provider: $e');
+      return Providers(providers: [], link: '');
+    }
+  }
+
+  Future<List<String>> getTrailers(Movie item) async {
+    try {
+      return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
+    } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
+      return [];
+    }
+  }
+
+  Future<List<Movie>> getRecommendations(Movie movie) async {
+    try {
+      return await tmdbService.getRecommendations(
+        movie.id.toString(),
+        movie.mediaType,
+      );
+    } on Exception catch (e) {
+      logger.d('Fehler beim Laden der Trailer: $e');
+      return [];
+    }
+  }
+
+  Future<Movie> getMovie(Movie item) async {
+    TmdbService tmdbService = TmdbService();
+    try {
+      Movie movie = await _db.getMovie(item.id, item.mediaType);
+      if (movie.firebaseId == '') {
+        movie = await tmdbService.getMovieWithCredits(movie);
+      }
+      return movie;
+    } on Exception catch (e) {
+      throw Exception('Fehler beim Laden des Films: $e');
+    }
   }
 }
