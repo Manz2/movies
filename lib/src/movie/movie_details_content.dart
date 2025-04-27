@@ -26,6 +26,23 @@ class MovieDetailsContent extends StatelessWidget {
     }
   }
 
+  String _getFskDescription(String fsk) {
+    switch (fsk) {
+      case '0':
+        return 'Keine Altersbeschränkung. Filme sind für Kinder absolut unbedenklich. Keine Gewalt, keine Ängstigungen, keine belastenden Themen. Geeignet für Familien und Kleinkinder.';
+      case '6':
+        return 'Ab 6 Jahren freigegeben. Kann erste Spannungsmomente, leichtes Gruseln oder Konflikte enthalten. Hauptfiguren müssen klar positiv dargestellt sein.';
+      case '12':
+        return 'Ab 12 Jahren freigegeben. Filme können Action, Bedrohungen oder ernstere Themen enthalten, aber keine drastische Gewalt. Kinder ab 6 Jahren dürfen mit Elternbegleitung ins Kino.';
+      case '16':
+        return 'Ab 16 Jahren freigegeben. Inhalte können intensive Gewaltszenen, Horror oder ernsthafte gesellschaftliche Konflikte zeigen.';
+      case '18':
+        return 'Keine Jugendfreigabe. Filme zeigen starke Gewalt, explizite Sexualität oder extrem belastende Inhalte. Nur für Erwachsene.';
+      default:
+        return 'Keine Information verfügbar.';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final movie = controller.model.movie;
@@ -64,15 +81,35 @@ class MovieDetailsContent extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   if (['0', '6', '12', '16', '18'].contains(movie.fsk))
-                    SizedBox(
-                      height: 30,
-                      child: Image.asset(
-                        'assets/images/FSK${movie.fsk}.png',
-                        fit: BoxFit.contain,
+                    GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => AlertDialog(
+                                title: Text('FSK ${movie.fsk}'),
+                                content: Text(_getFskDescription(movie.fsk)),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.of(context).pop(),
+                                    child: Text('Schließen'),
+                                  ),
+                                ],
+                              ),
+                        );
+                      },
+                      child: SizedBox(
+                        height: 30,
+                        child: Image.asset(
+                          'assets/images/FSK${movie.fsk}.png',
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                 ],
               ),
+
               const SizedBox(height: 8),
               ExpandableText(text: movie.description, fontSize: fontSize),
               const SizedBox(height: 8),
