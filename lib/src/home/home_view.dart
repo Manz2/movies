@@ -7,6 +7,7 @@ import 'package:movies/src/Filter/filter_view.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/Watchlist/watchlist_view.dart';
 import 'package:movies/src/home/home_controller.dart';
+import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/search/search_view.dart';
@@ -124,6 +125,58 @@ class HomeViewState extends State<HomeView> {
     });
   }
 
+  void _onMovieTap(Movie movie, BuildContext context) async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => const Center(child: CircularProgressIndicator()),
+      );
+      final providers = await _controller.getProviders(movie);
+      final trailers = await _controller.getTrailers(movie);
+      final recommendations = await _controller.getRecommendations(movie);
+      if (!context.mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      Navigator.pushNamed(
+        context,
+        MovieView.routeName,
+        arguments: MovieViewArguments(
+          movie: movie,
+          providers: providers,
+          trailers: trailers,
+          recommendations: recommendations,
+        ),
+      ).then((val) => _loadMovies());
+    } catch (e) {
+      logger.log(Level.error, e.toString());
+      Navigator.of(context, rootNavigator: true).pop();
+    }
+  }
+
+  Future<void> _onMovieDelete(Movie item, BuildContext context) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    await _controller.removeMovie(item);
+    if (!context.mounted) return;
+    Navigator.of(context, rootNavigator: true).pop();
+    setState(() {});
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${item.title} wurde gelöscht'),
+        action: SnackBarAction(
+          label: 'undo',
+          onPressed: () async {
+            await _controller.addMovie(context, item);
+            setState(() {});
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,177 +244,71 @@ class HomeViewState extends State<HomeView> {
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          if (_controller.model.movies.isEmpty) ...[
-            if (_loading)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: const Center(child: CircularProgressIndicator()),
-              )
-            else ...[
-              Text(
-                "Keine Filme gefunden",
-                style: TextStyle(fontSize: _fontSize),
-              ),
-              IconButton(icon: const Icon(Icons.sync), onPressed: _syncMovies),
-            ],
-          ],
-
-          if (!_showCoverView &&
-              _showSearchBar &&
-              _controller.model.movies.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(
-                  hintText: 'Suche nach Filmtitel', // <- ersetzt labelText
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search),
-                ),
-                onChanged: (value) {
-                  _searchText = value;
-                  _applySearchFilter();
-                },
-              ),
-            ),
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _syncMovies,
-              child:
-                  _showCoverView
-                      ? MovieCoverCarousel(
-                        movies: _controller.model.movies,
-                        onTap: (movie) async {
-                          try {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder:
-                                  (_) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                            );
-                            final providers = await _controller.getProviders(
-                              movie,
-                            );
-                            final trailers = await _controller.getTrailers(
-                              movie,
-                            );
-                            final recomendartions = await _controller.getRecommendations(
-                              movie,
-                            );
-                            if (!context.mounted) return;
-                            Navigator.of(context, rootNavigator: true).pop();
-                            if (!context.mounted) return;
-                            Navigator.pushNamed(
-                              context,
-                              MovieView.routeName,
-                              arguments: MovieViewArguments(
-                                movie: movie,
-                                providers: providers,
-                                trailers: trailers,
-                                recommendations: recomendartions,
-                              ),
-                            ).then((val) => _loadMovies());
-                          } on Exception catch (e) {
-                            logger.log(Level.error, e.toString());
-                            Navigator.of(context, rootNavigator: true).pop();
-                          }
-                        },
-                        scrollController: _carouselScrollController,
-                      )
-                      : ListView.builder(
-                        controller: _listScrollController,
-                        restorationId: 'sampleItemListView',
-                        itemCount: _controller.model.filteredMovies.length,
-                        itemBuilder: (context, index) {
-                          final item = _controller.model.filteredMovies[index];
-                          return MovieListTileView(
-                            movie: item,
-                            fontSize: _fontSize,
-                            onTap: () async {
-                              try {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder:
-                                      (_) => const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                );
-                                final providers = await _controller
-                                    .getProviders(item);
-                                final trailers = await _controller.getTrailers(
-                                  item,
-                                );
-                                final recomendartions = await _controller.getRecommendations(
-                                  item,
-                                );
-                                if (!context.mounted) return;
-                                Navigator.of(
-                                  context,
-                                  rootNavigator: true,
-                                ).pop();
-                                if (!context.mounted) return;
-                                Navigator.pushNamed(
-                                  context,
-                                  MovieView.routeName,
-                                  arguments: MovieViewArguments(
-                                    movie: item,
-                                    providers: providers,
-                                    trailers: trailers,
-                                    recommendations: recomendartions
-                                  ),
-                                ).then((val) => _loadMovies());
-                              } on Exception catch (e) {
-                                logger.log(Level.error, e.toString());
-                                Navigator.of(
-                                  context,
-                                  rootNavigator: true,
-                                ).pop();
-                              }
-                            },
-                            confirmDismiss:
-                                () => showConfirmDialog(
-                                  context: context,
-                                  message:
-                                      'Möchtest du "${item.title}" wirklich löschen?',
-                                ),
-                            onDismissed: () async {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder:
-                                    (_) => const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                              );
-                              await _controller.removeMovie(item);
-                              if (!context.mounted) return;
-                              Navigator.of(context, rootNavigator: true).pop();
-                              setState(() {});
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('${item.title} wurde gelöscht'),
-                                  action: SnackBarAction(
-                                    label: 'undo',
-                                    onPressed: () async {
-                                      await _controller.addMovie(context, item);
-                                      setState(() {});
-                                    },
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
+          RefreshIndicator(
+            onRefresh: _syncMovies,
+            child:
+                _showCoverView
+                    ? MovieCoverCarousel(
+                      movies: _controller.model.movies,
+                      onTap: (movie) => _onMovieTap(movie, context),
+                      scrollController: _carouselScrollController,
+                    )
+                    : ListView.builder(
+                      controller: _listScrollController,
+                      padding: EdgeInsets.only(
+                        top:
+                            (!_showCoverView &&
+                                    _controller.model.movies.isNotEmpty)
+                                ? 56.0
+                                : 0.0,
                       ),
-            ),
+                      itemCount: _controller.model.filteredMovies.length,
+                      itemBuilder: (context, index) {
+                        final item = _controller.model.filteredMovies[index];
+                        return MovieListTileView(
+                          movie: item,
+                          fontSize: _fontSize,
+                          onTap: () => _onMovieTap(item, context),
+                          confirmDismiss:
+                              () => showConfirmDialog(
+                                context: context,
+                                message:
+                                    'Möchtest du "${item.title}" wirklich löschen?',
+                              ),
+                          onDismissed: () => _onMovieDelete(item, context),
+                        );
+                      },
+                    ),
           ),
+          if (!_showCoverView && _controller.model.movies.isNotEmpty)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              top: _showSearchBar ? 0 : -56,
+              left: 0,
+              right: 0,
+              height: 56,
+              child: Container(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    hintText: 'Suche nach Filmtitel',
+                    border: InputBorder.none,
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                  onChanged: (value) {
+                    _searchText = value;
+                    _applySearchFilter();
+                  },
+                ),
+              ),
+            ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.pushNamed(
