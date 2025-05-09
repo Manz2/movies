@@ -32,7 +32,6 @@ class HomeViewState extends State<HomeView> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = '';
   bool _showSearchBar = true;
-  bool _loading = false;
   Logger logger = Logger();
 
   double _fontSize = 16.0;
@@ -80,14 +79,8 @@ class HomeViewState extends State<HomeView> {
   }
 
   Future<void> _syncMovies() async {
-    setState(() {
-      _loading = true;
-    });
     await _controller.syncMovies();
     setState(() {});
-    setState(() {
-      _loading = false;
-    });
   }
 
   void _loadMovies() async {
@@ -248,6 +241,7 @@ class HomeViewState extends State<HomeView> {
         children: [
           RefreshIndicator(
             onRefresh: _syncMovies,
+            edgeOffset: 56.0,
             child:
                 _showCoverView
                     ? MovieCoverCarousel(
