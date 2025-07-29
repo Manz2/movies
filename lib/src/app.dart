@@ -30,7 +30,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           restorationScopeId: 'app',
           supportedLocales: const [Locale('en', '')],
-          theme: ThemeData(),
+          theme: ThemeData(
+            splashFactory: NoSplash.splashFactory,
+          ),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           debugShowCheckedModeBanner: false,
