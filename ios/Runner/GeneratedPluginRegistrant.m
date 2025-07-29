@@ -24,6 +24,12 @@
 @import firebase_database;
 #endif
 
+#if __has_include(<firebase_messaging/FLTFirebaseMessagingPlugin.h>)
+#import <firebase_messaging/FLTFirebaseMessagingPlugin.h>
+#else
+@import firebase_messaging;
+#endif
+
 #if __has_include(<flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>)
 #import <flutter_inappwebview_ios/InAppWebViewFlutterPlugin.h>
 #else
@@ -66,6 +72,7 @@
   [FLTFirebaseAuthPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseAuthPlugin"]];
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FLTFirebaseDatabasePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseDatabasePlugin"]];
+  [FLTFirebaseMessagingPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseMessagingPlugin"]];
   [InAppWebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"InAppWebViewFlutterPlugin"]];
   [FlutterSecureStoragePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterSecureStoragePlugin"]];
   [PathProviderPlugin registerWithRegistrar:[registry registrarForPlugin:@"PathProviderPlugin"]];
