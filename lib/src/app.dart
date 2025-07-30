@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:movies/main.dart';
 import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/Filter/filter_model.dart';
@@ -16,11 +17,13 @@ import 'package:movies/src/search/search_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
+
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
+  
 
   @override
   Widget build(BuildContext context) {
@@ -30,9 +33,7 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           restorationScopeId: 'app',
           supportedLocales: const [Locale('en', '')],
-          theme: ThemeData(
-            splashFactory: NoSplash.splashFactory,
-          ),
+          theme: ThemeData(splashFactory: NoSplash.splashFactory),
           darkTheme: ThemeData.dark(),
           themeMode: settingsController.themeMode,
           debugShowCheckedModeBanner: false,
@@ -43,6 +44,7 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute<void>(
               settings: routeSettings,
               builder: (BuildContext context) {
+                globalAppContext = context;
                 // Wenn nicht eingeloggt → Login anzeigen
                 if (user == null && routeSettings.name != LoginView.routeName) {
                   return LoginView(controller: LoginController());
