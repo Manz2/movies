@@ -8,7 +8,6 @@ import 'src/settings/settings_controller.dart';
 import 'src/settings/settings_service.dart';
 import 'src/push_notification_service.dart';
 
-
 BuildContext? globalAppContext;
 
 void main() async {
@@ -25,9 +24,9 @@ void main() async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   final settingsController = SettingsController(SettingsService(), uid: uid);
   await settingsController.loadSettings();
+
+  await PushNotificationService.storeInitialMessage();
   await PushNotificationService.initialize();
 
-  runApp(
-    MyApp(settingsController: settingsController),
-  );
+  runApp(MyApp(settingsController: settingsController));
 }

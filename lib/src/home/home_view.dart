@@ -10,6 +10,7 @@ import 'package:movies/src/home/home_controller.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/push_notification_service.dart';
 import 'package:movies/src/search/search_view.dart';
 import 'package:movies/src/settings/settings_view.dart';
 import 'package:movies/src/shared_widgets/confirm_dialog.dart';
@@ -40,6 +41,9 @@ class HomeViewState extends State<HomeView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await PushNotificationService.handleInitialMessageIfNeeded();
+    });
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -16,12 +18,31 @@ class PushNotificationService {
 
   static final Logger logger = Logger();
 
-  static RemoteMessage? _lastMessage;
+  static RemoteMessage? _initialMessage;
 
   static Future<void> initialize() async {
-
     await _initFCM();
     await _initLocalNotifications();
+  }
+
+  static Future<void> storeInitialMessage() async {
+    _initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  }
+
+  static Future<void> handleInitialMessageIfNeeded() async {
+    if (_initialMessage != null) {
+      await _handleMessage(_initialMessage);
+      _initialMessage = null;
+    }
+  }
+
+  static Future<Map<String, dynamic>> parsePayload(String payload) async {
+    try {
+      return jsonDecode(payload);
+    } catch (e) {
+      logger.e("Fehler beim Payload-Parsing: $e");
+      return {};
+    }
   }
 
   static Future<void> _initFCM() async {
@@ -32,6 +53,13 @@ class PushNotificationService {
       badge: true,
       sound: true,
     );
+
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
       logger.d('Permission granted for push notifications');
@@ -65,8 +93,12 @@ class PushNotificationService {
     await _localNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        if (_lastMessage != null) {
-          await _handleMessage(_lastMessage);
+        // Extrahiere Daten aus payload falls gesetzt
+        if (response.payload != null) {
+          final data = Map<String, dynamic>.from(
+            await parsePayload(response.payload!),
+          );
+          await _handleMessage(RemoteMessage(data: data));
         }
       },
     );
@@ -84,39 +116,33 @@ class PushNotificationService {
         ?.createNotificationChannel(channel);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _lastMessage = message;
-
       final notification = message.notification;
       final android = message.notification?.android;
 
       if (notification != null) {
-        _localNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              'default_channel',
-              'Standard',
-              icon: android?.smallIcon ?? '@mipmap/ic_launcher',
-              importance: Importance.max,
-              priority: Priority.high,
+        if (android != null) {
+          _localNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              android: AndroidNotificationDetails(
+                'default_channel',
+                'Standard',
+                icon: android.smallIcon ?? '@mipmap/ic_launcher',
+                importance: Importance.max,
+                priority: Priority.high,
+              ),
             ),
-            iOS: const DarwinNotificationDetails(),
-          ),
-        );
+            payload: jsonEncode(message.data), // Hier speichern wir die Daten
+          );
+        }
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       _handleMessage(message);
     });
-
-    RemoteMessage? initialMessage = await FirebaseMessaging.instance
-        .getInitialMessage();
-    if (initialMessage != null) {
-      _handleMessage(initialMessage);
-    }
   }
 
   static Future<void> _handleMessage(RemoteMessage? message) async {
