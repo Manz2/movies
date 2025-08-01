@@ -155,104 +155,104 @@ class MovieViewState extends State<MovieView> {
         ],
         topActions: const [],
       ),
-      builder:
-          (context, player) => Scaffold(
-            floatingActionButton:
-                _isFabVisible
-                    ? FloatingActionButton(
-                      onPressed: () async {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext dialogContext) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                        );
-                        await controller.addMovie();
-                        if (!context.mounted) return;
-                        Navigator.of(context).pop();
-                        _toggleFabVisibility();
-                      },
-                      child: const Icon(Icons.add),
-                    )
-                    : null,
-            appBar: AppBar(
-              title: Text(controller.model.movie.title),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.remove_red_eye_rounded),
-                  onPressed: () async {
-                    await controller.getWatchlists();
-                    if (!context.mounted) return;
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return WatchlistDialog(
-                          fontSize: _fontSize,
-                          controller: controller,
-                        );
-                      },
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    _trailerController.pause();
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      HomeView.routeName,
-                      (route) => false,
-                    );
-                  },
-                ),
-              ],
+      builder: (context, player) => Scaffold(
+        floatingActionButton: _isFabVisible
+            ? FloatingActionButton(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext dialogContext) {
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  );
+                  await controller.addMovie();
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                  _toggleFabVisibility();
+                },
+                child: const Icon(Icons.add),
+              )
+            : null,
+        appBar: AppBar(
+          title: Text(controller.model.movie.title),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications_active),
+              onPressed: () {},
             ),
-            body: SingleChildScrollView(
-              child: Column(
+            IconButton(
+              icon: const Icon(Icons.remove_red_eye_rounded),
+              onPressed: () async {
+                await controller.getWatchlists();
+                if (!context.mounted) return;
+                await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return WatchlistDialog(
+                      fontSize: _fontSize,
+                      controller: controller,
+                    );
+                  },
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                _trailerController.pause();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  HomeView.routeName,
+                  (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MovieDetailsContent(
-                        controller: controller,
-                        fontSize: _fontSize,
-                        isFabVisible: _isFabVisible,
-                        onRatingChanged:
-                            (rating) => setState(() => this.rating = rating),
-                      ),
-                      if (controller.model.trailers.isNotEmpty)
-                        OrientationBuilder(
-                          builder: (context, orientation) {
-                            final isLandscape =
-                                orientation == Orientation.landscape;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (isLandscape) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Trailer:",
-                                    style: TextStyle(fontSize: _fontSize),
-                                  ),
-                                  player,
-                                ] else
-                                  // nötig, damit Player geladen bleibt – aber unsichtbar
-                                  Offstage(child: player),
-                              ],
-                            );
-                          },
-                        ),
-                    ],
+                children: [
+                  MovieDetailsContent(
+                    controller: controller,
+                    fontSize: _fontSize,
+                    isFabVisible: _isFabVisible,
+                    onRatingChanged: (rating) =>
+                        setState(() => this.rating = rating),
                   ),
+                  if (controller.model.trailers.isNotEmpty)
+                    OrientationBuilder(
+                      builder: (context, orientation) {
+                        final isLandscape =
+                            orientation == Orientation.landscape;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isLandscape) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                "Trailer:",
+                                style: TextStyle(fontSize: _fontSize),
+                              ),
+                              player,
+                            ] else
+                              // nötig, damit Player geladen bleibt – aber unsichtbar
+                              Offstage(child: player),
+                          ],
+                        );
+                      },
+                    ),
                 ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
 }

@@ -11,7 +11,7 @@ class MovieModel {
     required this.movie,
     required this.providers,
     required this.trailers,
-    required this.recommendations
+    required this.recommendations,
   });
 }
 
@@ -20,6 +20,11 @@ class Provider {
   String type;
   String id;
   Provider({required this.icon, required this.type, required this.id});
+  Provider.fromJson(Map<String, dynamic> json)
+    : icon = json['icon'],
+      type = json['type'],
+      id = json['id'];
+  Map<String, dynamic> toJson() => {'icon': icon, 'type': type, 'id': id};
 }
 
 class Providers {

@@ -1,5 +1,6 @@
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 
 abstract class DbServiceInterface {
   Future<void> initializeUserData();
@@ -17,4 +18,9 @@ abstract class DbServiceInterface {
   Future<void> removeMovieFromWatchlist(Watchlist watchlist, Entry entry);
   Future<Watchlist> getWatchlistMovies(String id);
   Future<Watchlist> setWatchlist(Watchlist watchlist);
+  Future<void> setNotification(Movie movie, String token, List<String> providers);
+  Future<void> removeNotification(String token, Movie movie);
+  Future<void> removeAllNotifications(String token);
+  Future<List<Provider>> getMyProviders();
+  Future<void> setMyProviders(List<Provider> providers);
 }

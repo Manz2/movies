@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/movie/movie_model.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
   final String uid;
@@ -17,11 +18,18 @@ class DbServiceFirebase implements DbServiceInterface {
   DatabaseReference get movieRef => userRef.child("movies");
   DatabaseReference get watchlistRef => userRef.child("watchlists");
   DatabaseReference get junkRef => userRef.child("junk");
+  DatabaseReference get notificationRef => userRef.child("notifications");
+  DatabaseReference get providersRef => userRef.child("providers");
 
   @override
   Future<void> initializeUserData() async {
     try {
-      await userRef.set({"movies": {}, "watchlists": {}, "junk": {}});
+      await userRef.set({
+        "movies": {},
+        "watchlists": {},
+        "junk": {},
+        "notifications": {},
+      });
       logger.d("Initialized user data for UID: $uid");
     } catch (e) {
       throw Exception("Error initializing user data: $e");
@@ -46,24 +54,23 @@ class DbServiceFirebase implements DbServiceInterface {
     final movies = await getMovies();
     return movies.firstWhere(
       (m) => m.id == id && m.mediaType == mediaType,
-      orElse:
-          () => Movie(
-            id: id,
-            title: "title",
-            description: "description",
-            fsk: "fsk",
-            rating: 1,
-            year: 1,
-            duration: 1,
-            image: "image",
-            actors: [],
-            genre: [],
-            popularity: 1,
-            mediaType: mediaType,
-            privateRating: 0,
-            firebaseId: '',
-            addedAt: DateTime.now(),
-          ),
+      orElse: () => Movie(
+        id: id,
+        title: "title",
+        description: "description",
+        fsk: "fsk",
+        rating: 1,
+        year: 1,
+        duration: 1,
+        image: "image",
+        actors: [],
+        genre: [],
+        popularity: 1,
+        mediaType: mediaType,
+        privateRating: 0,
+        firebaseId: '',
+        addedAt: DateTime.now(),
+      ),
     );
   }
 
@@ -120,8 +127,11 @@ class DbServiceFirebase implements DbServiceInterface {
     Watchlist watchlist,
     Movie movie,
   ) async {
-    final newPostKey =
-        watchlistRef.child(watchlist.id).child('entries').push().key;
+    final newPostKey = watchlistRef
+        .child(watchlist.id)
+        .child('entries')
+        .push()
+        .key;
     final entry = Entry(
       name: movie.title,
       id: movie.id,
@@ -254,5 +264,80 @@ class DbServiceFirebase implements DbServiceInterface {
     }
 
     return duplicates;
+  }
+
+  @override
+  Future<void> setNotification(
+    Movie movie,
+    String token,
+    List<String> providers,
+  ) async {
+    try {
+      final notificationData = {
+        'movieId': movie.id,
+        'mediaType': movie.mediaType,
+        'title': movie.title,
+        'addedAt': DateTime.now().toIso8601String(),
+        'providers': providers,
+      };
+      await notificationRef.child(token).set(notificationData);
+    } catch (e) {
+      throw Exception("Error setting notification: $e");
+    }
+  }
+
+  @override
+  Future<void> removeAllNotifications(String token) async {
+    try {
+      await notificationRef.child(token).remove();
+    } catch (e) {
+      throw Exception("Error removing notifications for token $token: $e");
+    }
+  }
+
+  @override
+  Future<void> removeNotification(String token, Movie movie) async {
+    try {
+      final snapshot = await notificationRef.child(token).get();
+      final data = snapshot.value as Map<dynamic, dynamic>?;
+
+      if (data != null && data['movieId'] == movie.id) {
+        await notificationRef.child(token).remove();
+      }
+    } catch (e) {
+      throw Exception(
+        "Error removing notification for token $token and movie ${movie.id}: $e",
+      );
+    }
+  }
+
+  @override
+  Future<List<Provider>> getMyProviders() async {
+    try {
+      final snapshot = await providersRef.get();
+      if (snapshot.exists) {
+        return snapshot.children
+            .map<Provider>(
+              (e) =>
+                  Provider.fromJson(Map<String, dynamic>.from(e.value as Map)),
+            )
+            .toList();
+      } else {
+        logger.d("No providers available in the database");
+        return [];
+      }
+    } catch (e) {
+      logger.e("Error fetching providers: $e");
+      return [];
+    }
+  }
+
+  @override
+  Future<void> setMyProviders(List<Provider> providers) {
+    final updates = <String, dynamic>{};
+    for (var provider in providers) {
+      updates[provider.id] = provider.toJson();
+    }
+    return providersRef.update(updates);
   }
 }
