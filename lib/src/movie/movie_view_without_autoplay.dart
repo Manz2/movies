@@ -74,7 +74,7 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
     _loadFontSize();
   }
 
-  _istSaved() async {
+  void _istSaved() async {
     _isFabVisible = !await controller.isSaved();
     setState(() {});
   }

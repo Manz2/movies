@@ -41,7 +41,7 @@ class SearchViewState extends State<SearchView> {
     });
   }
 
-  _getPopular() async {
+  void _getPopular() async {
     await controller.getPopular();
     setState(() {});
   }

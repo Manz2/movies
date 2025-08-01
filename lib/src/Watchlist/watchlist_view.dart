@@ -45,7 +45,7 @@ class WatchlistViewState extends State<WatchlistView> {
     super.initState();
   }
 
-  _loadState() {
+  void _loadState() {
     setState(() {});
   }
 
@@ -253,7 +253,7 @@ class WatchlistViewState extends State<WatchlistView> {
     );
   }
 
-  _loadMovies() async {
+  void _loadMovies() async {
     await controller.getMoviesForCurrentWatchlist(
       controller.model.currentWatchlist,
     );

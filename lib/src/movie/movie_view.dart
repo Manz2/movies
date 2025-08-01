@@ -61,7 +61,7 @@ class MovieViewState extends State<MovieView> {
     _loadFontSize();
   }
 
-  _istSaved() async {
+  void _istSaved() async {
     _isFabVisible = !await controller.isSaved();
     setState(() {});
   }
@@ -79,7 +79,7 @@ class MovieViewState extends State<MovieView> {
     });
   }
 
-  _initTrailer() {
+  void _initTrailer() {
     if (controller.model.trailers.isNotEmpty) {
       _trailerController = YoutubePlayerController(
         initialVideoId: controller.model.trailers[0],

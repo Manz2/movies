@@ -36,7 +36,7 @@ class TmdbService {
     }
   }
 
-  Future<Movie> getMovieWithCredits(movie1) async {
+  Future<Movie> getMovieWithCredits(Movie movie1) async {
     int id = int.parse(movie1.id);
     String mediaType = movie1.mediaType;
     double privateRating = movie1.privateRating;

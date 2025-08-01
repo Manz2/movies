@@ -39,7 +39,7 @@ class Movie {
 
   bool get getOnList => onList;
 
-  setOnList(bool value) {
+  void setOnList(bool value) {
     onList = value;
   }
 
