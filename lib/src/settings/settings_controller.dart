@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:json_store/json_store.dart';
 import 'package:logger/logger.dart';
@@ -73,5 +74,12 @@ class SettingsController with ChangeNotifier {
       LoginView.routeName,
       (route) => false,
     );
+  }
+
+  Future<void> removeNotifications() async {
+    DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String? token = await messaging.getToken();
+    await dbServiceFirebase.removeAllNotifications(token!);
   }
 }

@@ -63,3 +63,4 @@ windows/flutter/generated_plugins.cmake
 ios/Runner/GoogleService-Info.plist
 ios/GoogleService-Info.plist
 ios/Runner/GoogleService-Info 2.plist
+functions/.env
