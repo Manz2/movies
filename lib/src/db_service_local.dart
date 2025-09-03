@@ -3,7 +3,6 @@ import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/movie/movie_model.dart';
 
 class DbServiceLocal implements DbServiceInterface {
   final _jsonStore = JsonStore(dbName: 'movies');
@@ -154,14 +153,9 @@ class DbServiceLocal implements DbServiceInterface {
   Future<void> removeNotification(String token, Movie movie) {
     throw UnimplementedError();
   }
-
+  
   @override
-  Future<List<Provider>> getMyProviders() {
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<void> setMyProviders(List<Provider> providers) {
+  Future<bool> isNotificationSet(String token, Movie movie) {
     throw UnimplementedError();
   }
 }

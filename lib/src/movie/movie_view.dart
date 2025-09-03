@@ -59,6 +59,7 @@ class MovieViewState extends State<MovieView> {
     _istSaved();
     _initTrailer();
     _loadFontSize();
+    controller.loadNotificationState();
   }
 
   void _istSaved() async {
@@ -177,9 +178,35 @@ class MovieViewState extends State<MovieView> {
         appBar: AppBar(
           title: Text(controller.model.movie.title),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_active),
-              onPressed: () {},
+            AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) {
+                return IconButton(
+                  icon: Icon(
+                    controller.notificationSet
+                        ? Icons.notifications_active
+                        : Icons.notifications_none,
+                    color: controller.notificationSet
+                        ? Theme.of(context)
+                              .colorScheme
+                              .primary // z. B. Blau
+                        : null, // Standard Icon-Farbe
+                  ),
+                  onPressed: () async {
+                    await controller.toggleNotification();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          controller.notificationSet
+                              ? 'Benachrichtigung gesetzt!'
+                              : 'Benachrichtigung entfernt!',
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
             IconButton(
               icon: const Icon(Icons.remove_red_eye_rounded),

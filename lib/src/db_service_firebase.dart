@@ -5,7 +5,6 @@ import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/movie/movie_model.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
   final String uid;
@@ -274,16 +273,24 @@ class DbServiceFirebase implements DbServiceInterface {
   ) async {
     try {
       final notificationData = {
-        'movieId': movie.id,
-        'mediaType': movie.mediaType,
         'title': movie.title,
         'addedAt': DateTime.now().toIso8601String(),
+        'mediaType': movie.mediaType,
         'providers': providers,
+        'id': movie.id,
       };
-      await notificationRef.child(token).set(notificationData);
+      await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .set(notificationData);
     } catch (e) {
       throw Exception("Error setting notification: $e");
     }
+  }
+
+  String _notificationKey(Movie movie) {
+    final key = '${movie.id}_${movie.mediaType}';
+    return key;
   }
 
   @override
@@ -291,53 +298,32 @@ class DbServiceFirebase implements DbServiceInterface {
     try {
       await notificationRef.child(token).remove();
     } catch (e) {
-      throw Exception("Error removing notifications for token $token: $e");
+      throw Exception("Error removing all notifications for token $token: $e");
     }
   }
 
   @override
   Future<void> removeNotification(String token, Movie movie) async {
     try {
-      final snapshot = await notificationRef.child(token).get();
-      final data = snapshot.value as Map<dynamic, dynamic>?;
-
-      if (data != null && data['movieId'] == movie.id) {
-        await notificationRef.child(token).remove();
-      }
+      await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .remove();
     } catch (e) {
-      throw Exception(
-        "Error removing notification for token $token and movie ${movie.id}: $e",
-      );
+      throw Exception("Error removing notification: $e");
     }
   }
 
   @override
-  Future<List<Provider>> getMyProviders() async {
+  Future<bool> isNotificationSet(String token, Movie movie) async {
     try {
-      final snapshot = await providersRef.get();
-      if (snapshot.exists) {
-        return snapshot.children
-            .map<Provider>(
-              (e) =>
-                  Provider.fromJson(Map<String, dynamic>.from(e.value as Map)),
-            )
-            .toList();
-      } else {
-        logger.d("No providers available in the database");
-        return [];
-      }
+      final snapshot = await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .get();
+      return snapshot.exists;
     } catch (e) {
-      logger.e("Error fetching providers: $e");
-      return [];
+      throw Exception("Error checking notification: $e");
     }
-  }
-
-  @override
-  Future<void> setMyProviders(List<Provider> providers) {
-    final updates = <String, dynamic>{};
-    for (var provider in providers) {
-      updates[provider.id] = provider.toJson();
-    }
-    return providersRef.update(updates);
   }
 }

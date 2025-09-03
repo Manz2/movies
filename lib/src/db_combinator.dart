@@ -3,7 +3,6 @@ import 'package:movies/src/db_service_firebase.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/db_service_local.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/movie/movie_model.dart';
 
 class DbCombinator implements DbServiceInterface {
   final String uid;
@@ -119,14 +118,9 @@ class DbCombinator implements DbServiceInterface {
   ) async {
     await _dbServiceFirebase.setNotification(movie, token, providers);
   }
-
+  
   @override
-  Future<List<Provider>> getMyProviders() async {
-    return await _dbServiceFirebase.getMyProviders();
-  }
-
-  @override
-  Future<void> setMyProviders(List<Provider> providers) async {
-    await _dbServiceFirebase.setMyProviders(providers);
+  Future<bool> isNotificationSet(String token, Movie movie) async {
+    return await _dbServiceFirebase.isNotificationSet(token, movie);
   }
 }
