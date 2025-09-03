@@ -439,45 +439,4 @@ class TmdbService {
 
     return recommendedMovies;
   }
-
-  Future<List<Provider>> getAllProviders() async {
-    try {
-      final movieUrl =
-          '$baseUrl/watch/providers/movie?api_key=$apiKey&language=de-DE';
-      final tvUrl =
-          '$baseUrl/watch/providers/tv?api_key=$apiKey&language=de-DE';
-
-      final movieResponse = await http.get(Uri.parse(movieUrl));
-      final tvResponse = await http.get(Uri.parse(tvUrl));
-
-      if (movieResponse.statusCode != 200 || tvResponse.statusCode != 200) {
-        throw HttpException("Failed to fetch providers");
-      }
-
-      final movieJson = json.decode(movieResponse.body);
-      final tvJson = json.decode(tvResponse.body);
-
-      final allRawProviders = [...movieJson['results'], ...tvJson['results']];
-
-      final Map<String, Provider> uniqueProviders = {};
-
-      for (var provider in allRawProviders) {
-        final id = provider['provider_id'].toString();
-        if (!uniqueProviders.containsKey(id)) {
-          uniqueProviders[id] = Provider(
-            id: id,
-            icon: provider['logo_path'] != null
-                ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                : '',
-            type: 'unknown',
-          );
-        }
-      }
-
-      return uniqueProviders.values.toList();
-    } catch (e) {
-      logger.e("Error fetching all providers: $e");
-      return [];
-    }
-  }
 }
