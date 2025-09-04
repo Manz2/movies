@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
@@ -7,10 +8,13 @@ import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MovieController {
+class MovieController extends ChangeNotifier {
   final MovieModel _model;
   final String uid;
   final DbCombinator _db;
+
+  bool _notificationSet = false;
+  bool get notificationSet => _notificationSet;
 
   MovieController({
     required this.uid,
@@ -35,8 +39,9 @@ class MovieController {
       List<Movie> localMovies = await _db.getMovies();
 
       // Set aus kombinierten "id|mediaType"-Strings erstellen
-      Set<String> localMovieKeys =
-          localMovies.map((m) => '${m.id}|${m.mediaType}').toSet();
+      Set<String> localMovieKeys = localMovies
+          .map((m) => '${m.id}|${m.mediaType}')
+          .toSet();
 
       List<Movie> combinedCredits = await tmdbService.getCombinedCredits(
         actorId,
@@ -180,6 +185,30 @@ class MovieController {
       return movie;
     } on Exception catch (e) {
       throw Exception('Fehler beim Laden des Films: $e');
+    }
+  }
+
+  Future<void> toggleNotification() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String? token = await messaging.getToken();
+    if (token == null) return;
+
+    if (_notificationSet) {
+      await _db.removeNotification(token, _model.movie);
+      _notificationSet = false;
+    } else {
+      await _db.setNotification(_model.movie, token, []);
+      _notificationSet = true;
+    }
+    notifyListeners();
+  }
+
+  Future<void> loadNotificationState() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    String? token = await messaging.getToken();
+    if (token != null) {
+      _notificationSet = await _db.isNotificationSet(token, _model.movie);
+      notifyListeners();
     }
   }
 }

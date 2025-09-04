@@ -36,7 +36,7 @@ class TmdbService {
     }
   }
 
-  Future<Movie> getMovieWithCredits(movie1) async {
+  Future<Movie> getMovieWithCredits(Movie movie1) async {
     int id = int.parse(movie1.id);
     String mediaType = movie1.mediaType;
     double privateRating = movie1.privateRating;
@@ -151,21 +151,18 @@ class TmdbService {
     String fsk =
         json['age_rating'] ??
         'Unbekannt'; // Hier könnte eine spezifische Logik für FSK notwendig sein
-    int rating =
-        (json['vote_average'] * 10)
-            .round(); // Umwandlung des Ratings in Prozent
-    int year =
-        json['release_date'] != null && json['release_date'].isNotEmpty
-            ? DateTime.parse(json['release_date']).year
-            : 0;
+    int rating = (json['vote_average'] * 10)
+        .round(); // Umwandlung des Ratings in Prozent
+    int year = json['release_date'] != null && json['release_date'].isNotEmpty
+        ? DateTime.parse(json['release_date']).year
+        : 0;
     int duration =
         json['runtime'] ??
         json["number_of_seasons"] ??
         0; // Default auf 0, wenn keine Dauer angegeben
-    String image =
-        json['poster_path'] != null
-            ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
-            : '';
+    String image = json['poster_path'] != null
+        ? 'https://image.tmdb.org/t/p/w500${json['poster_path']}'
+        : '';
     double popularity = json['popularity'] ?? 0;
     String mediaType = json['media_type'] ?? mediaType2;
 
@@ -176,10 +173,9 @@ class TmdbService {
     }
 
     // Extrahieren der Genres
-    List<String> genre =
-        json['genres'] != null
-            ? List<String>.from(json['genres'].map((g) => g['name']))
-            : [];
+    List<String> genre = json['genres'] != null
+        ? List<String>.from(json['genres'].map((g) => g['name']))
+        : [];
 
     // Erstellen des Movie-Objekts
     return Movie(
@@ -207,10 +203,9 @@ class TmdbService {
       for (var actorJson in json['cast']) {
         Actor actor = Actor(
           name: actorJson['name'],
-          image:
-              actorJson['profile_path'] != null
-                  ? 'https://image.tmdb.org/t/p/w500${actorJson['profile_path']}'
-                  : '',
+          image: actorJson['profile_path'] != null
+              ? 'https://image.tmdb.org/t/p/w500${actorJson['profile_path']}'
+              : '',
           roleName: actorJson['character'] ?? 'Unbekannt',
           id: actorJson['id'] ?? 0, //Hier sollte nicht 0 stehen
         );
@@ -339,10 +334,9 @@ class TmdbService {
           for (var provider in resultJson['results']['DE']['flatrate']) {
             providers.add(
               Provider(
-                icon:
-                    provider['logo_path'] != null
-                        ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                        : '',
+                icon: provider['logo_path'] != null
+                    ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                    : '',
                 id: provider['provider_id'].toString(),
                 type: 'flatrate',
               ),
@@ -354,15 +348,14 @@ class TmdbService {
             providers.any((p) => p.id == provider['provider_id'].toString()) ==
                     false
                 ? providers.add(
-                  Provider(
-                    icon:
-                        provider['logo_path'] != null
-                            ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                            : '',
-                    id: provider['provider_id'].toString(),
-                    type: 'rent',
-                  ),
-                )
+                    Provider(
+                      icon: provider['logo_path'] != null
+                          ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                          : '',
+                      id: provider['provider_id'].toString(),
+                      type: 'rent',
+                    ),
+                  )
                 : null;
           }
         }
@@ -371,15 +364,14 @@ class TmdbService {
             providers.any((p) => p.id == provider['provider_id'].toString()) ==
                     false
                 ? providers.add(
-                  Provider(
-                    icon:
-                        provider['logo_path'] != null
-                            ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
-                            : '',
-                    id: provider['provider_id'].toString(),
-                    type: 'buy',
-                  ),
-                )
+                    Provider(
+                      icon: provider['logo_path'] != null
+                          ? 'https://image.tmdb.org/t/p/w500${provider['logo_path']}'
+                          : '',
+                      id: provider['provider_id'].toString(),
+                      type: 'buy',
+                    ),
+                  )
                 : null;
           }
         }
@@ -427,24 +419,24 @@ class TmdbService {
   }
 
   Future<List<Movie>> getRecommendations(String id, String mediaType) async {
-  final url = '$baseUrl/$mediaType/$id/recommendations?api_key=$apiKey&language=de-DE';
-  final response = await http.get(Uri.parse(url));
+    final url =
+        '$baseUrl/$mediaType/$id/recommendations?api_key=$apiKey&language=de-DE';
+    final response = await http.get(Uri.parse(url));
 
-  if (response.statusCode != 200) {
-    throw HttpException("Failed to load recommendations for id=$id");
+    if (response.statusCode != 200) {
+      throw HttpException("Failed to load recommendations for id=$id");
+    }
+
+    final Map<String, dynamic> jsonMap = json.decode(response.body);
+    final List<dynamic> results = jsonMap['results'];
+
+    List<Movie> recommendedMovies = [];
+
+    for (var result in results) {
+      Movie movie = _movieFromTmdb(result, mediaType, 0, '', DateTime.now());
+      recommendedMovies.add(movie);
+    }
+
+    return recommendedMovies;
   }
-
-  final Map<String, dynamic> jsonMap = json.decode(response.body);
-  final List<dynamic> results = jsonMap['results'];
-
-  List<Movie> recommendedMovies = [];
-
-  for (var result in results) {
-    Movie movie = _movieFromTmdb(result, mediaType, 0, '', DateTime.now());
-    recommendedMovies.add(movie);
-  }
-
-  return recommendedMovies;
-}
-
 }

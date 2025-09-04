@@ -114,7 +114,7 @@ class FilterViewState extends State<FilterView> {
     }
   }
 
-  _toggleMovieButton() {
+  void _toggleMovieButton() {
     controller.setMovie();
     if (movieIsSelected == true) {
       _durationrange = const RangeValues(30, 180);
@@ -129,7 +129,7 @@ class FilterViewState extends State<FilterView> {
     });
   }
 
-  _toggleTvButton() {
+  void _toggleTvButton() {
     controller.setTv();
     controller.setDuration(const RangeValues(30, 180));
     setState(() {
@@ -146,42 +146,42 @@ class FilterViewState extends State<FilterView> {
     });
   }
 
-  _togglefsk0() {
+  void _togglefsk0() {
     controller.setFsk0();
     setState(() {
       fsk0 = !fsk0; // Wechseln des Zustands
     });
   }
 
-  _togglefsk6() {
+  void _togglefsk6() {
     controller.setFsk6();
     setState(() {
       fsk6 = !fsk6; // Wechseln des Zustands
     });
   }
 
-  _togglefsk12() {
+  void _togglefsk12() {
     controller.setFsk12();
     setState(() {
       fsk12 = !fsk12; // Wechseln des Zustands
     });
   }
 
-  _togglefsk16() {
+  void _togglefsk16() {
     controller.setFsk16();
     setState(() {
       fsk16 = !fsk16; // Wechseln des Zustands
     });
   }
 
-  _togglefsk18() {
+  void _togglefsk18() {
     controller.setFsk18();
     setState(() {
       fsk18 = !fsk18; // Wechseln des Zustands
     });
   }
 
-  _toggleAccending() {
+  void _toggleAccending() {
     controller.setAccending();
     setState(() {
       accending = !accending; // Wechseln des Zustands

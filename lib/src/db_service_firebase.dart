@@ -17,11 +17,18 @@ class DbServiceFirebase implements DbServiceInterface {
   DatabaseReference get movieRef => userRef.child("movies");
   DatabaseReference get watchlistRef => userRef.child("watchlists");
   DatabaseReference get junkRef => userRef.child("junk");
+  DatabaseReference get notificationRef => userRef.child("notifications");
+  DatabaseReference get providersRef => userRef.child("providers");
 
   @override
   Future<void> initializeUserData() async {
     try {
-      await userRef.set({"movies": {}, "watchlists": {}, "junk": {}});
+      await userRef.set({
+        "movies": {},
+        "watchlists": {},
+        "junk": {},
+        "notifications": {},
+      });
       logger.d("Initialized user data for UID: $uid");
     } catch (e) {
       throw Exception("Error initializing user data: $e");
@@ -46,24 +53,23 @@ class DbServiceFirebase implements DbServiceInterface {
     final movies = await getMovies();
     return movies.firstWhere(
       (m) => m.id == id && m.mediaType == mediaType,
-      orElse:
-          () => Movie(
-            id: id,
-            title: "title",
-            description: "description",
-            fsk: "fsk",
-            rating: 1,
-            year: 1,
-            duration: 1,
-            image: "image",
-            actors: [],
-            genre: [],
-            popularity: 1,
-            mediaType: mediaType,
-            privateRating: 0,
-            firebaseId: '',
-            addedAt: DateTime.now(),
-          ),
+      orElse: () => Movie(
+        id: id,
+        title: "title",
+        description: "description",
+        fsk: "fsk",
+        rating: 1,
+        year: 1,
+        duration: 1,
+        image: "image",
+        actors: [],
+        genre: [],
+        popularity: 1,
+        mediaType: mediaType,
+        privateRating: 0,
+        firebaseId: '',
+        addedAt: DateTime.now(),
+      ),
     );
   }
 
@@ -120,8 +126,11 @@ class DbServiceFirebase implements DbServiceInterface {
     Watchlist watchlist,
     Movie movie,
   ) async {
-    final newPostKey =
-        watchlistRef.child(watchlist.id).child('entries').push().key;
+    final newPostKey = watchlistRef
+        .child(watchlist.id)
+        .child('entries')
+        .push()
+        .key;
     final entry = Entry(
       name: movie.title,
       id: movie.id,
@@ -254,5 +263,67 @@ class DbServiceFirebase implements DbServiceInterface {
     }
 
     return duplicates;
+  }
+
+  @override
+  Future<void> setNotification(
+    Movie movie,
+    String token,
+    List<String> providers,
+  ) async {
+    try {
+      final notificationData = {
+        'title': movie.title,
+        'addedAt': DateTime.now().toIso8601String(),
+        'mediaType': movie.mediaType,
+        'providers': providers,
+        'id': movie.id,
+      };
+      await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .set(notificationData);
+    } catch (e) {
+      throw Exception("Error setting notification: $e");
+    }
+  }
+
+  String _notificationKey(Movie movie) {
+    final key = '${movie.id}_${movie.mediaType}';
+    return key;
+  }
+
+  @override
+  Future<void> removeAllNotifications(String token) async {
+    try {
+      await notificationRef.child(token).remove();
+    } catch (e) {
+      throw Exception("Error removing all notifications for token $token: $e");
+    }
+  }
+
+  @override
+  Future<void> removeNotification(String token, Movie movie) async {
+    try {
+      await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .remove();
+    } catch (e) {
+      throw Exception("Error removing notification: $e");
+    }
+  }
+
+  @override
+  Future<bool> isNotificationSet(String token, Movie movie) async {
+    try {
+      final snapshot = await notificationRef
+          .child(token)
+          .child(_notificationKey(movie))
+          .get();
+      return snapshot.exists;
+    } catch (e) {
+      throw Exception("Error checking notification: $e");
+    }
   }
 }

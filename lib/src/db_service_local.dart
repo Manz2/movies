@@ -138,4 +138,24 @@ class DbServiceLocal implements DbServiceInterface {
   Future<void> initializeUserData() {
     throw UnimplementedError();
   }
+  
+  @override
+  Future<void> setNotification(Movie movie, String token, List<String> providers) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<void> removeAllNotifications(String token) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<void> removeNotification(String token, Movie movie) {
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future<bool> isNotificationSet(String token, Movie movie) {
+    throw UnimplementedError();
+  }
 }

@@ -99,4 +99,28 @@ class DbCombinator implements DbServiceInterface {
   Future<void> initializeUserData() async {
     await _dbServiceFirebase.initializeUserData();
   }
+
+  @override
+  Future<void> removeAllNotifications(String token) async {
+    await _dbServiceFirebase.removeAllNotifications(token);
+  }
+
+  @override
+  Future<void> removeNotification(String token, Movie movie) async {
+    await _dbServiceFirebase.removeNotification(token, movie);
+  }
+
+  @override
+  Future<void> setNotification(
+    Movie movie,
+    String token,
+    List<String> providers,
+  ) async {
+    await _dbServiceFirebase.setNotification(movie, token, providers);
+  }
+  
+  @override
+  Future<bool> isNotificationSet(String token, Movie movie) async {
+    return await _dbServiceFirebase.isNotificationSet(token, movie);
+  }
 }

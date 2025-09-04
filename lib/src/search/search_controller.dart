@@ -51,9 +51,9 @@ class SearchPageController {
           barrierDismissible: false,
           builder: (_) => const Center(child: CircularProgressIndicator()),
         );
-        Movie movie = await _getMovie(result.id, result.type);
-        Providers providers = await _getProviders(movie);
-        List<String> trailers = await _getTrailers(movie);
+        Movie movie = await getMovie(result.id, result.type);
+        Providers providers = await getProviders(movie);
+        List<String> trailers = await getTrailers(movie);
         List<Movie> recommendations = await getRecommendations(movie);
         if (!context.mounted) return;
         Navigator.of(context, rootNavigator: true).pop();
@@ -117,7 +117,7 @@ class SearchPageController {
     return [];
   }
 
-  Future<Movie> _getMovie(String id, String mediaType) async {
+  Future<Movie> getMovie(String id, String mediaType) async {
     try {
       Movie movie = await _db.getMovie(id, mediaType);
       if (movie.firebaseId == '') {
@@ -137,7 +137,7 @@ class SearchPageController {
     }
   }
 
-  Future<Providers> _getProviders(Movie item) async {
+  Future<Providers> getProviders(Movie item) async {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.mediaType);
     } on Exception catch (e) {
@@ -146,7 +146,7 @@ class SearchPageController {
     }
   }
 
-  Future<List<String>> _getTrailers(Movie movie) async {
+  Future<List<String>> getTrailers(Movie movie) async {
     try {
       return await tmdbService.getTrailers(
         movie.id.toString(),

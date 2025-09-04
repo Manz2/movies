@@ -42,13 +42,13 @@ class HomeController {
     await _getFilteredMovies();
   }
 
-  addMovie(BuildContext context, Movie movie) async {
+  Future<void> addMovie(BuildContext context, Movie movie) async {
     try {
       _model.addMovie(movie);
       _db.addMovie(movie);
     } on Exception catch (e) {
       logger.e('Fehler beim Hinzufügen des Films: $e');
-      if (!context.mounted) return false;
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(

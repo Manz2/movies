@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/shared_widgets/confirm_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_controller.dart';
@@ -193,8 +194,8 @@ class SettingsViewState extends State<SettingsView> {
               padding: const EdgeInsets.all(16.0),
               child: ElevatedButton(
                 onPressed: () async {
-                  List<Movie> deleted =
-                      await widget.controller.removeDublicates();
+                  List<Movie> deleted = await widget.controller
+                      .removeDublicates();
                   String names = deleted.map((e) => e.title).join(', ');
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -209,6 +210,32 @@ class SettingsViewState extends State<SettingsView> {
                 ),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () async {
+                  final confirmed = await showConfirmDialog(
+                    context: context,
+                    message: "Willst du wirklich alle Notifications löschen?",
+                  );
+
+                  if (confirmed == true) {
+                    await widget.controller.removeNotifications();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text("Alle Notifications wurden gelöscht."),
+                      ),
+                    );
+                  }
+                },
+                child: Text(
+                  'Notifications löschen',
+                  style: TextStyle(fontSize: _fontSize),
+                ),
+              ),
+            ),
+
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
               child: Text("Account:", style: TextStyle(fontSize: _fontSize)),

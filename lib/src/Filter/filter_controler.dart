@@ -76,7 +76,7 @@ class FilterController {
         values.end.toInt(); // Umwandlung von double zu int
   }
 
-  setYearFrom(String text) {
+  void setYearFrom(String text) {
     if (text.isNotEmpty) {
       _model.filter.yearFrom = int.parse(text);
     } else {
@@ -84,7 +84,7 @@ class FilterController {
     }
   }
 
-  setYearTo(String text) {
+  void setYearTo(String text) {
     if (text.isNotEmpty) {
       _model.filter.yearTo = int.parse(text);
     } else {
@@ -92,19 +92,19 @@ class FilterController {
     }
   }
 
-  setGenres(List<String> genres) {
+  void setGenres(List<String> genres) {
     _model.filter.genres = genres;
   }
 
-  setRating(rating) {
+  void setRating(double rating) {
     _model.filter.rating = rating;
   }
 
-  setSortBy(String value) {
+  void setSortBy(String value) {
     _model.filter.sortBy = value;
   }
 
-  setAccending() {
+  void setAccending() {
     _model.filter.accending = !_model.filter.accending;
   }
 

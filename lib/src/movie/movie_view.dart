@@ -59,9 +59,10 @@ class MovieViewState extends State<MovieView> {
     _istSaved();
     _initTrailer();
     _loadFontSize();
+    controller.loadNotificationState();
   }
 
-  _istSaved() async {
+  void _istSaved() async {
     _isFabVisible = !await controller.isSaved();
     setState(() {});
   }
@@ -79,7 +80,7 @@ class MovieViewState extends State<MovieView> {
     });
   }
 
-  _initTrailer() {
+  void _initTrailer() {
     if (controller.model.trailers.isNotEmpty) {
       _trailerController = YoutubePlayerController(
         initialVideoId: controller.model.trailers[0],
@@ -155,104 +156,130 @@ class MovieViewState extends State<MovieView> {
         ],
         topActions: const [],
       ),
-      builder:
-          (context, player) => Scaffold(
-            floatingActionButton:
-                _isFabVisible
-                    ? FloatingActionButton(
-                      onPressed: () async {
-                        showDialog(
-                          context: context,
-                          barrierDismissible: false,
-                          builder: (BuildContext dialogContext) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                        );
-                        await controller.addMovie();
-                        if (!context.mounted) return;
-                        Navigator.of(context).pop();
-                        _toggleFabVisibility();
-                      },
-                      child: const Icon(Icons.add),
-                    )
-                    : null,
-            appBar: AppBar(
-              title: Text(controller.model.movie.title),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.remove_red_eye_rounded),
-                  onPressed: () async {
-                    await controller.getWatchlists();
-                    if (!context.mounted) return;
-                    await showDialog(
-                      context: context,
-                      builder: (context) {
-                        return WatchlistDialog(
-                          fontSize: _fontSize,
-                          controller: controller,
-                        );
-                      },
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.home),
-                  onPressed: () {
-                    _trailerController.pause();
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      HomeView.routeName,
-                      (route) => false,
-                    );
-                  },
-                ),
-              ],
-            ),
-            body: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MovieDetailsContent(
-                        controller: controller,
-                        fontSize: _fontSize,
-                        isFabVisible: _isFabVisible,
-                        onRatingChanged:
-                            (rating) => setState(() => this.rating = rating),
-                      ),
-                      if (controller.model.trailers.isNotEmpty)
-                        OrientationBuilder(
-                          builder: (context, orientation) {
-                            final isLandscape =
-                                orientation == Orientation.landscape;
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (isLandscape) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    "Trailer:",
-                                    style: TextStyle(fontSize: _fontSize),
-                                  ),
-                                  player,
-                                ] else
-                                  // nötig, damit Player geladen bleibt – aber unsichtbar
-                                  Offstage(child: player),
-                              ],
-                            );
-                          },
-                        ),
-                    ],
+      builder: (context, player) => Scaffold(
+        floatingActionButton: _isFabVisible
+            ? FloatingActionButton(
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext dialogContext) {
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  );
+                  await controller.addMovie();
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                  _toggleFabVisibility();
+                },
+                child: const Icon(Icons.add),
+              )
+            : null,
+        appBar: AppBar(
+          title: Text(controller.model.movie.title),
+          actions: [
+            AnimatedBuilder(
+              animation: controller,
+              builder: (context, _) {
+                return IconButton(
+                  icon: Icon(
+                    controller.notificationSet
+                        ? Icons.notifications_active
+                        : Icons.notifications_none,
+                    color: controller.notificationSet
+                        ? Theme.of(context)
+                              .colorScheme
+                              .primary // z. B. Blau
+                        : null, // Standard Icon-Farbe
                   ),
+                  onPressed: () async {
+                    await controller.toggleNotification();
+                    if (!context.mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          controller.notificationSet
+                              ? 'Benachrichtigung gesetzt!'
+                              : 'Benachrichtigung entfernt!',
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.remove_red_eye_rounded),
+              onPressed: () async {
+                await controller.getWatchlists();
+                if (!context.mounted) return;
+                await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return WatchlistDialog(
+                      fontSize: _fontSize,
+                      controller: controller,
+                    );
+                  },
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.home),
+              onPressed: () {
+                _trailerController.pause();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  HomeView.routeName,
+                  (route) => false,
+                );
+              },
+            ),
+          ],
+        ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  MovieDetailsContent(
+                    controller: controller,
+                    fontSize: _fontSize,
+                    isFabVisible: _isFabVisible,
+                    onRatingChanged: (rating) =>
+                        setState(() => this.rating = rating),
+                  ),
+                  if (controller.model.trailers.isNotEmpty)
+                    OrientationBuilder(
+                      builder: (context, orientation) {
+                        final isLandscape =
+                            orientation == Orientation.landscape;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (isLandscape) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                "Trailer:",
+                                style: TextStyle(fontSize: _fontSize),
+                              ),
+                              player,
+                            ] else
+                              // nötig, damit Player geladen bleibt – aber unsichtbar
+                              Offstage(child: player),
+                          ],
+                        );
+                      },
+                    ),
                 ],
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
 }
