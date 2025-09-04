@@ -95,28 +95,57 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton:
-          _isFabVisible
-              ? FloatingActionButton(
-                onPressed: () async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext dialogContext) {
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  );
-                  await controller.addMovie();
-                  if (!context.mounted) return;
-                  Navigator.of(context).pop();
-                  _toggleFabVisibility();
-                },
-                child: const Icon(Icons.add),
-              )
-              : null,
+      floatingActionButton: _isFabVisible
+          ? FloatingActionButton(
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (BuildContext dialogContext) {
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                );
+                await controller.addMovie();
+                if (!context.mounted) return;
+                Navigator.of(context).pop();
+                _toggleFabVisibility();
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
       appBar: AppBar(
         title: Text(controller.model.movie.title),
         actions: [
+          AnimatedBuilder(
+            animation: controller,
+            builder: (context, _) {
+              return IconButton(
+                icon: Icon(
+                  controller.notificationSet
+                      ? Icons.notifications_active
+                      : Icons.notifications_none,
+                  color: controller.notificationSet
+                      ? Theme.of(context)
+                            .colorScheme
+                            .primary // z. B. Blau
+                      : null, // Standard Icon-Farbe
+                ),
+                onPressed: () async {
+                  await controller.toggleNotification();
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        controller.notificationSet
+                            ? 'Benachrichtigung gesetzt!'
+                            : 'Benachrichtigung entfernt!',
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.remove_red_eye_rounded),
             onPressed: () async {
