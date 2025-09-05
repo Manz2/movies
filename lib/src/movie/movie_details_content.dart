@@ -7,6 +7,7 @@ import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:movies/src/shared_widgets/expandable_text.dart';
 import 'package:movies/src/shared_widgets/recommendation_list.dart';
+import 'package:movies/src/tmdb_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class MovieDetailsContent extends StatelessWidget {
@@ -141,6 +142,9 @@ class MovieDetailsContent extends StatelessWidget {
                           movie.director.id,
                           isDirector: true,
                         );
+                        final fetchedDirector = await TmdbService().getActor(
+                          movie.director,
+                        );
                         if (!context.mounted) return;
                         Navigator.of(context, rootNavigator: true).pop();
                         if (!context.mounted) return;
@@ -148,7 +152,7 @@ class MovieDetailsContent extends StatelessWidget {
                           context,
                           ActorView.routeName,
                           arguments: ActorViewArguments(
-                            actor: movie.director,
+                            actor: fetchedDirector,
                             movies: movies,
                             fontSize: fontSize,
                             isDirector: true,
