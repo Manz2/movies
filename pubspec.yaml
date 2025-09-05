@@ -27,7 +27,7 @@ dependencies:
   youtube_player_flutter: ^9.1.1
   flutter_launcher_icons: ^0.14.4
   cached_network_image: ^3.4.1
-  flutter_local_notifications: ^19.4.0
+  flutter_local_notifications: ^19.4.1
 
 
 dev_dependencies:

@@ -66,6 +66,7 @@ class DbServiceLocal implements DbServiceInterface {
             privateRating: 0,
             firebaseId: '',
             addedAt: DateTime.now(),
+            director: '',
           ),
     );
   }

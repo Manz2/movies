@@ -71,7 +71,46 @@ class TmdbService {
       movie.fsk = await _getTvFsk(id);
     }
 
+    movie.director = await getDirector(id, mediaType);
+
     return movie;
+  }
+
+  Future<String> getDirector(int id, String mediaType) async {
+    String url;
+    if (mediaType == 'movie') {
+      url = '$baseUrl/movie/$id/credits?api_key=$apiKey&language=de-DE';
+    } else if (mediaType == 'tv') {
+      url = '$baseUrl/tv/$id/aggregate_credits?api_key=$apiKey&language=de-DE';
+    } else {
+      return '';
+    }
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final jsonMap = json.decode(response.body);
+      if (mediaType == 'movie') {
+        if (jsonMap['crew'] != null) {
+          for (var crewMember in jsonMap['crew']) {
+            if (crewMember['job'] == 'Director') {
+              return crewMember['name'] ?? '';
+            }
+          }
+        }
+      } else if (mediaType == 'tv') {
+        if (jsonMap['crew'] != null) {
+          for (var crewMember in jsonMap['crew']) {
+            if (crewMember['jobs'] != null) {
+              for (var job in crewMember['jobs']) {
+                if (job['job'] == 'Director') {
+                  return crewMember['name'] ?? '';
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return '';
   }
 
   Future<String> _getMovieFsk(int id) async {
@@ -194,6 +233,7 @@ class TmdbService {
       privateRating: privateRating,
       firebaseId: firebaseId,
       addedAt: addedAt,
+      director: '',
     );
   }
 

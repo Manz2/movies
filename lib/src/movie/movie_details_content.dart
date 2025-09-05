@@ -86,18 +86,16 @@ class MovieDetailsContent extends StatelessWidget {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder:
-                              (context) => AlertDialog(
-                                title: Text('FSK ${movie.fsk}'),
-                                content: Text(_getFskDescription(movie.fsk)),
-                                actions: [
-                                  TextButton(
-                                    onPressed:
-                                        () => Navigator.of(context).pop(),
-                                    child: Text('Schließen'),
-                                  ),
-                                ],
+                          builder: (context) => AlertDialog(
+                            title: Text('FSK ${movie.fsk}'),
+                            content: Text(_getFskDescription(movie.fsk)),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: Text('Schließen'),
                               ),
+                            ],
+                          ),
                         );
                       },
                       child: SizedBox(
@@ -124,19 +122,24 @@ class MovieDetailsContent extends StatelessWidget {
               Text("Jahr: ${movie.year}", style: TextStyle(fontSize: fontSize)),
               const SizedBox(height: 8),
               Text(
+                "Director: ${movie.director}",
+                style: TextStyle(fontSize: fontSize),
+              ),
+              const SizedBox(height: 8),
+              Text(
                 "Genre: ${movie.genre.join(', ')}",
                 style: TextStyle(fontSize: fontSize),
               ),
               const SizedBox(height: 8),
               movie.mediaType == 'movie'
                   ? Text(
-                    "Dauer: ${controller.getDuration()}",
-                    style: TextStyle(fontSize: fontSize),
-                  )
+                      "Dauer: ${controller.getDuration()}",
+                      style: TextStyle(fontSize: fontSize),
+                    )
                   : Text(
-                    "Dauer: ${movie.duration} Staffeln",
-                    style: TextStyle(fontSize: fontSize),
-                  ),
+                      "Dauer: ${movie.duration} Staffeln",
+                      style: TextStyle(fontSize: fontSize),
+                    ),
               const SizedBox(height: 8),
               if (!isFabVisible) ...[
                 Text("Privates Rating:", style: TextStyle(fontSize: fontSize)),

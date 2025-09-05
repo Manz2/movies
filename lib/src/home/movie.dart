@@ -14,27 +14,31 @@ class Movie {
   double privateRating;
   String firebaseId;
   DateTime addedAt;
+  String director; // New field
   bool onList = false;
-  Movie(
-      {required this.id,
-      required this.title,
-      required this.description,
-      required this.fsk,
-      required this.rating,
-      required this.year,
-      required this.duration,
-      required this.image,
-      required this.actors,
-      required this.genre,
-      required this.popularity,
-      required this.mediaType,
-      required this.privateRating,
-      required this.firebaseId,
-      required this.addedAt});
+
+  Movie({
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.fsk,
+    required this.rating,
+    required this.year,
+    required this.duration,
+    required this.image,
+    required this.actors,
+    required this.genre,
+    required this.popularity,
+    required this.mediaType,
+    required this.privateRating,
+    required this.firebaseId,
+    required this.addedAt,
+    required this.director,
+  });
 
   @override
   String toString() {
-    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt}';
+    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt, director: $director}';
   }
 
   bool get getOnList => onList;
@@ -61,6 +65,7 @@ class Movie {
       'privateRating': privateRating,
       'firebaseId': firebaseId,
       'addedAt': addedAt.toIso8601String(),
+      'director': director,
     };
   }
 
@@ -83,7 +88,8 @@ class Movie {
       mediaType: json['MediaType'],
       privateRating: json['privateRating'].toDouble() ?? 0,
       firebaseId: json['firebaseId'] ?? '',
-      addedAt: json['addedAt'] != null ?DateTime.parse(json['addedAt']) : DateTime.now(),
+      addedAt: json['addedAt'] != null ? DateTime.parse(json['addedAt']) : DateTime.now(),
+      director: json['director'] ?? '',
     );
   }
 }
