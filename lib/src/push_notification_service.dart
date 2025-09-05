@@ -67,10 +67,6 @@ class PushNotificationService {
       logger.d('Permission denied for push notifications');
       return;
     }
-
-    String? token = await messaging.getToken();
-    logger.d('📱 FCM-Token: $token');
-    await Clipboard.setData(ClipboardData(text: token!));
   }
 
   static Future<void> _initLocalNotifications() async {
