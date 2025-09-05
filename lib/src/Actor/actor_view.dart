@@ -20,8 +20,14 @@ class ActorView extends StatelessWidget {
     required this.movies,
     required this.fontSize,
     required String uid,
+    required bool isDirector,
   }) {
-    controller = ActorController(uid: uid, actor: actor, movies: movies);
+    controller = ActorController(
+      uid: uid,
+      actor: actor,
+      movies: movies,
+      isDirector: isDirector,
+    );
   }
 
   @override
@@ -53,15 +59,23 @@ class ActorView extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(10)),
-                  child:
-                      controller.model.actor.image != ''
-                          ? Image.network(
-                            controller.model.actor.image,
-                            height: 300,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          )
-                          : const Padding(padding: EdgeInsets.all(8)),
+                  child: controller.model.actor.image != ''
+                      ? Image.network(
+                          controller.model.actor.image,
+                          height: 300,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        )
+                      : const Padding(padding: EdgeInsets.all(8)),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+              Text(
+                controller.model.isDirector ? "Directed Movies:" : "Movies:",
+                style: TextStyle(
+                  fontSize: fontSize + 4,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(
@@ -76,10 +90,9 @@ class ActorView extends StatelessWidget {
                       child: ListTile(
                         leading: CircleAvatar(
                           radius: 35,
-                          foregroundImage:
-                              movie.image.isNotEmpty
-                                  ? NetworkImage(movie.image)
-                                  : const AssetImage("assets/images/Movie.png"),
+                          foregroundImage: movie.image.isNotEmpty
+                              ? NetworkImage(movie.image)
+                              : const AssetImage("assets/images/Movie.png"),
                         ),
                         title: Row(
                           children: [
@@ -99,10 +112,9 @@ class ActorView extends StatelessWidget {
                             showDialog(
                               context: context,
                               barrierDismissible: false,
-                              builder:
-                                  (_) => const Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
+                              builder: (_) => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
                             );
                             final movieWithCredits = await controller
                                 .getMovieWithCredits(movie);

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/home/test_movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/search/search_model.dart';
 import 'package:movies/src/secrets.dart';
@@ -76,14 +77,14 @@ class TmdbService {
     return movie;
   }
 
-  Future<String> getDirector(int id, String mediaType) async {
+  Future<Actor> getDirector(int id, String mediaType) async {
     String url;
     if (mediaType == 'movie') {
       url = '$baseUrl/movie/$id/credits?api_key=$apiKey&language=de-DE';
     } else if (mediaType == 'tv') {
       url = '$baseUrl/tv/$id/aggregate_credits?api_key=$apiKey&language=de-DE';
     } else {
-      return '';
+      return Actor(name: '', image: '', roleName: '', id: 0);
     }
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -92,7 +93,14 @@ class TmdbService {
         if (jsonMap['crew'] != null) {
           for (var crewMember in jsonMap['crew']) {
             if (crewMember['job'] == 'Director') {
-              return crewMember['name'] ?? '';
+              return Actor(
+                name: crewMember['name'],
+                image: crewMember['profile_path'] != null
+                    ? 'https://image.tmdb.org/t/p/w500${crewMember['profile_path']}'
+                    : '',
+                roleName: crewMember['character'] ?? 'Unbekannt',
+                id: crewMember['id'] ?? 0,
+              );
             }
           }
         }
@@ -102,7 +110,14 @@ class TmdbService {
             if (crewMember['jobs'] != null) {
               for (var job in crewMember['jobs']) {
                 if (job['job'] == 'Director') {
-                  return crewMember['name'] ?? '';
+                  return Actor(
+                    name: crewMember['name'],
+                    image: crewMember['profile_path'] != null
+                        ? 'https://image.tmdb.org/t/p/w500${crewMember['profile_path']}'
+                        : '',
+                    roleName: crewMember['character'] ?? 'Unbekannt',
+                    id: crewMember['id'] ?? 0,
+                  );
                 }
               }
             }
@@ -110,7 +125,7 @@ class TmdbService {
         }
       }
     }
-    return '';
+    return Actor(name: '', image: '', roleName: '', id: 0);
   }
 
   Future<String> _getMovieFsk(int id) async {
@@ -233,7 +248,7 @@ class TmdbService {
       privateRating: privateRating,
       firebaseId: firebaseId,
       addedAt: addedAt,
-      director: '',
+      director: testActor1,
     );
   }
 
@@ -271,32 +286,43 @@ class TmdbService {
     return actors;
   }
 
-  Future<List<Movie>> getCombinedCredits(int id) async {
+  Future<List<Movie>> getCombinedCredits(
+    int id, {
+    bool isDirector = false,
+  }) async {
     final url =
         '$baseUrl/person/$id/combined_credits?api_key=$apiKey&language=de-DE';
 
     final response = await http.get(Uri.parse(url));
     if (response.statusCode != 200) {
-      throw HttpException("Failed to load movie with id=$id");
+      throw HttpException("Failed to load credits for person with id=$id");
     }
 
     final Map<String, dynamic> jsonMap = json.decode(response.body);
-    final List<dynamic> castList = jsonMap['cast'];
 
-    // Optional: check if popularity exists and is double
-    castList.sort((a, b) {
+    // Wenn Director → crew filtern, sonst cast nehmen
+    final List<dynamic> credits;
+    if (isDirector) {
+      credits = (jsonMap['crew'] as List<dynamic>)
+          .where((c) => c['job'] == 'Director')
+          .toList();
+    } else {
+      credits = jsonMap['cast'] as List<dynamic>;
+    }
+
+    // Nach vote_count sortieren (Absteigend)
+    credits.sort((a, b) {
       final popA = (a['vote_count'] ?? 0).toDouble();
       final popB = (b['vote_count'] ?? 0).toDouble();
-      return popB.compareTo(popA); // Absteigend
+      return popB.compareTo(popA);
     });
 
     // Duplikate entfernen basierend auf der ID
     final Map<int, Movie> uniqueMovies = {};
 
-    for (var json in castList) {
+    for (var json in credits) {
       final movie = _movieFromTmdb(json, 'unbekannt', 0, '', DateTime.now());
-      uniqueMovies[int.parse(movie.id)] =
-          movie; // Map überschreibt bei doppelter ID automatisch
+      uniqueMovies[int.parse(movie.id)] = movie;
     }
 
     return uniqueMovies.values.toList();

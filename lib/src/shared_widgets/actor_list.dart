@@ -50,6 +50,7 @@ class ActorList extends StatelessWidget {
                       actor: actor,
                       movies: movies,
                       fontSize: fontSize,
+                      isDirector: false,
                     ),
                   );
                 } on Exception catch (e) {

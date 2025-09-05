@@ -14,7 +14,7 @@ class Movie {
   double privateRating;
   String firebaseId;
   DateTime addedAt;
-  String director; // New field
+  Actor director;
   bool onList = false;
 
   Movie({
@@ -65,7 +65,7 @@ class Movie {
       'privateRating': privateRating,
       'firebaseId': firebaseId,
       'addedAt': addedAt.toIso8601String(),
-      'director': director,
+      'director': director.toJson(),
     };
   }
 
@@ -88,8 +88,12 @@ class Movie {
       mediaType: json['MediaType'],
       privateRating: json['privateRating'].toDouble() ?? 0,
       firebaseId: json['firebaseId'] ?? '',
-      addedAt: json['addedAt'] != null ? DateTime.parse(json['addedAt']) : DateTime.now(),
-      director: json['director'] ?? '',
+      addedAt: json['addedAt'] != null
+          ? DateTime.parse(json['addedAt'])
+          : DateTime.now(),
+      director: json['director'] is Map<String, dynamic>
+          ? Actor.fromJson(json['director'])
+          : Actor(name: json['director'] ?? '', image: '', roleName: '', id: 0),
     );
   }
 }
@@ -99,11 +103,12 @@ class Actor {
   String image;
   String roleName;
   int id;
-  Actor(
-      {required this.name,
-      required this.image,
-      required this.roleName,
-      required this.id});
+  Actor({
+    required this.name,
+    required this.image,
+    required this.roleName,
+    required this.id,
+  });
 
   @override
   String toString() {
@@ -112,12 +117,7 @@ class Actor {
 
   // toJson Methode
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'image': image,
-      'roleName': roleName,
-      'id': id,
-    };
+    return {'name': name, 'image': image, 'roleName': roleName, 'id': id};
   }
 
   // fromJson Methode

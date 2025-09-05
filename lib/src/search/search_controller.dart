@@ -42,6 +42,7 @@ class SearchPageController {
           ),
           movies: movies,
           fontSize: fontSize,
+          isDirector: false,
         ),
       );
     } else if (result.type == 'movie' || result.type == 'tv') {

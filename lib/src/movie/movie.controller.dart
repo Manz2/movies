@@ -33,7 +33,7 @@ class MovieController extends ChangeNotifier {
   MovieModel get model => _model;
   Logger logger = Logger();
 
-  Future<List<Movie>> getMovies(int actorId) async {
+  Future<List<Movie>> getMovies(int actorId, {bool isDirector = false}) async {
     try {
       // Lokale Movies laden
       List<Movie> localMovies = await _db.getMovies();
@@ -45,6 +45,7 @@ class MovieController extends ChangeNotifier {
 
       List<Movie> combinedCredits = await tmdbService.getCombinedCredits(
         actorId,
+        isDirector: isDirector,
       );
 
       // Alle Filme markieren, die in der lokalen Liste sind (id UND mediaType matchen)

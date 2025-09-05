@@ -81,6 +81,7 @@ class MyApp extends StatelessWidget {
                       actor: args.actor,
                       movies: args.movies,
                       fontSize: args.fontSize,
+                      isDirector: args.isDirector,
                     );
                   case FilterView.routeName:
                     final args = routeSettings.arguments as Filter;

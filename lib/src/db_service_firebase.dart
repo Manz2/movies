@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_service_interface.dart';
 import 'package:movies/src/home/movie.dart';
+import 'package:movies/src/home/test_movie.dart';
 
 class DbServiceFirebase implements DbServiceInterface {
   final String uid;
@@ -69,7 +70,7 @@ class DbServiceFirebase implements DbServiceInterface {
         privateRating: 0,
         firebaseId: '',
         addedAt: DateTime.now(),
-        director: '',
+        director: testActor1,
       ),
     );
   }

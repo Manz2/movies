@@ -10,9 +10,9 @@ class ActorController {
   final TmdbService tmdbService = TmdbService();
   final String uid;
   final DbCombinator _db;
-  ActorController({required Actor actor, required movies, required this.uid})
+  ActorController({required Actor actor, required movies, required this.uid, required bool isDirector})
     : _db = DbCombinator(uid: uid),
-      _model = ActorModel(actor: actor, movies: movies);
+      _model = ActorModel(actor: actor, movies: movies, isDirector: isDirector);
 
   ActorModel get model => _model;
   Logger logger = Logger();

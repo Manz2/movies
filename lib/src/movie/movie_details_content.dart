@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating/flutter_rating.dart';
+import 'package:logger/logger.dart';
+import 'package:movies/src/Actor/actor_model.dart';
+import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/shared_widgets/actor_list.dart';
 import 'package:movies/src/shared_widgets/expandable_text.dart';
@@ -46,6 +49,7 @@ class MovieDetailsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Logger logger = Logger();
     final movie = controller.model.movie;
     final providers = controller.model.providers;
     final orientation = MediaQuery.of(context).orientation;
@@ -121,10 +125,48 @@ class MovieDetailsContent extends StatelessWidget {
               const SizedBox(height: 8),
               Text("Jahr: ${movie.year}", style: TextStyle(fontSize: fontSize)),
               const SizedBox(height: 8),
-              Text(
-                "Director: ${movie.director}",
-                style: TextStyle(fontSize: fontSize),
+              Row(
+                children: [
+                  Text("Director: ", style: TextStyle(fontSize: fontSize)),
+                  GestureDetector(
+                    onTap: () async {
+                      try {
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) =>
+                              const Center(child: CircularProgressIndicator()),
+                        );
+                        final movies = await controller.getMovies(
+                          movie.director.id,
+                          isDirector: true,
+                        );
+                        if (!context.mounted) return;
+                        Navigator.of(context, rootNavigator: true).pop();
+                        if (!context.mounted) return;
+                        Navigator.pushNamed(
+                          context,
+                          ActorView.routeName,
+                          arguments: ActorViewArguments(
+                            actor: movie.director,
+                            movies: movies,
+                            fontSize: fontSize,
+                            isDirector: true,
+                          ),
+                        );
+                      } on Exception catch (e) {
+                        logger.log(Level.error, e.toString());
+                        Navigator.of(context, rootNavigator: true).pop();
+                      }
+                    },
+                    child: Text(
+                      movie.director.name,
+                      style: TextStyle(fontSize: fontSize),
+                    ),
+                  ),
+                ],
               ),
+
               const SizedBox(height: 8),
               Text(
                 "Genre: ${movie.genre.join(', ')}",

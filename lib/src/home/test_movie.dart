@@ -32,5 +32,5 @@ Movie testMovie = Movie(
   privateRating: 5,
   firebaseId: '',
   addedAt: DateTime.now(),
-  director: "",
+  director: testActor1,
 );
