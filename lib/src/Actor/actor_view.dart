@@ -69,15 +69,18 @@ class ActorView extends StatelessWidget {
                       : const Padding(padding: EdgeInsets.all(8)),
                 ),
               ),
-
-              const SizedBox(height: 16),
-              Text(
-                controller.model.isDirector ? "Directed Movies:" : "Movies:",
-                style: TextStyle(
-                  fontSize: fontSize + 4,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              controller.model.isDirector
+                  ? const SizedBox(height: 16)
+                  : const SizedBox(),
+              controller.model.isDirector
+                  ? Text(
+                      "Directed:",
+                      style: TextStyle(
+                        fontSize: fontSize + 4,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : const SizedBox(),
               SizedBox(
                 height: 400, // Höhe des Containers für die Schauspielerliste
                 child: ListView.builder(

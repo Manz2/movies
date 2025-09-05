@@ -161,7 +161,11 @@ class MovieDetailsContent extends StatelessWidget {
                     },
                     child: Text(
                       movie.director.name,
-                      style: TextStyle(fontSize: fontSize),
+                      style: TextStyle(
+                        fontSize: fontSize,
+                        color: Theme.of(context).colorScheme.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
