@@ -29,17 +29,13 @@ class SearchPageController {
   ) async {
     if (result.type == 'person') {
       final movies = await _getMovies(int.parse(result.id));
+      final actor = await tmdbService.getActor(Actor(name: result.name, image: result.image, roleName: "", id: int.parse(result.id), biography: '', birthday: null, deathday: null));
       if (!context.mounted) return;
       Navigator.pushNamed(
         context,
         ActorView.routeName,
         arguments: ActorViewArguments(
-          actor: Actor(
-            name: result.name,
-            image: result.image,
-            roleName: "roleName",
-            id: int.parse(result.id),
-          ),
+          actor: actor,
           movies: movies,
           fontSize: fontSize,
           isDirector: false,

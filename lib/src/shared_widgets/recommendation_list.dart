@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/movie/movie.controller.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/shared_widgets/base_controller.dart';
 
 class RecommendationList extends StatelessWidget {
   final List<Movie> movies;
-  final MovieController controller;
+  final BaseController controller;
+
   final double fontSize;
 
   const RecommendationList({
@@ -35,8 +36,8 @@ class RecommendationList extends StatelessWidget {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder:
-                        (_) => const Center(child: CircularProgressIndicator()),
+                    builder: (_) =>
+                        const Center(child: CircularProgressIndicator()),
                   );
                   Movie newMovie = await controller.getMovie(movie);
                   Providers providers = await controller.getProviders(newMovie);
@@ -67,23 +68,51 @@ class RecommendationList extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child:
-                          movie.image.isNotEmpty
-                              ? Image.network(
-                                movie.image,
-                                height: 160,
-                                width: 110,
-                                fit: BoxFit.cover,
-                              )
-                              : Image.asset(
-                                "assets/images/Movie.png",
-                                height: 160,
-                                width: 110,
-                                fit: BoxFit.cover,
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: movie.onList
+                            ? [
+                                BoxShadow(
+                                  color: Colors.green.withValues(alpha: 0.8),
+                                  blurRadius: 6,
+                                  spreadRadius: 1,
+                                ),
+                              ]
+                            : [],
+                      ),
+                      child: Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: movie.image.isNotEmpty
+                                ? Image.network(
+                                    movie.image,
+                                    height: 160,
+                                    width: 110,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    "assets/images/Movie.png",
+                                    height: 160,
+                                    width: 110,
+                                    fit: BoxFit.cover,
+                                  ),
+                          ),
+                          if (movie.onList)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Colors.green.withValues(alpha: 0.8),
+                                size: 24,
                               ),
+                            ),
+                        ],
+                      ),
                     ),
+
                     const SizedBox(height: 8),
                     Tooltip(
                       message: movie.title,

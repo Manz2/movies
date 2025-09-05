@@ -5,10 +5,11 @@ import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/shared_widgets/base_controller.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class MovieController extends ChangeNotifier {
+class MovieController extends BaseController with ChangeNotifier {
   final MovieModel _model;
   final String uid;
   final DbCombinator _db;
@@ -146,6 +147,7 @@ class MovieController extends ChangeNotifier {
     return "$hours Std. $minutes Min."; // Verbleibende Minuten
   }
 
+  @override
   Future<Providers> getProviders(Movie item) async {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.mediaType);
@@ -155,6 +157,7 @@ class MovieController extends ChangeNotifier {
     }
   }
 
+  @override
   Future<List<String>> getTrailers(Movie item) async {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
@@ -164,6 +167,7 @@ class MovieController extends ChangeNotifier {
     }
   }
 
+  @override
   Future<List<Movie>> getRecommendations(Movie movie) async {
     try {
       return await tmdbService.getRecommendations(
@@ -176,6 +180,7 @@ class MovieController extends ChangeNotifier {
     }
   }
 
+  @override
   Future<Movie> getMovie(Movie item) async {
     TmdbService tmdbService = TmdbService();
     try {

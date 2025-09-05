@@ -3,21 +3,23 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/shared_widgets/base_controller.dart';
 import 'package:movies/src/tmdb_service.dart';
 
-class ActorController {
+class ActorController extends BaseController<Actor> {
   final ActorModel _model;
   final TmdbService tmdbService = TmdbService();
   final String uid;
   final DbCombinator _db;
-  ActorController({required Actor actor, required movies, required this.uid, required bool isDirector})
+  ActorController({required Actor actor, required movies, required this.uid, required bool isDirector,})
     : _db = DbCombinator(uid: uid),
-      _model = ActorModel(actor: actor, movies: movies, isDirector: isDirector);
+      _model = ActorModel(actor: actor, movies: movies, isDirector: isDirector,);
 
   ActorModel get model => _model;
   Logger logger = Logger();
 
-  Future<Movie> getMovieWithCredits(Movie movie2) async {
+  @override
+  Future<Movie> getMovie(Movie movie2) async {
     try {
       Movie movie = await _db.getMovie(movie2.id, movie2.mediaType);
       if (movie.firebaseId == '') {
@@ -29,6 +31,7 @@ class ActorController {
     }
   }
 
+  @override
   Future<Providers> getProviders(Movie item) async {
     try {
       return await tmdbService.getProviders(item.id.toString(), item.mediaType);
@@ -38,6 +41,7 @@ class ActorController {
     }
   }
 
+  @override
   Future<List<String>> getTrailers(Movie item) async {
     try {
       return await tmdbService.getTrailers(item.id.toString(), item.mediaType);
@@ -47,6 +51,7 @@ class ActorController {
     }
   }
 
+  @override
   Future<List<Movie>> getRecommendations(Movie movie) async {
     try {
       return await tmdbService.getRecommendations(

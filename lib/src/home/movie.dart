@@ -93,7 +93,7 @@ class Movie {
           : DateTime.now(),
       director: json['director'] is Map<String, dynamic>
           ? Actor.fromJson(json['director'])
-          : Actor(name: json['director'] ?? '', image: '', roleName: '', id: 0),
+          : Actor(name: json['director'] ?? '', image: '', roleName: '', id: 0, biography: '', birthday: null, deathday: null),
     );
   }
 }
@@ -103,11 +103,17 @@ class Actor {
   String image;
   String roleName;
   int id;
+  String biography;
+  DateTime? birthday;
+  DateTime? deathday;
   Actor({
     required this.name,
     required this.image,
     required this.roleName,
     required this.id,
+    required this.biography,
+    required this.birthday,
+    required this.deathday,
   });
 
   @override
@@ -127,6 +133,13 @@ class Actor {
       image: json['image'],
       roleName: json['roleName'],
       id: json['id'],
+      biography: json['biography'] ?? '',
+      birthday: json['birthday'] != null
+          ? DateTime.parse(json['birthday'])
+          : null,
+      deathday: json['deathday'] != null
+          ? DateTime.parse(json['deathday'])
+          : null,
     );
   }
 }

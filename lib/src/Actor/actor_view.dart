@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:movies/src/Actor/actor_controller.dart';
 import 'package:movies/src/home/movie.dart';
-import 'package:movies/src/movie/movie_model.dart';
-import 'package:movies/src/movie/movie_view.dart';
 import 'package:movies/src/home/home_view.dart';
+import 'package:movies/src/shared_widgets/expandable_text.dart';
+import 'package:movies/src/shared_widgets/recommendation_list.dart';
 
 class ActorView extends StatelessWidget {
   final Actor actor;
@@ -32,7 +31,6 @@ class ActorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Logger logger = Logger();
     return Scaffold(
       appBar: AppBar(
         title: Text(controller.model.actor.name),
@@ -69,86 +67,50 @@ class ActorView extends StatelessWidget {
                       : const Padding(padding: EdgeInsets.all(8)),
                 ),
               ),
-              controller.model.isDirector
-                  ? const SizedBox(height: 16)
-                  : const SizedBox(),
-              controller.model.isDirector
-                  ? Text(
-                      "Directed:",
-                      style: TextStyle(
-                        fontSize: fontSize + 4,
-                        fontWeight: FontWeight.bold,
+              controller.model.actor.biography != ''
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 8, 15, 4),
+                      child: ExpandableText(
+                        text: controller.model.actor.biography,
+                        fontSize: fontSize,
                       ),
                     )
                   : const SizedBox(),
-              SizedBox(
-                height: 400, // Höhe des Containers für die Schauspielerliste
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical, // Vertikale Scrollrichtung
-                  itemCount: controller.model.movies.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    final movie = controller.model.movies[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 8, bottom: 8),
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          radius: 35,
-                          foregroundImage: movie.image.isNotEmpty
-                              ? NetworkImage(movie.image)
-                              : const AssetImage("assets/images/Movie.png"),
-                        ),
-                        title: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                movie.title,
-                                style: TextStyle(fontSize: fontSize + 2),
-                              ),
-                            ),
-                            if (movie.onList) ...[
-                              const Icon(Icons.check, color: Colors.green),
-                            ],
-                          ],
-                        ),
-                        onTap: () async {
-                          try {
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (_) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                            final movieWithCredits = await controller
-                                .getMovieWithCredits(movie);
-                            Providers providers = await controller.getProviders(
-                              movie,
-                            );
-                            List<String> trailers = await controller
-                                .getTrailers(movie);
-                            List<Movie> recommendations = await controller
-                                .getRecommendations(movie);
-                            if (!context.mounted) return;
-                            Navigator.of(context, rootNavigator: true).pop();
-                            if (!context.mounted) return;
-                            Navigator.pushNamed(
-                              context,
-                              MovieView.routeName,
-                              arguments: MovieViewArguments(
-                                movie: movieWithCredits,
-                                providers: providers,
-                                trailers: trailers,
-                                recommendations: recommendations,
-                              ),
-                            );
-                          } on Exception catch (e) {
-                            logger.log(Level.error, e.toString());
-                            Navigator.of(context, rootNavigator: true).pop();
-                          }
-                        },
+              controller.model.actor.birthday != null &&
+                      controller.model.actor.deathday == null
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 8, 15, 4),
+                      child: Text(
+                        "Alter: ${DateTime.now().year - controller.model.actor.birthday!.year - (DateTime.now().month < controller.model.actor.birthday!.month || (DateTime.now().month == controller.model.actor.birthday!.month && DateTime.now().day < controller.model.actor.birthday!.day) ? 1 : 0)}",
+                        style: TextStyle(fontSize: fontSize),
                       ),
-                    );
-                  },
+                    )
+                  : const SizedBox(),
+              controller.model.actor.deathday != null
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
+                      child: Text(
+                        "Verstorben am: ${controller.model.actor.deathday!.day.toString().padLeft(2, '0')}.${controller.model.actor.deathday!.month.toString().padLeft(2, '0')}.${controller.model.actor.deathday!.year} "
+                        "(${controller.model.actor.deathday!.year - controller.model.actor.birthday!.year - (controller.model.actor.deathday!.month < controller.model.actor.birthday!.month || (controller.model.actor.deathday!.month == controller.model.actor.birthday!.month && controller.model.actor.deathday!.day < controller.model.actor.birthday!.day) ? 1 : 0)} Jahre)",
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+                    )
+                  : const SizedBox(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 4, 15, 4),
+                child: controller.model.isDirector
+                    ? Text("Directed:", style: TextStyle(fontSize: fontSize))
+                    : Text(
+                        "Filmografie:",
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 4, 15, 4),
+                child: RecommendationList(
+                  movies: controller.model.movies,
+                  controller: controller,
+                  fontSize: fontSize,
                 ),
               ),
             ],

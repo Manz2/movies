@@ -84,7 +84,15 @@ class TmdbService {
     } else if (mediaType == 'tv') {
       url = '$baseUrl/tv/$id/aggregate_credits?api_key=$apiKey&language=de-DE';
     } else {
-      return Actor(name: '', image: '', roleName: '', id: 0);
+      return Actor(
+        name: '',
+        image: '',
+        roleName: '',
+        id: 0,
+        biography: '',
+        birthday: null,
+        deathday: null,
+      );
     }
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -100,6 +108,9 @@ class TmdbService {
                     : '',
                 roleName: crewMember['character'] ?? 'Unbekannt',
                 id: crewMember['id'] ?? 0,
+                biography: '',
+                birthday: null,
+                deathday: null,
               );
             }
           }
@@ -117,6 +128,9 @@ class TmdbService {
                         : '',
                     roleName: crewMember['character'] ?? 'Unbekannt',
                     id: crewMember['id'] ?? 0,
+                    biography: '',
+                    birthday: null,
+                    deathday: null,
                   );
                 }
               }
@@ -125,7 +139,15 @@ class TmdbService {
         }
       }
     }
-    return Actor(name: '', image: '', roleName: '', id: 0);
+    return Actor(
+      name: '',
+      image: '',
+      roleName: '',
+      id: 0,
+      biography: '',
+      birthday: null,
+      deathday: null,
+    );
   }
 
   Future<String> _getMovieFsk(int id) async {
@@ -263,6 +285,9 @@ class TmdbService {
               : '',
           roleName: actorJson['character'] ?? 'Unbekannt',
           id: actorJson['id'] ?? 0, //Hier sollte nicht 0 stehen
+          biography: '',
+          birthday: null,
+          deathday: null,
         );
         if (mediaType == 'tv' && actorJson['roles'] != null) {
           final buffer = StringBuffer();
@@ -504,5 +529,25 @@ class TmdbService {
     }
 
     return recommendedMovies;
+  }
+
+  Future getActor(Actor actor) async {
+    final url = '$baseUrl/person/${actor.id}?api_key=$apiKey&language=de-DE';
+
+    final response = await http.get(Uri.parse(url));
+
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonMap = json.decode(response.body);
+      actor.biography = jsonMap['biography'] ?? '';
+      actor.birthday = jsonMap['birthday'] != null
+          ? DateTime.parse(jsonMap['birthday'])
+          : null;
+      actor.deathday = jsonMap['deathday'] != null
+          ? DateTime.parse(jsonMap['deathday'])
+          : null;
+      return actor;
+    } else {
+      throw HttpException("Failed to load actor with id=${actor.id}");
+    }
   }
 }

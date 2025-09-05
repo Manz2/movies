@@ -4,6 +4,7 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/Actor/actor_view.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie.controller.dart';
+import 'package:movies/src/tmdb_service.dart';
 
 class ActorList extends StatelessWidget {
   final List<Actor> actors;
@@ -36,10 +37,11 @@ class ActorList extends StatelessWidget {
                   showDialog(
                     context: context,
                     barrierDismissible: false,
-                    builder:
-                        (_) => const Center(child: CircularProgressIndicator()),
+                    builder: (_) =>
+                        const Center(child: CircularProgressIndicator()),
                   );
                   final movies = await controller.getMovies(actor.id);
+                  final fetchedActor = await TmdbService().getActor(actor);
                   if (!context.mounted) return;
                   Navigator.of(context, rootNavigator: true).pop();
                   if (!context.mounted) return;
@@ -47,7 +49,7 @@ class ActorList extends StatelessWidget {
                     context,
                     ActorView.routeName,
                     arguments: ActorViewArguments(
-                      actor: actor,
+                      actor: fetchedActor,
                       movies: movies,
                       fontSize: fontSize,
                       isDirector: false,
@@ -64,13 +66,12 @@ class ActorList extends StatelessWidget {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      foregroundImage:
-                          actor.image.isNotEmpty
-                              ? NetworkImage(actor.image)
-                              : const AssetImage(
-                                    "assets/images/ActorPlaceholder.png",
-                                  )
-                                  as ImageProvider,
+                      foregroundImage: actor.image.isNotEmpty
+                          ? NetworkImage(actor.image)
+                          : const AssetImage(
+                                  "assets/images/ActorPlaceholder.png",
+                                )
+                                as ImageProvider,
                     ),
                     Tooltip(
                       message: actor.name,

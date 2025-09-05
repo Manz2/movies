@@ -4,6 +4,7 @@ class ActorModel {
   Actor actor;
   List<Movie> movies;
   bool isDirector;
+
   ActorModel({
     required this.actor,
     required this.movies,
