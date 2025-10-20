@@ -39,15 +39,17 @@
       background-color: #ffffff;
     }
     
+    /* Adapt to system dark mode preference */
     @media (prefers-color-scheme: dark) {
       body {
         background-color: #121212;
       }
       .loader {
-        border-top-color: #bb86fc !important;
+        border-top-color: #bb86fc;
       }
     }
     
+    /* Loading overlay - displayed during app initialization */
     #loading {
       position: fixed;
       top: 0;
@@ -74,12 +76,23 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    /* Hide loading once Flutter is ready */
+    .flutter-ready #loading {
+      display: none;
+    }
   </style>
 </head>
 <body>
   <div id="loading">
     <div class="loader"></div>
   </div>
+  <script>
+    // Mark body as ready once Flutter engine is loaded
+    window.addEventListener('flutter-first-frame', function() {
+      document.body.classList.add('flutter-ready');
+    });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
