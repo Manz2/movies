@@ -9,6 +9,8 @@ workflows:
 
     environment:
       flutter: stable
+      groups:
+        - movies
       vars:
         APP_STORE_APPLE_ID: "6670212882"
       ios_signing:
@@ -21,6 +23,9 @@ workflows:
         - $HOME/Library/Caches/CocoaPods
 
     scripts:
+      - name: "Restore secret files"
+        script: |
+          echo $SECRETS_B64 | base64 -d > lib/src/secrets.dart
       - name: Prepare Signing & Dependencies
         script: |
           keychain initialize

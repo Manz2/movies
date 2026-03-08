@@ -52,7 +52,6 @@ linux
 
 /linux/flutter
 firebase.json
-lib/firebase_options.dart
 android/app/google-services.json
 windows/flutter/generated_plugin_registrant.cc
 windows/flutter/generated_plugin_registrant.h
