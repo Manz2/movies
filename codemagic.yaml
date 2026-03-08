@@ -1,0 +1,45 @@
+workflows:
+  ios-testflight:
+    name: iOS TestFlight Build
+    instance_type: mac_mini_m2
+    max_build_duration: 30
+
+    integrations:
+      app_store_connect: Codemagic API Key BuyNow
+
+    environment:
+      flutter: stable
+      vars:
+        APP_STORE_APPLE_ID: "6670212882"
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: "com.movies2.ios"
+
+    cache:
+      cache_paths:
+        - $FLUTTER_ROOT/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+
+    scripts:
+      - name: Prepare Signing & Dependencies
+        script: |
+          keychain initialize
+          keychain add-certificates
+          xcode-project use-profiles
+          flutter pub get
+      - name: Flutter build ipa
+        script: |
+          LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number --platform=IOS "$APP_STORE_APPLE_ID")
+          
+          flutter build ipa --release \
+            --build-name=1.0.0 \
+            --build-number=$(($LATEST_BUILD + 1)) \
+            --export-options-plist=/Users/builder/export_options.plist
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
