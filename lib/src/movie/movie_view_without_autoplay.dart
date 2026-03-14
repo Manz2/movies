@@ -33,6 +33,7 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
   late final MovieController controller;
   bool _isFabVisible = false;
   double _fontSize = 16.0;
+  bool _hasNavigatedToAutoplay = false;
 
   set rating(double rating) {
     controller.setRating(rating);
@@ -41,22 +42,6 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final orientation = MediaQuery.of(context).orientation;
-
-      if (widget.trailers.isNotEmpty && orientation != Orientation.landscape) {
-        Navigator.of(context).pushReplacementNamed(
-          MovieView.routeName,
-          arguments: MovieViewArguments(
-            movie: widget.movie,
-            providers: widget.providers,
-            trailers: widget.trailers,
-            recommendations: widget.recommendations,
-            autoplay: true,
-          ),
-        );
-      }
-    });
     final uid = FirebaseAuth.instance.currentUser?.uid;
 
     if (uid == null) {
@@ -72,6 +57,32 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
     );
     _istSaved();
     _loadFontSize();
+  }
+
+  void _maybeNavigateToAutoplay() {
+    if (_hasNavigatedToAutoplay || widget.trailers.isEmpty) {
+      return;
+    }
+
+    final orientation = MediaQuery.of(context).orientation;
+    if (orientation != Orientation.landscape) {
+      return;
+    }
+
+    _hasNavigatedToAutoplay = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed(
+        MovieView.routeName,
+        arguments: MovieViewArguments(
+          movie: widget.movie,
+          providers: widget.providers,
+          trailers: widget.trailers,
+          recommendations: widget.recommendations,
+          autoplay: true,
+        ),
+      );
+    });
   }
 
   void _istSaved() async {
@@ -94,6 +105,8 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
 
   @override
   Widget build(BuildContext context) {
+    _maybeNavigateToAutoplay();
+
     return Scaffold(
       floatingActionButton: _isFabVisible
           ? FloatingActionButton(

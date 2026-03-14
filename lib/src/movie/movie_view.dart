@@ -86,7 +86,7 @@ class MovieViewState extends State<MovieView> {
         initialVideoId: controller.model.trailers[0],
         flags: const YoutubePlayerFlags(
           mute: false,
-          autoPlay: false,
+          autoPlay: true,
           disableDragSeek: false,
           loop: false,
           isLive: false,
@@ -99,7 +99,7 @@ class MovieViewState extends State<MovieView> {
         initialVideoId: 'no_trailer',
         flags: const YoutubePlayerFlags(
           mute: false,
-          autoPlay: false,
+          autoPlay: true,
           disableDragSeek: false,
           loop: false,
           isLive: false,

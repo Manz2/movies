@@ -72,28 +72,38 @@ class Movie {
   // fromJson Methode
   factory Movie.fromJson(Map<String, dynamic> json) {
     return Movie(
-      id: json['id'],
-      title: json['title'],
-      description: json['description'],
-      fsk: json['fsk'],
-      rating: json['rating'],
-      year: json['year'],
-      duration: json['duration'],
-      image: json['image'],
-      actors: (json['actors'] as List)
-          .map((actorJson) => Actor.fromJson(actorJson))
-          .toList(),
-      genre: List<String>.from(json['genre']),
-      popularity: json['popularity'],
-      mediaType: json['MediaType'],
-      privateRating: json['privateRating'].toDouble() ?? 0,
+      id: json['id'] ?? 0,
+      title: json['title'] ?? '',
+      description: json['description'] ?? '',
+      fsk: json['fsk'] ?? '',
+      rating: int.tryParse(json['rating']?.toString() ?? '0') ?? 0,
+      year: json['year'] ?? 0,
+      duration: json['duration'] ?? 0,
+      image: json['image'] ?? '',
+      actors: (json['actors'] is List)
+          ? (json['actors'] as List)
+                .map((a) => Actor.fromJson(Map<String, dynamic>.from(a)))
+                .toList()
+          : [],
+      genre: json['genre'] != null ? List<String>.from(json['genre']) : [],
+      popularity: (json['popularity'] ?? 0).toDouble(),
+      mediaType: json['MediaType'] ?? '',
+      privateRating: (json['privateRating'] ?? 0).toDouble(),
       firebaseId: json['firebaseId'] ?? '',
       addedAt: json['addedAt'] != null
-          ? DateTime.parse(json['addedAt'])
+          ? DateTime.tryParse(json['addedAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
-      director: json['director'] is Map<String, dynamic>
-          ? Actor.fromJson(json['director'])
-          : Actor(name: json['director'] ?? '', image: '', roleName: '', id: 0, biography: '', birthday: null, deathday: null),
+      director: (json['director'] is Map)
+          ? Actor.fromJson(Map<String, dynamic>.from(json['director']))
+          : Actor(
+              name: json['director']?.toString() ?? '',
+              image: '',
+              roleName: '',
+              id: 0,
+              biography: '',
+              birthday: null,
+              deathday: null,
+            ),
     );
   }
 }

@@ -207,21 +207,27 @@ class MovieDetailsContent extends StatelessWidget {
               const SizedBox(height: 8),
               Text("Anbieter:", style: TextStyle(fontSize: fontSize)),
               const SizedBox(height: 8),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: GestureDetector(
-                  onTap: () => _launchURL(providers.link),
-                  child: Row(
-                    children: [
-                      for (final provider in providers.providers)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Image.network(provider.icon, height: 50),
-                        ),
-                    ],
+              if (providers.providers.isEmpty)
+                Text(
+                  "Aktuell keine Anbieter gefunden.",
+                  style: TextStyle(fontSize: fontSize),
+                )
+              else
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: GestureDetector(
+                    onTap: () => _launchURL(providers.link),
+                    child: Row(
+                      children: [
+                        for (final provider in providers.providers)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Image.network(provider.icon, height: 50),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
               const SizedBox(height: 8),
               if (controller.model.trailers.isNotEmpty) ...[
                 Text("Trailer:", style: TextStyle(fontSize: fontSize)),
@@ -261,13 +267,15 @@ class MovieDetailsContent extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
               ],
-              Text("Cast:", style: TextStyle(fontSize: fontSize)),
-              const SizedBox(height: 8),
-              ActorList(
-                actors: controller.model.movie.actors,
-                controller: controller,
-                fontSize: fontSize,
-              ),
+              if (controller.model.movie.actors.isNotEmpty) ...[
+                Text("Cast:", style: TextStyle(fontSize: fontSize)),
+                const SizedBox(height: 8),
+                ActorList(
+                  actors: controller.model.movie.actors,
+                  controller: controller,
+                  fontSize: fontSize,
+                ),
+              ],
               Text(
                 "Das könnte dir gefallen:",
                 style: TextStyle(fontSize: fontSize),
