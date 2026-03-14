@@ -86,7 +86,7 @@ class PushNotificationService {
     );
 
     await _localNotificationsPlugin.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
         // Extrahiere Daten aus payload falls gesetzt
         if (response.payload != null) {
@@ -117,10 +117,10 @@ class PushNotificationService {
       if (notification != null) {
         if (android != null) {
           _localNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
+            id: notification.hashCode,
+            title: notification.title,
+            body: notification.body,
+            notificationDetails: NotificationDetails(
               android: AndroidNotificationDetails(
                 'default_channel',
                 'Standard',
