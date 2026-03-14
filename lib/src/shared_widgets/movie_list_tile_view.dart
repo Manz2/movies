@@ -33,7 +33,7 @@ class MovieListTileView extends StatelessWidget {
             children: [
               const SizedBox(width: 12),
               CircleAvatar(
-                radius: 40,
+                radius: 50,
                 foregroundImage:
                     movie.image.isNotEmpty
                         ? CachedNetworkImageProvider(movie.image)
