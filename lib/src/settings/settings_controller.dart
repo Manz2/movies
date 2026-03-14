@@ -76,6 +76,37 @@ class SettingsController with ChangeNotifier {
     );
   }
 
+  Future<String?> deleteAccount(BuildContext context) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        return 'Kein eingeloggter Nutzer gefunden.';
+      }
+
+      await user.delete();
+
+      final jsonStore = JsonStore(dbName: 'movies');
+      await jsonStore.clearDataBase();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (!context.mounted) return null;
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        LoginView.routeName,
+        (route) => false,
+      );
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        return 'Bitte melde dich erneut an, bevor du den Account löschst.';
+      }
+      return e.message ?? 'Account konnte nicht gelöscht werden.';
+    } catch (_) {
+      return 'Account konnte nicht gelöscht werden.';
+    }
+  }
+
   Future<void> removeNotifications() async {
     DbServiceFirebase dbServiceFirebase = DbServiceFirebase(uid!);
     FirebaseMessaging messaging = FirebaseMessaging.instance;

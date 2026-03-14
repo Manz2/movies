@@ -250,6 +250,37 @@ class SettingsViewState extends State<SettingsView> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () async {
+                  final confirmed = await showConfirmDialog(
+                    context: context,
+                    message: 'Willst du deinen Account wirklich löschen?',
+                  );
+
+                  if (confirmed != true) return;
+                  final errorMessage = await widget.controller.deleteAccount(
+                    context,
+                  );
+
+                  if (!context.mounted) return;
+                  if (errorMessage != null) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(errorMessage)));
+                  }
+                },
+                child: Text(
+                  'Account löschen',
+                  style: TextStyle(fontSize: _fontSize),
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text("Credits:", style: TextStyle(fontSize: _fontSize)),
             ),
