@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "816692756307",
+    "firebase_url": "https://movies-1430c-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "movies-1430c",
+    "storage_bucket": "movies-1430c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816692756307:android:f2c0d02a6e25727d6deba6",
+        "android_client_info": {
+          "package_name": "com.movies2.android"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGqDZIQLLyS47WP9AU-UiD7me2R34uMtM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
