@@ -262,6 +262,7 @@ class SettingsViewState extends State<SettingsView> {
                     message: 'Willst du deinen Account wirklich löschen?',
                   );
 
+                  if (!context.mounted) return;
                   if (confirmed != true) return;
                   final errorMessage = await widget.controller.deleteAccount(
                     context,
