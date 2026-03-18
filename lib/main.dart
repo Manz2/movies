@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,8 +27,18 @@ void main() async {
   final settingsController = SettingsController(SettingsService(), uid: uid);
   await settingsController.loadSettings();
 
-  await PushNotificationService.storeInitialMessage();
-  await PushNotificationService.initialize();
-
   runApp(MyApp(settingsController: settingsController));
+  unawaited(_initializeNotificationsSafely());
+}
+
+Future<void> _initializeNotificationsSafely() async {
+  try {
+    await PushNotificationService.storeInitialMessage().timeout(
+      const Duration(seconds: 10),
+    );
+    await PushNotificationService.initialize().timeout(
+      const Duration(seconds: 20),
+    );
+  } catch (_) {
+  }
 }
