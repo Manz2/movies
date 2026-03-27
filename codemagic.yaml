@@ -37,8 +37,6 @@ workflows:
           LATEST_BUILD=$(app-store-connect get-latest-testflight-build-number --platform=IOS "$APP_STORE_APPLE_ID")
           
           flutter build ipa --release \
-            --build-name=1.0.0 \
-            --build-number=$(($LATEST_BUILD + 1)) \
             --export-options-plist=/Users/builder/export_options.plist
 
     artifacts:
