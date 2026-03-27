@@ -39,4 +39,5 @@ Movie testMovie = Movie(
   firebaseId: '',
   addedAt: DateTime.now(),
   director: testActor1,
+  imdbId: 'tt1234567',
 );

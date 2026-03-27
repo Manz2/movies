@@ -46,6 +46,7 @@ class SettingsController with ChangeNotifier {
         logger.e('Fehler beim Synchronisieren der Filme: $e');
       }
     }
+    logger.i('Filme synchronisiert');
   }
 
   Future<void> clearDataBase() async {

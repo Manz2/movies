@@ -7,11 +7,13 @@ class MovieModel {
   Providers providers;
   List<String> trailers;
   List<Movie> recommendations = [];
+  int numberOfOscars;
   MovieModel({
     required this.movie,
     required this.providers,
     required this.trailers,
     required this.recommendations,
+    required this.numberOfOscars,
   });
 }
 
@@ -39,11 +41,13 @@ class MovieViewArguments {
   List<String> trailers;
   bool? autoplay;
   List<Movie> recommendations;
+  int numberOfOscars;
   MovieViewArguments({
     required this.movie,
     required this.providers,
     required this.trailers,
     required this.recommendations,
     this.autoplay,
+    required this.numberOfOscars,
   });
 }

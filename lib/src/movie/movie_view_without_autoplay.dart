@@ -14,6 +14,7 @@ class MovieViewWithoutAutoplay extends StatefulWidget {
   final Providers providers;
   final List<String> trailers;
   final List<Movie> recommendations;
+  final int numberOfOscars;
 
   static const routeName = '/movie_details';
 
@@ -23,6 +24,7 @@ class MovieViewWithoutAutoplay extends StatefulWidget {
     required this.providers,
     required this.trailers,
     required this.recommendations,
+    required this.numberOfOscars,
   });
 
   @override
@@ -54,6 +56,7 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
       providers: widget.providers,
       trailers: widget.trailers,
       recommendations: widget.recommendations,
+      numberOfOscars: widget.numberOfOscars, // Platzhalter, wird später geladen
     );
     _istSaved();
     _loadFontSize();
@@ -80,6 +83,7 @@ class MovieViewState extends State<MovieViewWithoutAutoplay> {
           trailers: widget.trailers,
           recommendations: widget.recommendations,
           autoplay: true,
+          numberOfOscars: widget.numberOfOscars,
         ),
       );
     });

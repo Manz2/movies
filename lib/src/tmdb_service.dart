@@ -253,6 +253,8 @@ class TmdbService {
         ? List<String>.from(json['genres'].map((g) => g['name']))
         : [];
 
+    String imdbId = json['imdb_id'] ?? '';
+
     // Erstellen des Movie-Objekts
     return Movie(
       id: id,
@@ -271,6 +273,7 @@ class TmdbService {
       firebaseId: firebaseId,
       addedAt: addedAt,
       director: testActor1,
+      imdbId: imdbId,
     );
   }
 

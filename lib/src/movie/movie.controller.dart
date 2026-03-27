@@ -5,6 +5,7 @@ import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/oscar_service.dart';
 import 'package:movies/src/shared_widgets/base_controller.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,7 @@ class MovieController extends BaseController with ChangeNotifier {
   final MovieModel _model;
   final String uid;
   final DbCombinator _db;
+  final int numberOfOscars;
 
   bool _notificationSet = false;
   bool get notificationSet => _notificationSet;
@@ -23,11 +25,13 @@ class MovieController extends BaseController with ChangeNotifier {
     required Providers providers,
     required List<String> trailers,
     required List<Movie> recommendations,
+    required this.numberOfOscars,
   }) : _model = MovieModel(
          movie: movie,
          providers: providers,
          trailers: trailers,
          recommendations: recommendations,
+         numberOfOscars: numberOfOscars,
        ),
        _db = DbCombinator(uid: uid);
   final TmdbService tmdbService = TmdbService();
@@ -216,5 +220,11 @@ class MovieController extends BaseController with ChangeNotifier {
       _notificationSet = await _db.isNotificationSet(token, _model.movie);
       notifyListeners();
     }
+  }
+
+  @override
+  Future<int> getNumberOfOscars(String movieImdbId) async {
+    final awards = await OscarService.getOscarsByImdbId(movieImdbId);
+    return awards.length;
   }
 }

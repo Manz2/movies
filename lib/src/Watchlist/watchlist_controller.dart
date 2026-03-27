@@ -3,6 +3,7 @@ import 'package:movies/src/Watchlist/watchlist_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/oscar_service.dart';
 import 'package:movies/src/tmdb_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -141,5 +142,10 @@ class WatchlistController {
       logger.d('Fehler beim Laden der Trailer: $e');
       return [];
     }
+  }
+
+    Future<int> getNumberOfOscars(String movieImdbId) async {
+    final awards = await OscarService.getOscarsByImdbId(movieImdbId);
+    return awards.length;
   }
 }

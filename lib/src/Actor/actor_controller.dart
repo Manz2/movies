@@ -3,6 +3,7 @@ import 'package:movies/src/Actor/actor_model.dart';
 import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
+import 'package:movies/src/oscar_service.dart';
 import 'package:movies/src/shared_widgets/base_controller.dart';
 import 'package:movies/src/tmdb_service.dart';
 
@@ -11,9 +12,17 @@ class ActorController extends BaseController<Actor> {
   final TmdbService tmdbService = TmdbService();
   final String uid;
   final DbCombinator _db;
-  ActorController({required Actor actor, required movies, required this.uid, required bool isDirector,})
-    : _db = DbCombinator(uid: uid),
-      _model = ActorModel(actor: actor, movies: movies, isDirector: isDirector,);
+  ActorController({
+    required Actor actor,
+    required movies,
+    required this.uid,
+    required bool isDirector,
+  }) : _db = DbCombinator(uid: uid),
+       _model = ActorModel(
+         actor: actor,
+         movies: movies,
+         isDirector: isDirector,
+       );
 
   ActorModel get model => _model;
   Logger logger = Logger();
@@ -62,5 +71,11 @@ class ActorController extends BaseController<Actor> {
       logger.d('Fehler beim Laden der Trailer: $e');
       return [];
     }
+  }
+
+  @override
+  Future<int> getNumberOfOscars(String movieImdbId) async {
+    final awards = await OscarService.getOscarsByImdbId(movieImdbId);
+    return awards.length;
   }
 }

@@ -17,13 +17,11 @@ import 'package:movies/src/search/search_view.dart';
 import 'settings/settings_controller.dart';
 import 'settings/settings_view.dart';
 
-
 /// The Widget that configures your application.
 class MyApp extends StatelessWidget {
   const MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +61,7 @@ class MyApp extends StatelessWidget {
                         providers: args.providers,
                         trailers: args.trailers,
                         recommendations: args.recommendations,
+                        numberOfOscars: args.numberOfOscars,
                       );
                     } else {
                       return MovieViewWithoutAutoplay(
@@ -70,6 +69,7 @@ class MyApp extends StatelessWidget {
                         providers: args.providers,
                         trailers: args.trailers,
                         recommendations: args.recommendations,
+                        numberOfOscars: args.numberOfOscars,
                       );
                     }
                   case SearchView.routeName:

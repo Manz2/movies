@@ -111,13 +111,11 @@ class HomeViewState extends State<HomeView> {
       if (_searchText.isEmpty) {
         _controller.model.filteredMovies = _controller.model.movies;
       } else {
-        _controller.model.filteredMovies =
-            _controller.model.movies
-                .where(
-                  (m) =>
-                      m.title.toLowerCase().contains(_searchText.toLowerCase()),
-                )
-                .toList();
+        _controller.model.filteredMovies = _controller.model.movies
+            .where(
+              (m) => m.title.toLowerCase().contains(_searchText.toLowerCase()),
+            )
+            .toList();
       }
     });
   }
@@ -132,6 +130,7 @@ class HomeViewState extends State<HomeView> {
       final providers = await _controller.getProviders(movie);
       final trailers = await _controller.getTrailers(movie);
       final recommendations = await _controller.getRecommendations(movie);
+      final numberOfOscars = await _controller.getNumberOfOscars(movie.imdbId);
       if (!context.mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
       Navigator.pushNamed(
@@ -142,6 +141,7 @@ class HomeViewState extends State<HomeView> {
           providers: providers,
           trailers: trailers,
           recommendations: recommendations,
+          numberOfOscars: numberOfOscars,
         ),
       ).then((val) => _loadMovies());
     } catch (e) {
@@ -200,8 +200,8 @@ class HomeViewState extends State<HomeView> {
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder:
-                      (_) => const Center(child: CircularProgressIndicator()),
+                  builder: (_) =>
+                      const Center(child: CircularProgressIndicator()),
                 );
                 Watchlist watchlist = await _controller.getCurrentWatchlist(
                   context,
@@ -246,39 +246,37 @@ class HomeViewState extends State<HomeView> {
           RefreshIndicator(
             onRefresh: _syncMovies,
             edgeOffset: 56.0,
-            child:
-                _showCoverView
-                    ? MovieCoverCarousel(
-                      movies: _controller.model.movies,
-                      onTap: (movie) => _onMovieTap(movie, context),
-                      scrollController: _carouselScrollController,
-                    )
-                    : ListView.builder(
-                      controller: _listScrollController,
-                      padding: EdgeInsets.only(
-                        top:
-                            (!_showCoverView &&
-                                    _controller.model.movies.isNotEmpty)
-                                ? 56.0
-                                : 0.0,
-                      ),
-                      itemCount: _controller.model.filteredMovies.length,
-                      itemBuilder: (context, index) {
-                        final item = _controller.model.filteredMovies[index];
-                        return MovieListTileView(
-                          movie: item,
-                          fontSize: _fontSize,
-                          onTap: () => _onMovieTap(item, context),
-                          confirmDismiss:
-                              () => showConfirmDialog(
-                                context: context,
-                                message:
-                                    'Möchtest du "${item.title}" wirklich löschen?',
-                              ),
-                          onDismissed: () => _onMovieDelete(item, context),
-                        );
-                      },
+            child: _showCoverView
+                ? MovieCoverCarousel(
+                    movies: _controller.model.movies,
+                    onTap: (movie) => _onMovieTap(movie, context),
+                    scrollController: _carouselScrollController,
+                  )
+                : ListView.builder(
+                    controller: _listScrollController,
+                    padding: EdgeInsets.only(
+                      top:
+                          (!_showCoverView &&
+                              _controller.model.movies.isNotEmpty)
+                          ? 56.0
+                          : 0.0,
                     ),
+                    itemCount: _controller.model.filteredMovies.length,
+                    itemBuilder: (context, index) {
+                      final item = _controller.model.filteredMovies[index];
+                      return MovieListTileView(
+                        movie: item,
+                        fontSize: _fontSize,
+                        onTap: () => _onMovieTap(item, context),
+                        confirmDismiss: () => showConfirmDialog(
+                          context: context,
+                          message:
+                              'Möchtest du "${item.title}" wirklich löschen?',
+                        ),
+                        onDismissed: () => _onMovieDelete(item, context),
+                      );
+                    },
+                  ),
           ),
           if (!_showCoverView && _controller.model.movies.isNotEmpty)
             AnimatedPositioned(

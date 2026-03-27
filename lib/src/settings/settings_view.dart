@@ -296,6 +296,13 @@ class SettingsViewState extends State<SettingsView> {
                 style: TextStyle(fontSize: _fontSize),
               ),
             ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                "Oscar-Daten von David V. Lu (oscar_data), verwendet unter der BSD 2-Clause License.",
+                style: TextStyle(fontSize: _fontSize),
+              ),
+            ),
           ],
         ),
       ),

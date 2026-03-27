@@ -204,6 +204,7 @@ class WatchlistViewState extends State<WatchlistView> {
                         List<Movie> recommendations = await controller.getRecommendations(
                           movie,
                         );
+                        final numberOfOscars = await controller.getNumberOfOscars(movie.imdbId);
                         if (!context.mounted) return;
                         Navigator.of(context, rootNavigator: true).pop();
                         Navigator.pushNamed(
@@ -213,7 +214,8 @@ class WatchlistViewState extends State<WatchlistView> {
                             movie: movie,
                             providers: providers,
                             trailers: trailers,
-                            recommendations: recommendations
+                            recommendations: recommendations,
+                            numberOfOscars: numberOfOscars,
                           ),
                         ).then((val) => _loadMovies());
                       } on Exception catch (e) {

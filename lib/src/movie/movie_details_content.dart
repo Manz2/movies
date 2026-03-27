@@ -116,13 +116,42 @@ class MovieDetailsContent extends StatelessWidget {
 
               const SizedBox(height: 8),
               ExpandableText(text: movie.description, fontSize: fontSize),
-              const SizedBox(height: 8),
-              Text("FSK: ${movie.fsk}", style: TextStyle(fontSize: fontSize)),
+
               const SizedBox(height: 8),
               Text(
                 "Öffentliches Rating: ${movie.rating}",
                 style: TextStyle(fontSize: fontSize),
               ),
+              if (controller.model.numberOfOscars > 0) ...[
+                const SizedBox(height: 8),
+                Text(
+                  "Oscars: ${controller.model.numberOfOscars}",
+                  style: TextStyle(fontSize: fontSize),
+                ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      for (
+                        int i = 0;
+                        i < controller.model.numberOfOscars;
+                        i++
+                      ) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: SizedBox(
+                            height: 60,
+                            child: Image.asset(
+                              'assets/images/oscar.png',
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 8),
               Text("Jahr: ${movie.year}", style: TextStyle(fontSize: fontSize)),
               const SizedBox(height: 8),
@@ -204,6 +233,7 @@ class MovieDetailsContent extends StatelessWidget {
                   onRatingChanged: onRatingChanged,
                 ),
               ],
+
               const SizedBox(height: 8),
               Text("Anbieter:", style: TextStyle(fontSize: fontSize)),
               const SizedBox(height: 8),

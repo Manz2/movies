@@ -171,6 +171,7 @@ class PushNotificationService {
       final providers = await controller.getProviders(movie);
       final trailers = await controller.getTrailers(movie);
       final recommendations = await controller.getRecommendations(movie);
+      final numberOfOscars = await controller.getNumberOfOscars(movie.imdbId);
 
       // Close loading dialog
       if (context.mounted) {
@@ -184,6 +185,7 @@ class PushNotificationService {
           providers: providers,
           trailers: trailers,
           recommendations: recommendations,
+          numberOfOscars: numberOfOscars,
         ),
       );
     } catch (e) {

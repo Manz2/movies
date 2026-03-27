@@ -16,6 +16,7 @@ class Movie {
   DateTime addedAt;
   Actor director;
   bool onList = false;
+  String imdbId;
 
   Movie({
     required this.id,
@@ -34,11 +35,12 @@ class Movie {
     required this.firebaseId,
     required this.addedAt,
     required this.director,
+    required this.imdbId,
   });
 
   @override
   String toString() {
-    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt, director: $director}';
+    return 'Movie{id: $id, title: $title, description: $description, fsk: $fsk, rating: $rating, year: $year, duration: $duration, image: $image, actors: $actors, genre: $genre, popularity: $popularity, privateRating: $privateRating, FirebaseId: $firebaseId, addedAt: $addedAt, director: $director, imdbId: $imdbId}';
   }
 
   bool get getOnList => onList;
@@ -66,6 +68,7 @@ class Movie {
       'firebaseId': firebaseId,
       'addedAt': addedAt.toIso8601String(),
       'director': director.toJson(),
+      'imdbId': imdbId,
     };
   }
 
@@ -104,6 +107,7 @@ class Movie {
               birthday: null,
               deathday: null,
             ),
+      imdbId: json['imdbId'] ?? '',
     );
   }
 }

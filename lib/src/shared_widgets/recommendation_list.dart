@@ -46,6 +46,7 @@ class RecommendationList extends StatelessWidget {
                   );
                   List<Movie> recommendations = await controller
                       .getRecommendations(newMovie);
+                  final numberOfOscars = await controller.getNumberOfOscars(newMovie.imdbId);
                   if (!context.mounted) return;
                   Navigator.of(context, rootNavigator: true).pop();
                   Navigator.pushNamed(
@@ -56,6 +57,7 @@ class RecommendationList extends StatelessWidget {
                       providers: providers,
                       trailers: trailers,
                       recommendations: recommendations,
+                      numberOfOscars: numberOfOscars,
                     ),
                   );
                 } on Exception catch (e) {

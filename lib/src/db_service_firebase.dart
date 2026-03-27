@@ -71,6 +71,7 @@ class DbServiceFirebase implements DbServiceInterface {
         firebaseId: '',
         addedAt: DateTime.now(),
         director: testActor1,
+        imdbId: '',
       ),
     );
   }

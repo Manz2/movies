@@ -6,6 +6,7 @@ import 'package:movies/src/db_combinator.dart';
 import 'package:movies/src/home/movie.dart';
 import 'package:movies/src/movie/movie_model.dart';
 import 'package:movies/src/movie/movie_view.dart';
+import 'package:movies/src/oscar_service.dart';
 import 'package:movies/src/search/search_model.dart';
 import 'package:movies/src/tmdb_service.dart';
 
@@ -52,6 +53,7 @@ class SearchPageController {
         Providers providers = await getProviders(movie);
         List<String> trailers = await getTrailers(movie);
         List<Movie> recommendations = await getRecommendations(movie);
+        final numberOfOscars = await getNumberOfOscars(movie.imdbId);
         if (!context.mounted) return;
         Navigator.of(context, rootNavigator: true).pop();
 
@@ -62,7 +64,8 @@ class SearchPageController {
             movie: movie,
             providers: providers,
             trailers: trailers,
-            recommendations: recommendations
+            recommendations: recommendations,
+            numberOfOscars: numberOfOscars,
           ),
         );
       } on Exception catch (e) {
@@ -141,6 +144,11 @@ class SearchPageController {
       logger.d('Fehler beim Laden der Provider: $e');
       return Providers(providers: [], link: '');
     }
+  }
+
+  Future<int> getNumberOfOscars(String movieImdbId) async {
+    final awards = await OscarService.getOscarsByImdbId(movieImdbId);
+    return awards.length;
   }
 
   Future<List<String>> getTrailers(Movie movie) async {

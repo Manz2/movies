@@ -14,7 +14,7 @@ class MovieView extends StatefulWidget {
   final Providers providers;
   final List<String> trailers;
   final List<Movie> recommendations;
-
+  final int numberOfOscars;
   static const routeName = '/movie_details';
 
   const MovieView({
@@ -23,6 +23,7 @@ class MovieView extends StatefulWidget {
     required this.providers,
     required this.trailers,
     required this.recommendations,
+    required this.numberOfOscars,
   });
 
   @override
@@ -55,6 +56,7 @@ class MovieViewState extends State<MovieView> {
       providers: widget.providers,
       trailers: widget.trailers,
       recommendations: widget.recommendations,
+      numberOfOscars: widget.numberOfOscars,
     );
     _istSaved();
     _initTrailer();
